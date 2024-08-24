@@ -24,7 +24,6 @@ UpdateHistory:
 v1.0.0 Creation
 
 */
-htmx.config.useTemplateFragments = true;
 
 class HeliumDialog extends HTMLElement {
     static observedAttributes = [
@@ -810,42 +809,6 @@ class HeliumButton extends HTMLElement {
     }
 }
 
-class HeliumCrudColumn extends HTMLElement {
-    static observedAttributes = [
-        'he-data',
-        'he-filter',
-    ];
-    name = '';
-    filter = '';
-    /** @type {HTML} */
-    htmlName = null;
-    htmlFilter = null;
-
-    constructor() {
-        super();
-    }
-
-    connectedCallback() {
-    }
-
-    /**
-     * Callback for attribute changes of the web component.
-     * @param {string} name The attribute name
-     * @param {string} _oldValue The previous attribute value
-     * @param {string} newValue The new attribute value
-     */
-    attributeChangedCallback(name, _oldValue, newValue) {
-        switch (name) {
-            case 'he-date':
-                this.name = newValue;
-                break;
-            case 'he-filter':
-                this.filter = newValue;
-                break;
-        }
-    }
-}
-
 class HeliumCrudTable extends HTMLElement {
     static observedAttributes = [
         'he-endpoint',
@@ -880,7 +843,6 @@ class HeliumCrudTable extends HTMLElement {
     countChecked = 0;
     /** @type {jQuery} **/
     checkSelected = null
-
 
     constructor() {
         super();
@@ -997,33 +959,29 @@ class HeliumCrudTable extends HTMLElement {
         }
         `);
 
-        let rowColNames = document.createElement('tr');
-        // Empty `<th>` for checkboxes
-        rowColNames.append(document.createElement('th'));
+        let table = document.createElement('table');
 
-        this.checkAll = document.createElement('input');
-        this.checkAll.type = 'checkbox';
-        this.checkAll.id = 'check-all';
-        this.checkAll.onchange = (e) => this._handleChangeCheckAll.bind(this)(e);
+        this.form = document.createElement('form');
+        this.form.id = "form-tbl";
+        this.form.append(table);
 
-        let cellCheckAll = document.createElement('td');
-        cellCheckAll.append(this.checkAll);
+        shadow.append(this.form);
+        shadow.adoptedStyleSheets = [sheet];
 
         let rowFilters = document.createElement('tr');
-        rowFilters.append(cellCheckAll);
+        let rowColNames = document.createElement('tr');
 
-        for (let column of this._getColumns()) {
-            let colName = column.getAttribute('he-data') ?? '';
-
-            let cellName = document.createElement('th');
-            cellName.innerHTML = column.getAttribute('he-name');
-            rowColNames.append(cellName);
+        const columns = this.querySelectorAll('th');
+        for (let column of columns) {
+            let colName = column.getAttribute('he-column') ?? column.innerText;
+            column.setAttribute('he-column', colName);
+            rowColNames.append(column);
 
             let cellFilter = document.createElement('td');
 
             const options = this._getColumnOptions(column);
 
-            if (options.length > 0) {
+            if (options && options.length > 0) {
                 let selFilter = document.createElement('select');
                 selFilter.id = 'filter-' + colName;
                 selFilter.name = column.getAttribute('he-data') ?? '';
@@ -1046,63 +1004,86 @@ class HeliumCrudTable extends HTMLElement {
             rowFilters.append(cellFilter);
         }
 
+        this.checkAll = document.createElement('input');
+        this.checkAll.type = 'checkbox';
+        this.checkAll.id = 'check-all';
+        this.checkAll.onchange = (e) => this._handleChangeCheckAll.bind(this)(e);
+
+        // Empty `<th>` for checkboxes
+        rowColNames.prepend(document.createElement('th'));
+        let cellCheckAll = document.createElement('td');
+        cellCheckAll.append(this.checkAll);
+
+        rowFilters.prepend(cellCheckAll);
+
         let tHead = document.createElement('thead');
         tHead.append(rowColNames);
         tHead.append(rowFilters);
+        table.append(tHead);
 
         this.body = document.createElement('tbody');
 
-        let table = document.createElement('table');
-        table.append(tHead);
+        const rows = this.querySelectorAll('tr:has(td)');
+        for (const row of rows) {
+            let rowData = {};
+            for (let i=0; i<columns.length; ++i) {
+                const cell = row.children[i];
+                const column = columns[i]
+                const data = cell.getAttribute('he-data') ?? cell.innerText;
+                const colName = column.getAttribute('he-column') ?? column.innerText;
+                rowData[colName] = data;
+            }
+            let rowRendered = this._renderRow(rowData);
+            this.body.append(rowRendered);
+        }
         table.append(this.body);
 
-        this.form = document.createElement('form');
-        this.form.id = "form-tbl";
-        this.form.append(table);
-
         this.diagEdit = this._renderDialogEdit();
-
-        shadow.append(this.form);
         shadow.append(this.diagEdit);
-        shadow.adoptedStyleSheets = [sheet];
+        this.innerHTML = '';
     }
 
     /**
      * @param {HTMLElement} column
-     * @returns {Array<HTMLOptionElement>}
+     * @returns {?HTMLCollection<HTMLOptionElement>}
      */
     _getColumnOptions(column) {
-        /** @type {Array<HTMLOptionElement>} */
-        let options = [];
-        for (const child of column.children) {
-            if (child.nodeName == 'OPTION') {
-                options.push(child);
-            }
-        }
+        let selector = column.getAttribute('he-options');
 
-        return options;
+        /** @type {HTMLDataListElement} */
+        let list = document.querySelector('datalist'+selector);
+        return list == null ? null : list.children;
     }
 
-    _handleChangeFilter(_e) {
+    _handleChangeFilter(e) {
         this.offset = 0;
 
         if (this.endpoint != null) {
             this._requestRows(this._replaceBody);
             return;
         }
+
+        const filter = e.currentTarget;
+        const filterValue = filter.value.toLowerCase();
+        const colIdx = Array.prototype.indexOf.call(
+            filter.parentElement.parentElement.children, 
+            filter.parentElement
+        );
+        for (const row of this.body.children) {
+            const data = row.children[colIdx].getAttribute('he-data');
+            if (data.toLowerCase().includes(filterValue)) {
+                console.log('show')
+            } else {
+                console.log('hide')
+            }
+        }
     }
 
     /**
-     * @returns {Array<HeliumCrudColumn>}
+     * @returns {NodeListOf<HTMLTableCellElement>}
      */
     _getColumns() {
-        let columns = [];
-        for (let child of this.children) {
-            if (child.hasAttribute('he-data')) {
-                columns.push(child);
-            }
-        }
-        return columns;
+        return this.shadowRoot.querySelectorAll('th[he-column]')
     }
 
     /**
@@ -1124,7 +1105,7 @@ class HeliumCrudTable extends HTMLElement {
         row.onclick = (e) => this._handleClickRow.bind(this)(e);
 
         for (let column of this._getColumns()) {
-            let colName = column.getAttribute('he-data');
+            let colName = column.getAttribute('he-column');
             let colType = column.getAttribute('he-type');
             let cell = document.createElement('td');
             let val = data[colName] ?? '';
@@ -1432,12 +1413,8 @@ class HeliumCrudTable extends HTMLElement {
     }
 
     _renderDialogEdit() {
-        let dialog = document.createElement('dialog');
+        let dialog = document.createElement('he-dialog');
         dialog.id = 'diag-edit';
-
-        let header = document.createElement('div');
-        header.id = 'header-diag-edit';
-        dialog.append(header);
 
         this.formDialogEdit = document.createElement('form');
         this.formDialogEdit.id = 'form-diag-edit';
@@ -1457,7 +1434,7 @@ class HeliumCrudTable extends HTMLElement {
 
             const options = this._getColumnOptions(column);
 
-            if (options.length > 0) {
+            if (options && options.length > 0) {
                 let select = document.createElement('select');
                 select.id = id;
                 select.name = name;
@@ -1488,7 +1465,7 @@ class HeliumCrudTable extends HTMLElement {
         }
 
         let footer = document.createElement('div');
-        footer.id = 'fotter-diag-edit';
+        footer.id = 'footer-diag-edit';
         dialog.append(footer);
 
         let btnSave = document.createElement('button');
@@ -1639,7 +1616,7 @@ class HeliumCrudTable extends HTMLElement {
 }
 
 
-$(document).ready(function() {
+document.addEventListener("DOMContentLoaded", function() {
     customElements.define("he-dialog", HeliumDialog);
     customElements.define("he-tabs", HeliumTabs);
     customElements.define("he-select", HeliumSelect);
@@ -1647,7 +1624,6 @@ $(document).ready(function() {
     customElements.define("he-menu", HeliumMenu);
     customElements.define("he-button", HeliumButton);
     customElements.define("he-crud-table", HeliumCrudTable);
-    customElements.define("he-crud-column", HeliumCrudColumn);
 
     document.addEventListener("he-dialog-new", function(evt) {
         /** @type {HeliumDialog} */
@@ -1663,4 +1639,4 @@ $(document).ready(function() {
         }
         diag.show();
     })
-})
+});
