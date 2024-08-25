@@ -337,7 +337,7 @@ class HeliumTabs extends HTMLElement {
             check.name = 'he-tabs-idx';
             check.value = tabNr;
             check.setAttribute('hidden', 'true');
-            check.onchange = e => self.tabChangedCallback(e);
+            check.onchange = e => self.tabChangeCallback(e);
 
             if (tabNr > 0) {
                 elem.style.display = 'none';
@@ -362,7 +362,7 @@ class HeliumTabs extends HTMLElement {
      * Hides the old content and shows the new.
      * @param {Event} e
      */
-    tabChangedCallback(e) {
+    tabChangeCallback(e) {
         /** @type {HTMLInputElement} */
         const check = e.target;
         const tabNrNew = Number(check.value);
@@ -839,10 +839,6 @@ class HeliumCrudTable extends HTMLElement {
     pagination;
     /** @type {number} */
     offset = 0;
-    /** @type {number} **/
-    countChecked = 0;
-    /** @type {jQuery} **/
-    checkSelected = null
 
     constructor() {
         super();
@@ -860,7 +856,7 @@ class HeliumCrudTable extends HTMLElement {
             z-index: 100;
         }
 
-        th {
+        thead th {
             background-color: #0082b4;
             color: white;
             font-weight: 500;
@@ -869,6 +865,16 @@ class HeliumCrudTable extends HTMLElement {
             vertical-align: middle;
             text-wrap: nowrap;
             width: 0;
+        }
+
+        thead th:hover .label-sorter {
+            opacity: 0.5;
+        }
+
+        thead th div {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
         }
 
         thead td {
@@ -902,21 +908,6 @@ class HeliumCrudTable extends HTMLElement {
 
         thead select {
             padding: 0px 3px;
-        }
-
-        thead input[type=radio] + label {
-            cursor: pointer;
-            padding: 5px;
-            color: rgba(255, 255, 255, 0.5411764706);
-        }
-
-        thead input[type=radio]:hover + label {
-            cursor: pointer;
-            color: white;
-        }
-
-        thead input[type=radio]:checked + label {
-            color: white;
         }
 
         thead a {
@@ -957,6 +948,31 @@ class HeliumCrudTable extends HTMLElement {
         .check-row, #check-all {
             scale: 1.2;
         }
+
+        .cont-sorters {
+            display: inline-flex;
+            flex-direction: column;
+            font-size: 0.7rem;
+            gap: 0;
+            cursor: pointer;
+        }
+
+        .label-sorter {
+            opacity: 0;
+        }
+
+        thead th div .label-sorter:hover {
+            opacity: 1;
+        }
+
+        thead th div .label-sorter:has(input:checked) {
+            opacity: 1;
+        }
+
+        .label-sorter input {
+            display: none;
+        }
+
         `);
 
         let table = document.createElement('table');
@@ -974,7 +990,18 @@ class HeliumCrudTable extends HTMLElement {
         const columns = this.querySelectorAll('th');
         for (let column of columns) {
             let colName = column.getAttribute('he-column') ?? column.innerText;
+
+            let contHeaderCell = document.createElement('div');
+
+            let spanName = document.createElement('span');
+            spanName.innerHTML = column.innerHTML;
+            column.innerHTML = '';
+            contHeaderCell.append(spanName);
+
+            let contSorters = this._renderSorters(colName);
             column.setAttribute('he-column', colName);
+            contHeaderCell.append(contSorters);
+            column.append(contHeaderCell);
             rowColNames.append(column);
 
             let cellFilter = document.createElement('td');
@@ -985,7 +1012,7 @@ class HeliumCrudTable extends HTMLElement {
                 let selFilter = document.createElement('select');
                 selFilter.id = 'filter-' + colName;
                 selFilter.name = column.getAttribute('he-data') ?? '';
-                selFilter.onchange = (e) => this._handleChangeFilter(e);
+                selFilter.onchange = (e) => this._filterChangeCallback(e);
                 selFilter.append(document.createElement('option'));
                 for (const option of options) {
                     selFilter.append(option.cloneNode(true));
@@ -997,8 +1024,8 @@ class HeliumCrudTable extends HTMLElement {
                 inpFilter.type = 'search';
                 inpFilter.name = column.getAttribute('he-data') ?? '';
                 inpFilter.value = column.getAttribute('he-filter') ?? '';
-                inpFilter.onchange = (e) => this._handleChangeFilter(e);
-                cellFilter.append(inpFilter);
+                inpFilter.onchange = (e) => this._filterChangeCallback(e);
+                cellFilter.prepend(inpFilter);
             }
 
             rowFilters.append(cellFilter);
@@ -1007,7 +1034,7 @@ class HeliumCrudTable extends HTMLElement {
         this.checkAll = document.createElement('input');
         this.checkAll.type = 'checkbox';
         this.checkAll.id = 'check-all';
-        this.checkAll.onchange = (e) => this._handleChangeCheckAll.bind(this)(e);
+        this.checkAll.onchange = (e) => this._checkAllCheckCallback.bind(this)(e);
 
         // Empty `<th>` for checkboxes
         rowColNames.prepend(document.createElement('th'));
@@ -1026,7 +1053,7 @@ class HeliumCrudTable extends HTMLElement {
         const rows = this.querySelectorAll('tr:has(td)');
         for (const row of rows) {
             let rowData = {};
-            for (let i=0; i<columns.length; ++i) {
+            for (let i = 0; i < columns.length; ++i) {
                 const cell = row.children[i];
                 const column = columns[i]
                 const data = cell.getAttribute('he-data') ?? cell.innerText;
@@ -1044,6 +1071,45 @@ class HeliumCrudTable extends HTMLElement {
     }
 
     /**
+     * @param {string} colName The name of column for the sorters
+     * @returns HTMLDivElement
+     */
+    _renderSorters(colName) {
+        let radioSortAsc = document.createElement('input');
+        radioSortAsc.type = 'radio';
+        radioSortAsc.name = 'sort';
+        radioSortAsc.value = colName + '-asc';
+        radioSortAsc.id = colName + '-asc';
+        radioSortAsc.onclick = (e) => this._sortClickCallback.bind(this)(e, false);
+
+        let labelSortAsc = document.createElement('label');
+        labelSortAsc.for = colName + 'asc';
+        labelSortAsc.innerHTML = '▲';
+        labelSortAsc.classList.add('label-sorter');
+        labelSortAsc.append(radioSortAsc);
+
+        let radioSortDesc = document.createElement('input');
+        radioSortDesc.type = 'radio';
+        radioSortDesc.name = 'sort';
+        radioSortDesc.value = colName + '-desc';
+        radioSortDesc.id = colName + '-desc';
+        radioSortDesc.onclick = (e) => this._sortClickCallback.bind(this)(e, true);
+
+        let labelSortDesc = document.createElement('label');
+        labelSortDesc.for = colName + 'desc';
+        labelSortDesc.classList.add('label-sorter');
+        labelSortDesc.innerHTML = '▼';
+        labelSortDesc.append(radioSortDesc);
+
+        let contSorters = document.createElement('div');
+        contSorters.classList.add('cont-sorters')
+        contSorters.append(labelSortAsc);
+        contSorters.append(labelSortDesc);
+
+        return contSorters;
+    }
+
+    /**
      * @param {HTMLElement} column
      * @returns {?HTMLCollection<HTMLOptionElement>}
      */
@@ -1051,11 +1117,39 @@ class HeliumCrudTable extends HTMLElement {
         let selector = column.getAttribute('he-options');
 
         /** @type {HTMLDataListElement} */
-        let list = document.querySelector('datalist'+selector);
+        let list = document.querySelector('datalist' + selector);
         return list == null ? null : list.children;
     }
 
-    _handleChangeFilter(e) {
+
+    /**
+     * @param {InputEvent} e 
+     * @param {bool} isDesc 
+     * @returns void
+     */
+    _sortClickCallback(e, isDesc) {
+        let sort = e.currentTarget;
+        const colIdx = Array.prototype.indexOf.call(
+            sort.parentElement.parentElement.parentElement.parentElement.parentElement.children,
+            sort.parentElement.parentElement.parentElement.parentElement
+        );
+
+        let values = [];
+        for (const row of this.body.children) {
+            values.push([row.children[colIdx].getAttribute('he-data'), row]);
+        }
+
+        let newOrder = isDesc 
+            ? Array.from(values).sort((a, b) => b[0].localeCompare(a[0]))
+            : Array.from(values).sort((a, b) => a[0].localeCompare(b[0]));
+
+
+        for (const row of newOrder) {
+            this.body.append(row[1]);
+        }
+    }
+
+    _filterChangeCallback(e) {
         this.offset = 0;
 
         if (this.endpoint != null) {
@@ -1066,15 +1160,27 @@ class HeliumCrudTable extends HTMLElement {
         const filter = e.currentTarget;
         const filterValue = filter.value.toLowerCase();
         const colIdx = Array.prototype.indexOf.call(
-            filter.parentElement.parentElement.children, 
+            filter.parentElement.parentElement.children,
             filter.parentElement
         );
         for (const row of this.body.children) {
             const data = row.children[colIdx].getAttribute('he-data');
+            let hideMask = row.getAttribute('he-mask') ?? 0;
+
             if (data.toLowerCase().includes(filterValue)) {
-                console.log('show')
+                // Clear bit bit for column filter
+                hideMask &= ~1 << colIdx;
             } else {
-                console.log('hide')
+                // Set bit bit for column filter
+                hideMask |= 1 << colIdx;
+            }
+
+            row.setAttribute('he-mask', hideMask);
+
+            if (hideMask > 0) {
+                row.style.visibility = 'collapse';
+            } else {
+                row.style.visibility = null;
             }
         }
     }
@@ -1102,7 +1208,7 @@ class HeliumCrudTable extends HTMLElement {
         let row = document.createElement('tr');
         row.id = 'row-' + this.nextRowId++;
         row.append(cellCheck);
-        row.onclick = (e) => this._handleClickRow.bind(this)(e);
+        row.onclick = (e) => this._rowClickCallback.bind(this)(e);
 
         for (let column of this._getColumns()) {
             let colName = column.getAttribute('he-column');
@@ -1516,54 +1622,23 @@ class HeliumCrudTable extends HTMLElement {
             .catch(errorMsg => { console.log(errorMsg); });
     }
 
-    _handleChangeCheckRow(htmlCheck) {
-        if (htmlCheck.checked) {
-            ++this.countChecked;
-        } else if (this.countChecked > 0) {
-            --this.countChecked;
-            if (this.checkSelected && htmlCheck === this.checkSelected) {
-                this.checkSelected = null;
-            }
-        }
-
-        this._updateCheckAll();
-    }
-
     /**
      * Callback when the checkbox on top has changed.
-     * @param {HTMLInputElement} htmlCheckAll 
      * @returns void
      */
-    _handleChangeCheckAll() {
-        this.checkSelected = null;
-        for (const check of this.querySelectorAll('.check-row')) {
-            if (this.checkAll.checked && !check.hasAttribute('checked')) {
-                check.setAttribute('checked', true);
-                ++this.countChecked;
-            } else if (!this.checkAll.checked && check.hasAttribute('checked')) {
-                check.setAttribute('checked', false);
-                --this.countChecked;
+    _checkAllCheckCallback() {
+        this.checkAll.indeterminate = false;
+
+        for (const check of this.body.querySelectorAll('.check-row')) {
+            if (this.checkAll.checked) {
+                check.checked = true;
+            } else {
+                check.checked = false;
             }
         }
+
     }
 
-    _updateCheckAll() {
-        if (
-            this.countChecked === this.body.querySelectorAll('.check-row').length
-            && this.body.lastChild.id === 'row-btn-more'
-        ) {
-            this.checkAll.indeterminate = false;
-            this.checkAll.checked = true;
-        } else if (this.countChecked > 0) {
-            this.checkAll.indeterminate = true;
-            this.checkAll.checked = true;
-        } else {
-            this.checkAll.indeterminate = false;
-            this.checkAll.checked = false;
-        }
-
-        this._updateExternElements();
-    }
 
     _updateExternElements() {
         for (const elem of document.querySelectorAll(`[he-crud-table-checked="#${this.id}"]`)) {
@@ -1584,34 +1659,36 @@ class HeliumCrudTable extends HTMLElement {
         }
     }
 
-    _handleClickRow(e) {
-        const target = e.currentTarget;
-        console.log(this.countChecked);
+    /**
+     * 
+     * @param {InputEvent} e
+     * @returns void
+     */
+    _rowClickCallback(e) {
+        const row = e.currentTarget;
 
-        if (e.target === target.children[0].children[0]) {
-            return;
-        }
+        const checked = this.body.querySelectorAll('.check-row:checked');
+        let numChecked = checked.length;
 
-        if (this.checkSelected) {
-            this.checkSelected.checked = false;
-        } else {
-            ++this.countChecked;
-            this._updateCheckAll();
-        }
-
-        this.checkSelected = target.children[0].children[0];
-
-        if (this.checkSelected.checked) {
-            this.checkSelected = null;
-            if (this.countChecked > 0) {
-                --this.countChecked;
-                this._updateCheckAll();
+        if (!e.target.classList.contains('check-row')) {
+            for (let check of checked) {
+                check.checked = false;
             }
-        } else {
-            this.checkSelected.checked = true;
+
+            row.children[0].children[0].checked = true;
+            numChecked = 1;
         }
 
-        console.log(this.countChecked);
+        if (numChecked === 0) {
+            this.checkAll.checked = false;
+            this.checkAll.indeterminate = false;
+        } else if (numChecked < this.body.children.length) {
+            this.checkAll.checked = true;
+            this.checkAll.indeterminate = true;
+        } else {
+            this.checkAll.indeterminate = false;
+            this.checkAll.checked = true;
+        }
     }
 }
 
