@@ -1195,7 +1195,6 @@ class HeliumTable extends HTMLElement {
 
 
         thead input[type=search], input[type=date], select {
-            width: 100%;
             margin: 0;
             padding: 0px 7px;
             font-size: 14px;
@@ -1203,6 +1202,7 @@ class HeliumTable extends HTMLElement {
             height: 20px;
             outline: none;
             border: 0;
+            background-color: #00000026;
         }
 
         thead select {
@@ -1217,6 +1217,29 @@ class HeliumTable extends HTMLElement {
 
         thead a:hover {
             color: white;
+        }
+
+        thead .cont-filter {
+            position: relative;    
+        }
+        
+        thead .span-colname {
+            position: absolute;
+            left: 0.3rem;
+            pointer-events: none;
+            transition: 0.2s ease all;
+            top: 0px;
+            font-weight: 600;
+        }
+
+        .inp-filter {
+            color: white;
+        }
+
+        .inp-filter:focus ~ .span-colname, inp-filter:not(:placeholder-shown) ~ .span-colname {
+            top: -15px;
+            font-size: 13px;
+            opacity: 1;
         }
 
         tbody tr:nth-child(odd) {
@@ -1299,11 +1322,15 @@ class HeliumTable extends HTMLElement {
             let colName = column.getAttribute('he-column') ?? column.innerText;
 
             let contHeaderCell = document.createElement('div');
+            let contFilter = document.createElement('div');
+            contFilter.classList.add('cont-filter')
+            contHeaderCell.append(contFilter);
 
             let spanName = document.createElement('span');
             spanName.innerHTML = column.innerHTML.trim();
+            spanName.classList.add('span-colname');
             column.innerHTML = '';
-            contHeaderCell.append(spanName);
+            contFilter.append(spanName);
 
             let contSorters = this._renderSorters(colName);
             column.setAttribute('he-column', colName);
@@ -1319,20 +1346,23 @@ class HeliumTable extends HTMLElement {
                 let selFilter = document.createElement('select');
                 selFilter.id = 'filter-' + colName;
                 selFilter.name = colName;
+                selFilter.classList.add('inp-filter');
                 selFilter.onchange = (e) => this._filterChangeCallback(e);
                 selFilter.append(document.createElement('option'));
                 for (const option of options) {
                     selFilter.append(option.cloneNode(true));
                 }
-                cellFilter.append(selFilter);
+                contFilter.append(selFilter);
             } else {
                 let inpFilter = document.createElement('input');
                 inpFilter.id = 'filter-' + colName;
                 inpFilter.type = 'search';
                 inpFilter.name = colName;
+                inpFilter.placeholder = ' ';
+                inpFilter.classList.add('inp-filter');
                 inpFilter.value = column.getAttribute('he-filter') ?? '';
                 inpFilter.onchange = (e) => this._filterChangeCallback(e);
-                cellFilter.prepend(inpFilter);
+                contFilter.prepend(inpFilter);
             }
 
             rowFilters.append(cellFilter);
