@@ -27,10 +27,10 @@ v1.0.0 Creation
 
 class HeliumDialog extends HTMLElement {
     static observedAttributes = [
-        "open",
-        "title",
-        "close-icon",
-        "close-button",
+        "he-open",
+        "he-title",
+        "he-close-icon",
+        "he-close-button",
     ];
     /** @type {HTMLDialogElement} */
     dialog;
@@ -87,6 +87,12 @@ class HeliumDialog extends HTMLElement {
                 justify-content: flex-end;
                 padding: 10px;
                 gap: 5px;
+            }
+            
+            #he-title {
+                display: flex;
+                font-weight: 500;
+                align-items: center;
             }
 
             #he-diag-footer input[type=button] {
@@ -168,7 +174,7 @@ class HeliumDialog extends HTMLElement {
      * @param {string} newValue The new attribute value
      */
     attributeChangedCallback(name, _oldValue, newValue) {
-        if (name === "open") {
+        if (name === "he-open") {
             if (newValue === "true") {
                 this.dialog.showModal();
             } else {
@@ -176,11 +182,11 @@ class HeliumDialog extends HTMLElement {
             }
         }
 
-        if (name === "title") {
+        if (name === "he-title") {
             this.title.innerText = newValue;
         }
 
-        if (name === "close-button") {
+        if (name === "he-close-button") {
             if (newValue === "true") {
                 this.shadowRoot.querySelector('#he-btn-close').style.visibility = 'visible';
                 this.shadowRoot.querySelector('#he-diag-footer').style.visibility = 'visible';
@@ -190,7 +196,7 @@ class HeliumDialog extends HTMLElement {
             }
         }
 
-        if (name === "close-icon") {
+        if (name === "he-close-icon") {
             if (newValue === "true") {
                 this.shadowRoot.querySelector('#he-btn-close').style.visibility = 'visible';
             } else {
@@ -732,14 +738,14 @@ class HeliumButton extends HTMLElement {
 
         this.button = document.createElement('button');
         this.button.id = 'he-button'
-        this.button.innerHTML = this.innerHTML;
-        this.innerHTML = '';
 
         shadow.append(this.button);
         shadow.adoptedStyleSheets = [sheet];
     }
 
     connectedCallback() {
+        this.button.innerHTML = this.innerHTML;
+        this.innerHTML = '';
     }
 
     /**
@@ -809,7 +815,222 @@ class HeliumButton extends HTMLElement {
     }
 }
 
-class HeliumCrudTable extends HTMLElement {
+class HeliumFormDialog extends HTMLElement {
+    static observedAttributes = [
+        "he-open",
+        "he-title",
+        "he-close-icon",
+        "he-close-button",
+    ];
+    /** @type {HeliumDialog} */
+    dialog;
+
+    constructor() {
+        super();
+        let shadow = this.attachShadow({ mode: "open" });
+        let sheet = new CSSStyleSheet();
+
+        sheet.replaceSync(`
+            #he-form {
+                display: grid;
+                grid-template-columns: max-content 1fr;
+                gap: 0.5rem;
+                margin-bottom: 0.5rem;
+            }
+
+            #he-form input, #he-form select {
+                font-size: 16px;
+                padding: 3px 7px;
+            }
+
+            #footer-diag-edit he-button:first-child {
+                margin-right: 0.5rem;
+            }
+
+            .invalid-input {
+                border-color: red;
+            }
+            
+        `);
+
+        shadow.adoptedStyleSheets = [sheet];
+
+        this.dialog = document.createElement('he-dialog');
+
+        this.form= document.createElement('form');
+        this.form.id = 'he-form';
+        this.form.slot = 'body';
+        this.dialog.append(this.form);
+
+        let footer = document.createElement('div');
+        footer.id = 'footer-diag-edit';
+        footer.slot = 'footer';
+        this.dialog.append(footer);
+
+        let btnSave = document.createElement('he-button');
+        btnSave.innerHTML = 'Speichern';
+        btnSave.onclick = (e) => this.submit.bind(this)(e);
+        footer.append(btnSave)
+
+        let btnClose = document.createElement('he-button');
+        btnClose.innerHTML = 'Schließen';
+        btnClose.onclick = () => this.dialog.close();
+        footer.append(btnClose);
+
+        shadow.append(this.dialog);
+    }
+
+    connectedCallback() {
+        this.addEventListener("he-dialog-show", function() {
+            this.show();
+        })
+        this.addEventListener("he-dialog-close", function() {
+            this.close();
+        })
+    }
+
+    submit() {
+        // TODO(marco)
+    }
+
+    clear() {
+        for (const input of this.form.querySelectorAll('input')) {
+            input.value = '';
+        }
+    }
+
+    /**
+     * 
+     * @param {Object<string, string>} data
+     * @returns Self
+     */
+    setValues(data) {
+        for (const [name, val] of Object.entries(data)) {
+            const input = this.form.querySelector(`[name="${name}"]`);
+            if (input) {
+                input.value = val;
+            }
+        }
+
+        return this;
+    }
+
+    /**
+     * 
+     * @param {Array<{
+     *   name: string,
+     *   label: string,
+     *   pattern: ?string,
+     *   required: ?boolean,
+     *   placeholder: ?string,
+     *   value: ?string,
+     *   options: ?Object<string, string>
+     * }>} data
+     * @returns void
+     */
+    renderRows(data) {
+        this.form.innerHTML = '';
+
+        data.forEach((entry, i) => {
+            let labelText = entry.label;
+            if (entry.required) {
+                labelText += '*';
+            }
+
+            let id = `edit-${i}`;
+            let label = document.createElement('label');
+            label.for = id;
+            label.innerHTML = labelText;
+            this.form.append(label);
+
+            if (entry.options && entry.options.length > 0) {
+                let select = document.createElement('select');
+                select.id = id;
+                select.name = entry.name;
+                if (!entry.required) {
+                    select.append(document.createElement('option'));
+                }
+
+                for (const option of entry.options) {
+                    select.append(option.cloneNode(true));
+                }
+                this.form.append(select);
+            } else {
+                let input = document.createElement('input');
+                input.required = entry.required;
+                input.id = id;
+                input.name = entry.name;
+                input.type = 'text';
+                input.onblur = (e) => this._formInputBlurCallback.bind(this)(e);
+                if (entry.pattern) {
+                    input.pattern = entry.pattern;
+                }
+                if (entry.placeholder != null) {
+                    input.placeholder = entry.placeholder;
+                }
+                this.form.append(input);
+            }
+        });
+    }
+
+    /**
+     * @param {InputEvent} e
+     * @returns void
+     */
+    _formInputBlurCallback(e) {
+        const input = e.currentTarget;
+        const pattern = input.pattern
+        if (pattern == null) {
+            return;
+        }
+
+        const regex = new RegExp(pattern);
+        if (regex.test(input.value)) {
+            input.classList.remove('invalid-input');
+        } else {
+            input.classList.add('invalid-input');
+        }
+    }
+
+    /**
+     * Callback for attribute changes of the web component.
+     * @param {string} name The attribute name
+     * @param {string} _oldValue The previous attribute value
+     * @param {string} newValue The new attribute value
+     */
+    attributeChangedCallback(name, oldValue, newValue) {
+        this.dialog.attributeChangedCallback(name, oldValue, newValue);
+    }
+
+    /**
+     * Opens the dialog.
+     * @returns Self
+     */
+    show() {
+        this.dialog.show();
+        return this;
+    }
+
+    /**
+     * Opens the dialog. Alias for `show()`.
+     * @returns Self
+     */
+    showModal() {
+        this.dialog.showModal();
+        return this;
+    }
+
+    /**
+     * Closes the dialog.
+     * @return Self
+     */
+    close() {
+        this.dialog.close();
+        return this;
+    }
+}
+
+class HeliumTable extends HTMLElement {
     static observedAttributes = [
         'he-endpoint',
         'he-pagination',
@@ -825,7 +1046,7 @@ class HeliumCrudTable extends HTMLElement {
     formDialogEdit;
     /** @type {HTMLTableSectionElement} */
     body;
-    /** @type {HTMLDialogElement} */
+    /** @type {HeliumFormDialog} */
     diagEdit;
     /** @type {?Object.<string, string>} */
     dataOld;
@@ -921,23 +1142,23 @@ class HeliumCrudTable extends HTMLElement {
         }
 
         tbody tr:nth-child(odd) {
-                background-color: #f0f0f0;
-            }
+            background-color: #f0f0f0;
+        }
 
         tbody tr:hover {
-                background-color: #dcdcdc;
-            }
+            background-color: #dcdcdc;
+        }
 
         tbody td {
-                text-wrap: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                max-width: 400px;
-                padding: 3px 15px;
-                vertical-align: middle;
-                width: 0;
+            text-wrap: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 400px;
+            padding: 3px 15px;
+            vertical-align: middle;
+            width: 0;
 
-            }
+        }
 
         tbody td xmp {
             margin: 0;
@@ -972,8 +1193,13 @@ class HeliumCrudTable extends HTMLElement {
         .label-sorter input {
             display: none;
         }
-
         `);
+
+        shadow.adoptedStyleSheets = [sheet];
+    }
+
+    connectedCallback() {
+        const shadow = this.shadowRoot;
 
         let table = document.createElement('table');
 
@@ -982,7 +1208,6 @@ class HeliumCrudTable extends HTMLElement {
         this.form.append(table);
 
         shadow.append(this.form);
-        shadow.adoptedStyleSheets = [sheet];
 
         let rowFilters = document.createElement('tr');
         let rowColNames = document.createElement('tr');
@@ -994,7 +1219,7 @@ class HeliumCrudTable extends HTMLElement {
             let contHeaderCell = document.createElement('div');
 
             let spanName = document.createElement('span');
-            spanName.innerHTML = column.innerHTML;
+            spanName.innerHTML = column.innerHTML.trim();
             column.innerHTML = '';
             contHeaderCell.append(spanName);
 
@@ -1011,7 +1236,7 @@ class HeliumCrudTable extends HTMLElement {
             if (options && options.length > 0) {
                 let selFilter = document.createElement('select');
                 selFilter.id = 'filter-' + colName;
-                selFilter.name = column.getAttribute('he-data') ?? '';
+                selFilter.name = colName;
                 selFilter.onchange = (e) => this._filterChangeCallback(e);
                 selFilter.append(document.createElement('option'));
                 for (const option of options) {
@@ -1022,7 +1247,7 @@ class HeliumCrudTable extends HTMLElement {
                 let inpFilter = document.createElement('input');
                 inpFilter.id = 'filter-' + colName;
                 inpFilter.type = 'search';
-                inpFilter.name = column.getAttribute('he-data') ?? '';
+                inpFilter.name = colName;
                 inpFilter.value = column.getAttribute('he-filter') ?? '';
                 inpFilter.onchange = (e) => this._filterChangeCallback(e);
                 cellFilter.prepend(inpFilter);
@@ -1068,7 +1293,9 @@ class HeliumCrudTable extends HTMLElement {
         this.diagEdit = this._renderDialogEdit();
         shadow.append(this.diagEdit);
         this.innerHTML = '';
+        this._requestRows(this._replaceBody);
     }
+
 
     /**
      * @param {string} colName The name of column for the sorters
@@ -1139,7 +1366,7 @@ class HeliumCrudTable extends HTMLElement {
             values.push([row.children[colIdx].getAttribute('he-data'), row]);
         }
 
-        let newOrder = isDesc 
+        let newOrder = isDesc
             ? Array.from(values).sort((a, b) => b[0].localeCompare(a[0]))
             : Array.from(values).sort((a, b) => a[0].localeCompare(b[0]));
 
@@ -1226,14 +1453,9 @@ class HeliumCrudTable extends HTMLElement {
     }
 
     showDialogNew() {
-        for (let elem of this.formDialogEdit.children) {
-            if (elem.nodeName === 'INPUT') {
-                elem.value = '';
-            }
-        }
-
+        this.diagEdit.clear();
         this.editRequestType = 'POST';
-        this.diagEdit.children[0].innerHTML = 'Erstellen';
+        this.diagEdit.setAttribute('he-title', 'Erstellen');
         this.diagEdit.showModal();
     }
 
@@ -1244,26 +1466,13 @@ class HeliumCrudTable extends HTMLElement {
         }
 
         let row = check.parentElement.parentElement;
-        let data = this._getRowData(row);
+        let data = this._getRowData(row, true);
 
-        let columns = this._getColumns();
-        for (let column of columns) {
-            let colId = column.getAttribute('he-data');
-            let colType = column.getAttribute('he-type');
-            let inp = this.formDialogEdit.querySelector('#edit-' + colId)
-            if (inp != null) {
-                let val = data[colId] ?? '';
-                inp.value = this._renderCellText(val);
-                if (colType === 'data' || colType === 'datetime') {
-                    inp.value = val;
-                }
-            }
-        }
-
+        this.diagEdit.setValues(data);
         this.dataOld = data;
         this.idsEdit = [row.id];
         this.editRequestType = 'PATCH';
-        this.diagEdit.children[0].innerHTML = 'Bearbeiten';
+        this.diagEdit.setAttribute('he-title', 'Bearbeiten');
         this.diagEdit.showModal();
     }
 
@@ -1276,21 +1485,9 @@ class HeliumCrudTable extends HTMLElement {
         let row = check.parentElement.parentElement;
         let data = this._getRowData(row);
 
-        let columns = this._getColumns();
-        for (let column of columns) {
-            let colId = column.getAttribute('he-data');
-            let colType = column.getAttribute('he-type') ?? 'text';
-            let inp = this.formDialogEdit.querySelector('#edit-' + colId)
-            if (inp != null) {
-                inp.value = data[colId] ?? '';
-                if (colType === 'datetime') {
-                    inp.value = inp.value.replace(' ', 'T');
-                }
-            }
-        }
-
+        this.diagEdit.setValues(data);
         this.editRequestType = 'POST';
-        this.diagEdit.children[0].innerHTML = 'Duplizieren';
+        this.diagEdit.setAttribute('he-title', 'Duplizieren');
         this.diagEdit.showModal();
     }
 
@@ -1335,7 +1532,7 @@ class HeliumCrudTable extends HTMLElement {
     /**
      * @returns {Object.<string, string>}
      */
-    _getRowData(row) {
+    _getRowData(row, returnDisplayValues=false) {
         let data = {};
         let columns = this._getColumns();
         for (let i = 0; i < columns.length; ++i) {
@@ -1343,8 +1540,10 @@ class HeliumCrudTable extends HTMLElement {
             let cell = row.children[i + 1];
             let column = columns[i];
 
-            const colName = column.getAttribute('he-data');
-            data[colName] = cell.getAttribute('he-data');
+            const colName = column.getAttribute('he-column');
+            data[colName] = returnDisplayValues 
+                ? cell.innerText
+                : cell.getAttribute('he-data');
         }
 
         return data;
@@ -1377,10 +1576,6 @@ class HeliumCrudTable extends HTMLElement {
             })
             .catch(errorMsg => { console.log(errorMsg); });
 
-    }
-
-    connectedCallback() {
-        this._requestRows(this._replaceBody);
     }
 
     /**
@@ -1500,6 +1695,7 @@ class HeliumCrudTable extends HTMLElement {
     }
 
     /**
+     * TODO(marco): Maybe remove
      * Returns the *text* representation of a value depending on the data type.
      * @param {string} type 
      * @param {string} val 
@@ -1519,71 +1715,29 @@ class HeliumCrudTable extends HTMLElement {
     }
 
     _renderDialogEdit() {
-        let dialog = document.createElement('he-dialog');
-        dialog.id = 'diag-edit';
-
-        this.formDialogEdit = document.createElement('form');
-        this.formDialogEdit.id = 'form-diag-edit';
-        dialog.append(this.formDialogEdit);
-
+        let data = [];
         for (let column of this._getColumns()) {
-            let name = column.getAttribute('he-data');
-            let type = column.getAttribute('he-type') ?? 'text';
-            let isRequired = column.getAttribute('he-nullable') !== 'true';
-            let labelText = column.innerHTML;
-
-            let id = 'edit-' + name;
-            let label = document.createElement('label');
-            label.for = id;
-            label.innerHTML = labelText;
-            this.formDialogEdit.append(label);
-
             const options = this._getColumnOptions(column);
-
+            let optionValues = null;
             if (options && options.length > 0) {
-                let select = document.createElement('select');
-                select.id = id;
-                select.name = name;
-                if (!isRequired) {
-                    select.append(document.createElement('option'));
-                }
-
+                optionValues = [];
                 for (const option of options) {
-                    select.append(option.cloneNode(true));
+                    optionValues[option.name] = option.innerHTML;
                 }
-                this.formDialogEdit.append(select);
-            } else {
-                let input = document.createElement('input');
-                input.required = isRequired;
-                input.id = id;
-                input.name = name;
-                input.type = 'text';
-                switch (type) {
-                    case 'int':
-                        input.type = 'number';
-                        break;
-                    case 'datetime':
-                        input.type = 'datetime-local';
-                        break;
-                }
-                this.formDialogEdit.append(input);
             }
+            data.push({
+                name: column.getAttribute('he-column'),
+                required: column.getAttribute('he-required') === 'true',
+                label: column.querySelector('span').innerHTML,
+                placeholder: column.getAttribute('he-default'),
+                pattern: column.getAttribute('he-pattern'),
+                options: optionValues,
+            })
         }
 
-        let footer = document.createElement('div');
-        footer.id = 'footer-diag-edit';
-        dialog.append(footer);
-
-        let btnSave = document.createElement('button');
-        btnSave.innerHTML = 'Speichern';
-        btnSave.onclick = () => this._submitEdit();
-        footer.append(btnSave)
-
-        let btnClose = document.createElement('button');
-        btnClose.innerHTML = 'Schließen';
-        btnClose.onclick = () => dialog.close();
-        footer.append(btnClose);
-
+        /** @type {HeliumFormDialog} */
+        let dialog = document.createElement('he-form-dialog');
+        dialog.renderRows(data);
         return dialog;
     }
 
@@ -1591,6 +1745,8 @@ class HeliumCrudTable extends HTMLElement {
         let request = {
             data: [Object.fromEntries(new FormData(this.formDialogEdit).entries())],
         };
+
+        this._validateForm(request.data);
 
         if (this.dataOld != null) {
             request.old = [this.dataOld];
@@ -1639,21 +1795,20 @@ class HeliumCrudTable extends HTMLElement {
 
     }
 
-
     _updateExternElements() {
-        for (const elem of document.querySelectorAll(`[he-crud-table-checked="#${this.id}"]`)) {
-            elem.classList.remove('.he-crud-table-checked-none');
-            elem.classList.remove('.he-crud-table-checked-one');
-            elem.classList.remove('.he-crud-table-checked-multiple');
+        for (const elem of document.querySelectorAll(`[he-table-checked="#${this.id}"]`)) {
+            elem.classList.remove('.he-table-checked-none');
+            elem.classList.remove('.he-table-checked-one');
+            elem.classList.remove('.he-table-checked-multiple');
             switch (this.countChecked) {
                 case 0:
-                    elem.setAttribute('he-crud-table-state', 'none');
+                    elem.setAttribute('he-table-state', 'none');
                     break;
                 case 1:
-                    elem.setAttribute('he-crud-table-state', 'one');
+                    elem.setAttribute('he-table-state', 'one');
                     break;
                 default:
-                    elem.setAttribute('he-crud-table-state', 'multiple');
+                    elem.setAttribute('he-table-state', 'multiple');
                     break;
             }
         }
@@ -1695,12 +1850,13 @@ class HeliumCrudTable extends HTMLElement {
 
 document.addEventListener("DOMContentLoaded", function() {
     customElements.define("he-dialog", HeliumDialog);
+    customElements.define("he-form-dialog", HeliumFormDialog);
     customElements.define("he-tabs", HeliumTabs);
     customElements.define("he-select", HeliumSelect);
     customElements.define("he-help", HeliumHelp);
     customElements.define("he-menu", HeliumMenu);
     customElements.define("he-button", HeliumButton);
-    customElements.define("he-crud-table", HeliumCrudTable);
+    customElements.define("he-table", HeliumTable);
 
     document.addEventListener("he-dialog-new", function(evt) {
         /** @type {HeliumDialog} */
