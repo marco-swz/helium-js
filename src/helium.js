@@ -1133,6 +1133,7 @@ class HeliumTable extends HTMLElement {
             color: white;
             font-weight: 500;
             padding: 7px 15px;
+            padding-top: 15px;
             text-align: center;
             vertical-align: middle;
             text-wrap: nowrap;
@@ -1146,7 +1147,8 @@ class HeliumTable extends HTMLElement {
         thead th div {
             display: flex;
             align-items: center;
-            gap: 0.4rem;
+            gap: 0.7rem;
+            justify-content: space-between;
         }
 
         thead td {
@@ -1164,18 +1166,6 @@ class HeliumTable extends HTMLElement {
         thead td:last-child {
             border-radius: 0;
             padding-right: 15px;
-        }
-
-
-        thead input[type=search], input[type=date], select {
-            margin: 0;
-            padding: 0px 7px;
-            font-size: 14px;
-            font-weight: 500;
-            height: 20px;
-            outline: none;
-            border: 0;
-            background-color: #00000026;
         }
 
         thead select {
@@ -1205,13 +1195,34 @@ class HeliumTable extends HTMLElement {
             font-weight: 600;
         }
 
-        .inp-filter {
+        thead .inp-filter {
+            margin: 0;
+            padding: 0px 5px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            background-color: transparent;
+            outline: none;
+            border: 0;
             color: white;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            text-indent: 1px;
+            text-overflow: '';
         }
 
-        .inp-filter:focus ~ .span-colname, inp-filter:not(:placeholder-shown) ~ .span-colname {
-            top: -15px;
-            font-size: 13px;
+        thead .inp-filter:focus,
+        .cont-filter input:not(:placeholder-shown),
+        .cont-filter select:has(option:checked:not([value=""])) {
+            background-color: #00000026;
+            transform: translateY(5px);
+            font-weight: 600;
+        }
+
+        thead .inp-filter:focus + .span-colname, 
+        .cont-filter input:not(:placeholder-shown) + .span-colname,
+        .cont-filter select:has(option:checked:not([value=""])) + .span-colname {
+            transform: translateY(-11px);
+            font-size: 0.7rem;
             opacity: 1;
         }
 
@@ -1311,8 +1322,6 @@ class HeliumTable extends HTMLElement {
             column.append(contHeaderCell);
             rowColNames.append(column);
 
-            let cellFilter = document.createElement('td');
-
             const options = this._getColumnOptions(column);
 
             if (options && options.length > 0) {
@@ -1320,12 +1329,15 @@ class HeliumTable extends HTMLElement {
                 selFilter.id = 'filter-' + colName;
                 selFilter.name = colName;
                 selFilter.classList.add('inp-filter');
+                selFilter.style.width = column.offsetWidth + 'px';
                 selFilter.onchange = (e) => this._filterChangeCallback(e);
-                selFilter.append(document.createElement('option'));
+                let optionEmpty = document.createElement('option');
+                optionEmpty.value = '';
+                selFilter.append(optionEmpty);
                 for (const option of options) {
                     selFilter.append(option.cloneNode(true));
                 }
-                contFilter.append(selFilter);
+                contFilter.prepend(selFilter);
             } else {
                 let inpFilter = document.createElement('input');
                 inpFilter.id = 'filter-' + colName;
@@ -1334,11 +1346,10 @@ class HeliumTable extends HTMLElement {
                 inpFilter.placeholder = ' ';
                 inpFilter.classList.add('inp-filter');
                 inpFilter.value = column.getAttribute('he-filter') ?? '';
+                inpFilter.style.width = column.offsetWidth + 'px';
                 inpFilter.onchange = (e) => this._filterChangeCallback(e);
                 contFilter.prepend(inpFilter);
             }
-
-            rowFilters.append(cellFilter);
         }
 
         this.checkAll = document.createElement('input');
@@ -1346,12 +1357,9 @@ class HeliumTable extends HTMLElement {
         this.checkAll.id = 'check-all';
         this.checkAll.onchange = (e) => this._checkAllCheckCallback.bind(this)(e);
 
-        // Empty `<th>` for checkboxes
-        rowColNames.prepend(document.createElement('th'));
-        let cellCheckAll = document.createElement('td');
+        let cellCheckAll = document.createElement('th');
         cellCheckAll.append(this.checkAll);
-
-        rowFilters.prepend(cellCheckAll);
+        rowColNames.prepend(cellCheckAll);
 
         let tHead = document.createElement('thead');
         tHead.append(rowColNames);
@@ -1381,6 +1389,15 @@ class HeliumTable extends HTMLElement {
         this._requestRows(this._replaceBody);
     }
 
+    connectedCallback() {
+        for (let cont of this.form.querySelectorAll('.cont-filter')) {
+            let input = cont.querySelector('.span-colname');
+            let filter = cont.querySelector('.inp-filter');
+            filter.style.width = input.offsetWidth + 'px';
+            console.log(input.offsetWidth)
+        }
+        this._requestRows(this._replaceBody);
+    }
 
     /**
      * @param {string} colName The name of column for the sorters
@@ -1477,15 +1494,15 @@ class HeliumTable extends HTMLElement {
         const filter = e.currentTarget;
         const filterValue = filter.value.toLowerCase();
         const colIdx = Array.prototype.indexOf.call(
-            filter.parentElement.parentElement.children,
-            filter.parentElement
+            filter.parentElement.parentElement.parentElement.parentElement.children,
+            filter.parentElement.parentElement.parentElement
         );
         for (const row of this.body.children) {
             const data = row.children[colIdx].getAttribute('he-data');
             let hideMask = row.getAttribute('he-mask') ?? 0;
 
             if (data.toLowerCase().includes(filterValue)) {
-                // Clear bit bit for column filter
+                // Clear bit for column filter
                 hideMask &= ~1 << colIdx;
             } else {
                 // Set bit bit for column filter
