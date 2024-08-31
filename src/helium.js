@@ -857,7 +857,7 @@ class HeliumFormDialog extends HTMLElement {
 
         this.dialog = document.createElement('he-dialog');
 
-        this.form= document.createElement('form');
+        this.form = document.createElement('form');
         this.form.id = 'he-form';
         this.form.slot = 'body';
         this.dialog.append(this.form);
@@ -869,7 +869,8 @@ class HeliumFormDialog extends HTMLElement {
 
         let btnSave = document.createElement('he-button');
         btnSave.innerHTML = 'Speichern';
-        btnSave.onclick = (e) => this.submit.bind(this)(e);
+        btnSave.id = 'btn-save';
+        btnSave.onclick = () => this.submit.bind(this)();
         footer.append(btnSave)
 
         let btnClose = document.createElement('he-button');
@@ -889,8 +890,88 @@ class HeliumFormDialog extends HTMLElement {
         })
     }
 
-    submit() {
-        // TODO(marco)
+    getValues(validate = true) {
+        let values = {};
+        for (const input of this.body.querySelectorAll('input, select')) {
+            if (this._formInputBlurCallback({ currentTarget: input })) {
+                values[input.name] = input.value;
+            }
+        }
+        return values;
+    }
+
+    /**
+     * 
+     * @param {?string} enpoint 
+     * @param {?Object<string, string>} fetchArgs 
+     * @param {?function(RequestInit): RequestInit} callbackBefore
+     * @param {?function(Response): any} callbackAfter
+     * @returns void
+     */
+    submit(endpoint, fetchArgs, callbackBefore, callbackAfter) {
+        let values = {};
+        for (const input of this.form.querySelectorAll('input, select')) {
+            if (!this._formInputBlurCallback({ currentTarget: input })) {
+                return;
+            }
+            values[input.name] = input.value;
+        }
+
+        endpoint = endpoint
+            ?? this.getAttribute('he-endpoint')
+            ?? this.getAttribute('action');
+
+        fetchArgs = fetchArgs ?? {};
+        fetchArgs.method = fetchArgs.method
+            ?? this.getAttribute('he-method')
+            ?? this.getAttribute('method')
+            ?? 'POST';
+        fetchArgs.headers = fetchArgs.headers
+            ?? this.getAttribute('he-headers');
+        fetchArgs.body = JSON.stringify(values);
+
+        callbackBefore = callbackBefore ?? this.getAttribute('he-before-submit');
+        if (callbackBefore) {
+            console.log(callbackBefore)
+            fetchArgs = eval(callbackBefore + '(fetchArgs)');
+        }
+
+        callbackAfter = callbackAfter ?? this.getAttribute('he-after-submit');
+
+        this.dialog.querySelector('#btn-save').loading();
+
+        fetch(endpoint, fetchArgs)
+            .then(resp => {
+                this.dialog.querySelector('#btn-save').loading(false);
+
+                if (callbackAfter) {
+                    eval(callbackAfter + '(resp)');
+                }
+
+                const event = new CustomEvent("he-form-dialog-submit", {
+                    detail: {
+                        source: this.id,
+                        data: resp,
+                    }
+                });
+
+                this.dispatchEvent(event);
+            });
+    }
+
+    /**
+     * 
+     * @param {HTMLInputElement} input
+     * @returns boolean
+     */
+    _validateInput(input) {
+        const pattern = input.pattern
+        if (pattern == null) {
+            return true;
+        }
+
+        const regex = new RegExp(pattern);
+        return regex.test(input.value);
     }
 
     clear() {
@@ -975,21 +1056,18 @@ class HeliumFormDialog extends HTMLElement {
 
     /**
      * @param {InputEvent} e
-     * @returns void
+     * @returns boolean
      */
     _formInputBlurCallback(e) {
         const input = e.currentTarget;
-        const pattern = input.pattern
-        if (pattern == null) {
-            return;
-        }
-
-        const regex = new RegExp(pattern);
-        if (regex.test(input.value)) {
+        const isValid = this._validateInput(input);
+        if (isValid) {
             input.classList.remove('invalid-input');
         } else {
             input.classList.add('invalid-input');
         }
+
+        return isValid;
     }
 
     /**
@@ -1201,6 +1279,10 @@ class HeliumTable extends HTMLElement {
     connectedCallback() {
         const shadow = this.shadowRoot;
 
+        this.id = this.id == '' 
+            ? 'he-table-' + Math.floor(Math.random() * (1e10 + 1))
+            : this.id;
+
         let table = document.createElement('table');
 
         this.form = document.createElement('form');
@@ -1355,6 +1437,11 @@ class HeliumTable extends HTMLElement {
      * @returns void
      */
     _sortClickCallback(e, isDesc) {
+        if (this.endpoint) {
+            this._requestRows(this._replaceBody);
+            return;
+        }
+
         let sort = e.currentTarget;
         const colIdx = Array.prototype.indexOf.call(
             sort.parentElement.parentElement.parentElement.parentElement.parentElement.children,
@@ -1483,7 +1570,7 @@ class HeliumTable extends HTMLElement {
         }
 
         let row = check.parentElement.parentElement;
-        let data = this._getRowData(row);
+        let data = this._getRowData(row, true);
 
         this.diagEdit.setValues(data);
         this.editRequestType = 'POST';
@@ -1532,7 +1619,7 @@ class HeliumTable extends HTMLElement {
     /**
      * @returns {Object.<string, string>}
      */
-    _getRowData(row, returnDisplayValues=false) {
+    _getRowData(row, returnDisplayValues = false) {
         let data = {};
         let columns = this._getColumns();
         for (let i = 0; i < columns.length; ++i) {
@@ -1541,7 +1628,7 @@ class HeliumTable extends HTMLElement {
             let column = columns[i];
 
             const colName = column.getAttribute('he-column');
-            data[colName] = returnDisplayValues 
+            data[colName] = returnDisplayValues
                 ? cell.innerText
                 : cell.getAttribute('he-data');
         }
@@ -1610,7 +1697,7 @@ class HeliumTable extends HTMLElement {
 
         let columns = this._getColumns();
         for (let i = 0; i < columns.length; ++i) {
-            const colName = columns[i].getAttribute('he-data');
+            const colName = columns[i].getAttribute('he-column');
             const colType = columns[i].getAttribute('he-type') ?? 'text';
             const val = newData[colName];
             if (val == null) {
@@ -1622,7 +1709,6 @@ class HeliumTable extends HTMLElement {
             cell.setAttribute('he-data', val);
             cell.innerHTML = this._renderCellText(colType, val);
         }
-
     }
 
     /**
@@ -1633,6 +1719,8 @@ class HeliumTable extends HTMLElement {
         this.body.innerHTML = '';
         this.offset = 0;
 
+        this.checkAll.checked = false;
+        this.checkAll.indeterminate = false;
 
         let renderMore = false;
         if (this.pagination != null && data.length > this.pagination) {
@@ -1738,44 +1826,59 @@ class HeliumTable extends HTMLElement {
         /** @type {HeliumFormDialog} */
         let dialog = document.createElement('he-form-dialog');
         dialog.renderRows(data);
+
+        dialog.setAttribute('he-endpoint', this.endpoint);
+        dialog.setAttribute('he-before-submit', `document.querySelector('#${this.id}').formEditBeforeSubmitCallback`);
+        dialog.setAttribute('he-after-submit', `document.querySelector('#${this.id}').formEditAfterSubmitCallback`);
         return dialog;
     }
 
-    _submitEdit() {
-        let request = {
-            data: [Object.fromEntries(new FormData(this.formDialogEdit).entries())],
+    /**
+     * 
+     * @param {RequestInit} request
+     * @returns request
+     */
+    formEditBeforeSubmitCallback(request) {
+        request.body = {
+                data: [JSON.parse(request.body)],
         };
 
-        this._validateForm(request.data);
-
         if (this.dataOld != null) {
-            request.old = [this.dataOld];
+            request.body.old = [this.dataOld];
+        }
+        request.method = this.editRequestType,
+        request.headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
         }
 
-        fetch(this.endpoint, {
-            method: this.editRequestType,
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(request),
-        })
-            .then(resp => resp.json())
-            .then(data => {
-                switch (this.editRequestType) {
-                    case 'POST':
-                        this._requestRows(this._replaceBody);
-                        break;
-                    case 'PATCH':
-                        data.forEach((entry, i) => {
-                            const rowId = this.idsEdit[i];
-                            this.replaceRowData(rowId, entry);
-                        });
-                        break;
-                }
-                this.diagEdit.close();
-            })
-            .catch(errorMsg => { console.log(errorMsg); });
+        request.body = JSON.stringify(request.body);
+
+        return request;
+    }
+
+
+    /**
+     * 
+     * @param {Response} response
+     * @returns void
+     */
+    formEditAfterSubmitCallback(response) {
+        response.json().then(data => {
+            switch (this.editRequestType) {
+                case 'POST':
+                    this._requestRows(this._replaceBody);
+                    break;
+                case 'PATCH':
+                    data.forEach((entry, i) => {
+                        const rowId = this.idsEdit[i];
+                        this.replaceRowData(rowId, entry);
+                    });
+                    break;
+            }
+            this.diagEdit.close();
+        });
+
     }
 
     /**
