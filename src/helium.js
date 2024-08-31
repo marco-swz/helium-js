@@ -1,30 +1,3 @@
-/*
-                             __         .__         .__
-___  ______   ____   _______/  |______  |  | ______ |__| ____   ____
-\  \/ /  _ \_/ __ \ /  ___/\   __\__  \ |  | \____ \|  |/    \_/ __ \
- \   (  <_> )  ___/ \___ \  |  |  / __ \|  |_|  |_> >  |   |  \  ___/
-  \_/ \____/ \___  >____  > |__| (____  /____/   __/|__|___|  /\___  >
-                 \/     \/            \/     |__|           \/     \/
-
-Description:
-Helium is a custom webcomponent library, containing useful UI elements for various use cases.
-The content and functionality will grow as needed.
-
-So far, the following UI elements are implemented:
-- Dialog: A dialog with better handling than the native `dialog`
-- Tabs: Switch between predefined pages using tabs
-- Select: A wrapper around `select2`
-
-File: helium.js
-Author: Marco Schwarz | U681181
-Version: 1.0.0
-Creation: 2024-08-06 15:31:40
-Update: 2024-08-06 15:31:40
-UpdateHistory:
-v1.0.0 Creation
-
-*/
-
 class HeliumDialog extends HTMLElement {
     static observedAttributes = [
         "he-open",
