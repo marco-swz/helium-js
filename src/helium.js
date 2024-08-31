@@ -1386,16 +1386,13 @@ class HeliumTable extends HTMLElement {
         this.diagEdit = this._renderDialogEdit();
         shadow.append(this.diagEdit);
         this.innerHTML = '';
-        this._requestRows(this._replaceBody);
-    }
 
-    connectedCallback() {
         for (let cont of this.form.querySelectorAll('.cont-filter')) {
             let input = cont.querySelector('.span-colname');
             let filter = cont.querySelector('.inp-filter');
             filter.style.width = input.offsetWidth + 'px';
-            console.log(input.offsetWidth)
         }
+
         this._requestRows(this._replaceBody);
     }
 
@@ -1971,6 +1968,111 @@ class HeliumTable extends HTMLElement {
 }
 
 
+class HeliumCheck extends HTMLElement {
+    static observedAttributes = [
+        'title,'
+    ];
+
+    /** @type {HTMLInputElement} */
+    check;
+    /** @type {HTMLSpanElement} */
+    mark;
+
+    constructor() {
+        super();
+        let shadow = this.attachShadow({ mode: "open" });
+
+        let sheet = new CSSStyleSheet();
+        sheet.replaceSync(`
+.container {
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 22px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 25px;
+    width: 25px;
+    background-color: #eee;
+}
+
+.container:hover input ~ .checkmark {
+    background-color: #ccc;
+}
+
+.container input:checked ~ .checkmark {
+    background-color: #2196F3;
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.container input:checked ~ .checkmark:after {
+    display: block;
+}
+
+.container .checkmark:after {
+    left: 9px;
+    top: 5px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+} 
+        `);
+
+        let container = document.createElement('div');
+        container.classList.add('container');
+
+        this.check = document.createElement('input');
+        this.check.type = 'checkbox';
+        container.append(this.check);
+
+        this.mark = document.createElement('span');
+        this.mark.classList.add('checkmark');
+        container.append(this.mark);
+
+        shadow.append(container);
+        shadow.adoptedStyleSheets = [sheet];
+    }
+
+    connectedCallback() {
+    }
+
+    /**
+     * Callback for attribute changes of the web component.
+     * @param {string} name The attribute name
+     * @param {string} _oldValue The previous attribute value
+     * @param {string} newValue The new attribute value
+     */
+    attributeChangedCallback(name, _oldValue, newValue) {
+    }
+}
+
 document.addEventListener("DOMContentLoaded", function() {
     customElements.define("he-dialog", HeliumDialog);
     customElements.define("he-form-dialog", HeliumFormDialog);
@@ -1980,6 +2082,7 @@ document.addEventListener("DOMContentLoaded", function() {
     customElements.define("he-menu", HeliumMenu);
     customElements.define("he-button", HeliumButton);
     customElements.define("he-table", HeliumTable);
+    customElements.define("he-check", HeliumCheck);
 
     document.addEventListener("he-dialog-new", function(evt) {
         /** @type {HeliumDialog} */
