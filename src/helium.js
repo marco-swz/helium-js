@@ -1980,6 +1980,7 @@ class HeliumTable extends HTMLElement {
 
 
 class HeliumCheck extends HTMLElement {
+    static formAssociated = true;
     static observedAttributes = [
         'title,'
     ];
@@ -1988,9 +1989,12 @@ class HeliumCheck extends HTMLElement {
     check;
     /** @type {HTMLSpanElement} */
     mark;
+    /** @type {ElementInternals} */
+    internals;
 
     constructor() {
         super();
+        this.internals = this.attachInternals();
         let shadow = this.attachShadow({ mode: "open" });
 
         let sheet = new CSSStyleSheet();
@@ -2068,6 +2072,7 @@ class HeliumCheck extends HTMLElement {
 
         this.mark = document.createElement('div');
         this.mark.classList.add('checkmark');
+        this.mark.onclick = () => this.internals.setFormValue('true');
         container.append(this.mark);
 
         shadow.append(container);
