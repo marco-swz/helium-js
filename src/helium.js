@@ -623,6 +623,7 @@ class HeliumButton extends HTMLElement {
         'he-loading',
         'he-show-dialog',
         'he-close-dialog',
+        'he-submit',
     ];
     /** @type {HTMLInputElement} */
     button;
@@ -741,6 +742,9 @@ class HeliumButton extends HTMLElement {
                     this.listenerClick = this.addEventListener('click', this._closeDialog());
                 }
                 break;
+            case 'he-submit':
+                this.addEventListener('click', () => this._submitForm())
+                break;
             default:
                 if (newValue === null || newValue === 'false') {
                     this.button.removeAttribute(name);
@@ -775,6 +779,13 @@ class HeliumButton extends HTMLElement {
      */
     enable() {
         this.removeAttribute('disabled');
+    }
+
+    _submitForm() {
+        const id = this.getAttribute('he-submit');
+        const form = document.querySelector(id);
+        console.assert(form == null, `No form found with ID ${id}`)
+        form.submit();
     }
 
     _showDialog() {
@@ -1286,7 +1297,7 @@ class HeliumTable extends HTMLElement {
     connectedCallback() {
         const shadow = this.shadowRoot;
 
-        this.id = this.id == '' 
+        this.id = this.id == ''
             ? 'he-table-' + Math.floor(Math.random() * (1e10 + 1))
             : this.id;
 
@@ -1857,13 +1868,13 @@ class HeliumTable extends HTMLElement {
      */
     formEditBeforeSubmitCallback(request) {
         request.body = {
-                data: [JSON.parse(request.body)],
+            data: [JSON.parse(request.body)],
         };
 
         if (this.dataOld != null) {
             request.body.old = [this.dataOld];
         }
-        request.method = this.editRequestType,
+        request.method = this.editRequestType;
         request.headers = {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
@@ -1990,7 +2001,7 @@ class HeliumCheck extends HTMLElement {
     padding-left: 35px;
     margin-bottom: 12px;
     cursor: pointer;
-    font-size: 22px;
+    <--font-size: 22px;-->
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -2012,14 +2023,15 @@ class HeliumCheck extends HTMLElement {
     height: 25px;
     width: 25px;
     background-color: #eee;
+    transform: scale(var(--he-check-scale, 1)) translateY(-5px);
 }
 
 .container:hover input ~ .checkmark {
-    background-color: #ccc;
+    background-color: var(--he-check-clr-check, #ccc);
 }
 
 .container input:checked ~ .checkmark {
-    background-color: #2196F3;
+    background-color: var(--he-check-clr-box, #2196F3);
 }
 
 .checkmark:after {
@@ -2045,14 +2057,16 @@ class HeliumCheck extends HTMLElement {
 } 
         `);
 
-        let container = document.createElement('div');
+        let container = document.createElement('label');
         container.classList.add('container');
+        container.innerHTML = this.innerHTML;
+        this.innerHTML = '';
 
         this.check = document.createElement('input');
         this.check.type = 'checkbox';
         container.append(this.check);
 
-        this.mark = document.createElement('span');
+        this.mark = document.createElement('div');
         this.mark.classList.add('checkmark');
         container.append(this.mark);
 

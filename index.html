@@ -39,7 +39,17 @@
         </tr>
         </table>
     </he-table>
-    <he-check></he-check>
+    <form action="/test" id="form1">
+        <he-check id="check1">Check</he-check>
+        <he-button he-submit="#form1">Submit</he-button>
+    </form>
+
 </body>
+<style>
+#check1 {
+    --he-check-scale: 1;
+    font-size: 12px;
+}
+</style>
 
 </html>
