@@ -1131,6 +1131,8 @@ class HeliumTable extends HTMLElement {
         sheet.replaceSync(`
         table {
             border-spacing: 0;
+            border-collapse: separate;
+            border-radius: var(--he-table-radius, 4px);
         }
 
         thead {
@@ -1140,8 +1142,8 @@ class HeliumTable extends HTMLElement {
         }
 
         thead th {
-            background-color: #0082b4;
-            color: white;
+            background-color: var(--he-table-clr-accent, #0082b4);
+            color: var(--he-table-clr-bg, white);
             font-weight: 500;
             padding: 7px 15px;
             padding-top: 15px;
@@ -1195,6 +1197,7 @@ class HeliumTable extends HTMLElement {
 
         thead .cont-filter {
             position: relative;    
+            width: 100%;
         }
         
         thead .span-colname {
@@ -1215,10 +1218,25 @@ class HeliumTable extends HTMLElement {
             outline: none;
             border: 0;
             color: white;
+            width: 100%;
             -webkit-appearance: none;
             -moz-appearance: none;
             text-indent: 1px;
             text-overflow: '';
+            border-radius: var(--he-table-filter-radius, 2px);
+        }
+
+        tbody tr:last-child td:first-child {
+            border-bottom-left-radius: var(--he-table-radius, 4px);
+        }
+        tbody tr:last-child td:last-child {
+            border-bottom-right-radius: var(--he-table-radius, 4px);
+        }
+        thead tr:first-child th:first-child {
+            border-top-left-radius: var(--he-table-radius, 4px);
+        }
+        thead tr:first-child th:last-child {
+            border-top-right-radius: var(--he-table-radius, 4px);
         }
 
         thead .inp-filter:focus,
@@ -1235,6 +1253,10 @@ class HeliumTable extends HTMLElement {
             transform: translateY(-11px);
             font-size: 0.7rem;
             opacity: 1;
+        }
+        
+        tbody {
+            min-height: 15px;
         }
 
         tbody tr:nth-child(odd) {
@@ -1260,6 +1282,21 @@ class HeliumTable extends HTMLElement {
             margin: 0;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        tbody #row-btn-more {
+            background-color: var(--he-table-clr-accent, #0082b4);
+            color: var(--he-table-clr-bg, white);
+            cursor: pointer;
+            text-align: center;
+        }
+
+        tbody #row-btn-more:hover {
+            filter: brightness(110%);
+        }
+
+        tbody #row-btn-more td {
+            padding: 0.3rem;
         }
 
         .check-row, #check-all {
@@ -1288,6 +1325,39 @@ class HeliumTable extends HTMLElement {
 
         .label-sorter input {
             display: none;
+        }
+
+        table[he-loading] {
+            pointer-events: none;
+            cursor: no-drop;
+        }
+
+        table[he-loading] tbody {
+            position: relative;
+        }
+
+        table[he-loading] tbody::after {
+            content: "";
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: auto;
+            background: linear-gradient(-90deg, #dbd8d8 0%, #fcfcfc 50%, #dbd8d8 100%);
+            background-size: 400% 400%;
+            animation: pulse 1.2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                background-position: 0% 0%
+            }
+            100% {
+                background-position: -135% 0%
+            }
         }
         `);
 
@@ -1340,7 +1410,6 @@ class HeliumTable extends HTMLElement {
                 selFilter.id = 'filter-' + colName;
                 selFilter.name = colName;
                 selFilter.classList.add('inp-filter');
-                selFilter.style.width = column.offsetWidth + 'px';
                 selFilter.onchange = (e) => this._filterChangeCallback(e);
                 let optionEmpty = document.createElement('option');
                 optionEmpty.value = '';
@@ -1354,10 +1423,10 @@ class HeliumTable extends HTMLElement {
                 inpFilter.id = 'filter-' + colName;
                 inpFilter.type = 'search';
                 inpFilter.name = colName;
+                inpFilter.autocomplete = 'off';
                 inpFilter.placeholder = ' ';
                 inpFilter.classList.add('inp-filter');
                 inpFilter.value = column.getAttribute('he-filter') ?? '';
-                inpFilter.style.width = column.offsetWidth + 'px';
                 inpFilter.onchange = (e) => this._filterChangeCallback(e);
                 contFilter.prepend(inpFilter);
             }
@@ -1401,7 +1470,7 @@ class HeliumTable extends HTMLElement {
         for (let cont of this.form.querySelectorAll('.cont-filter')) {
             let input = cont.querySelector('.span-colname');
             let filter = cont.querySelector('.inp-filter');
-            filter.style.width = input.offsetWidth + 'px';
+            filter.style.minWidth = input.offsetWidth + 'px';
         }
 
         this._requestRows(this._replaceBody);
@@ -1534,6 +1603,26 @@ class HeliumTable extends HTMLElement {
         return this.shadowRoot.querySelectorAll('th[he-column]')
     }
 
+   /**
+     * TODO(marco): Maybe remove
+     * Returns the *text* representation of a value depending on the data type.
+     * @param {string} type 
+     * @param {string} val 
+     * @returns string
+     */
+    _renderCellText(type, val) {
+        switch (type) {
+            case 'date':
+                return val.split('-').reverse().join('.');
+            case 'datetime':
+                val = val.replace('T', ' ');
+                const [date, time] = val.split(' ');
+                return date.split('-').reverse().join('.') + ' ' + time;
+            default:
+                return val;
+        }
+    }
+
     /**
      * @param {Object.<string, string>} data 
      * @returns {HTMLTableRowElement}
@@ -1606,7 +1695,15 @@ class HeliumTable extends HTMLElement {
         this.diagEdit.showModal();
     }
 
-    deleteChecked() {
+    loading(enable=true) {
+        if (enable) {
+            this.body.parentElement.setAttribute('he-loading', true);
+        } else {
+            this.body.parentElement.removeAttribute('he-loading');
+        }
+    }
+
+    deleteChecked(confirm=true) {
         let checks = this.shadowRoot.querySelectorAll('.check-row:checked');
 
         let request = {
@@ -1625,23 +1722,33 @@ class HeliumTable extends HTMLElement {
             return;
         }
 
-        if (!window.confirm(`Es werden ${numDelete} Zeilen gelöscht.\nSind Sie sicher?`)) {
+        const msg = numDelete > 1 
+            ? `werden ${numDelete} Zeilen`
+            : `wird 1 Zeile`;
+        if (confirm && !window.confirm(`Es ${msg} gelöscht.\nSind Sie sicher?`)) {
             return;
         }
 
-        fetch(this.endpoint, {
-            method: 'DELETE',
-            body: request,
-        })
-            .then(resp => resp.json())
-            .then(data => {
-                data.foreach((delStatus, i) => {
-                    if (delStatus) {
-                        checks[i].parentElement.parentElement.remove();
-                    }
-                })
+        if (this.endpoint != null) {
+            fetch(this.endpoint, {
+                method: 'DELETE',
+                body: request,
             })
-            .catch(errorMsg => { console.log(errorMsg); });
+                .then(resp => resp.json())
+                .then(data => {
+                    data.foreach((delStatus, i) => {
+                        if (delStatus) {
+                            checks[i].parentElement.parentElement.remove();
+                        }
+                    })
+                })
+                .catch(errorMsg => { console.log(errorMsg); });
+            return;
+        }
+
+        for (const check of checks) {
+            check.parentElement.parentElement.remove();
+        }
     }
 
     /**
@@ -1675,6 +1782,8 @@ class HeliumTable extends HTMLElement {
             return;
         }
 
+        this.loading();
+
         let formData = new FormData(this.form);
 
         if (this.pagination != null) {
@@ -1689,7 +1798,8 @@ class HeliumTable extends HTMLElement {
             .then(data => {
                 callback.bind(this)(data);
             })
-            .catch(errorMsg => { console.log(errorMsg); });
+            .catch(errorMsg => { console.log(errorMsg); })
+            .finally(() => this.loading(false));
 
     }
 
@@ -1774,6 +1884,7 @@ class HeliumTable extends HTMLElement {
         row.id = 'row-btn-more';
         let cell = document.createElement('td');
         cell.colSpan = '100';
+        cell.title = 'Mehr anzeigen';
         cell.innerHTML = 'Mehr anzeigen';
         cell.onclick = () => this._handlePagination();
 
@@ -1810,26 +1921,6 @@ class HeliumTable extends HTMLElement {
         }
     }
 
-    /**
-     * TODO(marco): Maybe remove
-     * Returns the *text* representation of a value depending on the data type.
-     * @param {string} type 
-     * @param {string} val 
-     * @returns string
-     */
-    _renderCellText(type, val) {
-        switch (type) {
-            case 'date':
-                return val.split('-').reverse().join('.');
-            case 'datetime':
-                val = val.replace('T', ' ');
-                const [date, time] = val.split(' ');
-                return date.split('-').reverse().join('.') + ' ' + time;
-            default:
-                return val;
-        }
-    }
-
     _renderDialogEdit() {
         let data = [];
         for (let column of this._getColumns()) {
@@ -1841,6 +1932,11 @@ class HeliumTable extends HTMLElement {
                     optionValues[option.name] = option.innerHTML;
                 }
             }
+
+            if (column.getAttribute('he-noedit') === 'true') {
+                continue;
+            }
+
             data.push({
                 name: column.getAttribute('he-column'),
                 required: column.getAttribute('he-required') === 'true',
