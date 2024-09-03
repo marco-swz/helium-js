@@ -58,8 +58,8 @@ class HeliumDialog extends HTMLElement {
             #he-diag-header {
                 display: flex;
                 justify-content: space-between;
-                background-color: var(--he-color-accent, #0082b4);
-                color: white;
+                background-color: var(--he-dialog-clr-title, #0082b4);
+                color: var(--he-dialog-clr-title-text, white);
                 padding: 3px 10px;
             }
 
@@ -1627,13 +1627,13 @@ class HeliumTable extends HTMLElement {
         return this.shadowRoot.querySelectorAll('th[he-column]')
     }
 
-   /**
-     * TODO(marco): Maybe remove
-     * Returns the *text* representation of a value depending on the data type.
-     * @param {string} type 
-     * @param {string} val 
-     * @returns string
-     */
+    /**
+      * TODO(marco): Maybe remove
+      * Returns the *text* representation of a value depending on the data type.
+      * @param {string} type 
+      * @param {string} val 
+      * @returns string
+      */
     _renderCellText(type, val) {
         switch (type) {
             case 'date':
@@ -1719,7 +1719,7 @@ class HeliumTable extends HTMLElement {
         this.diagEdit.showModal();
     }
 
-    loading(enable=true) {
+    loading(enable = true) {
         if (enable) {
             this.body.parentElement.setAttribute('he-loading', true);
         } else {
@@ -1727,7 +1727,7 @@ class HeliumTable extends HTMLElement {
         }
     }
 
-    deleteChecked(confirm=true) {
+    deleteChecked(confirm = true) {
         let checks = this.shadowRoot.querySelectorAll('.check-row:checked');
 
         let request = {
@@ -1746,7 +1746,7 @@ class HeliumTable extends HTMLElement {
             return;
         }
 
-        const msg = numDelete > 1 
+        const msg = numDelete > 1
             ? `werden ${numDelete} Zeilen`
             : `wird 1 Zeile`;
         if (confirm && !window.confirm(`Es ${msg} gelöscht.\nSind Sie sicher?`)) {
@@ -2256,7 +2256,7 @@ class HeliumCheck extends HTMLElement {
                 if (newValue == null || newValue === 'false') {
                     this.indeterminate = false;
                 } else {
-                    this.indeterminate= true;
+                    this.indeterminate = true;
                 }
                 break;
         }
@@ -2265,6 +2265,39 @@ class HeliumCheck extends HTMLElement {
     toggle() {
         this.checked = !this.checked;
     }
+}
+
+function showDialogTemp(evt, type) {
+    /** @type {HeliumDialog} */
+    let diag = document.querySelector('#he-dialog-temp');
+    if (diag === null) {
+        diag = document.createElement('he-dialog');
+        diag.id = 'he-dialog-temp';
+        switch (type) {
+            case 'error':
+                diag.style.setProperty('--he-dialog-clr-title', 'indianred');
+                diag.setAttribute('he-title', 'Fehler');
+                break;
+            case 'warn':
+                diag.style.setProperty('--he-dialog-clr-title', 'orange');
+                diag.setAttribute('he-title', 'Warnung');
+                break;
+            case 'success':
+                diag.style.setProperty('--he-dialog-clr-title', 'seagreen');
+                diag.setAttribute('he-title', 'Erfolg');
+                break;
+            default:
+                diag.style.removeProperty('--he-dialog-clr-title');
+                diag.removeAttribute('he-title');
+                break;
+        }
+        document.body.append(diag);
+    }
+
+    if (evt.detail && evt.detail.value) {
+        diag.setBody(evt.detail.value);
+    }
+    diag.show();
 }
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -2278,18 +2311,19 @@ document.addEventListener("DOMContentLoaded", function() {
     customElements.define("he-table", HeliumTable);
     customElements.define("he-check", HeliumCheck);
 
-    document.addEventListener("he-dialog-new", function(evt) {
-        /** @type {HeliumDialog} */
-        let diag = document.querySelector('#he-dialog-temp');
-        if (diag === null) {
-            diag = document.createElement('he-dialog');
-            diag.id = 'he-dialog-temp';
-            document.body.append(diag);
-        }
+    document.addEventListener("he-dialog", function(e) {
+        showDialogTemp(e);
+    })
 
-        if (evt.detail && evt.detail.value) {
-            diag.setBody(evt.detail.value);
-        }
-        diag.show();
+    document.addEventListener("he-dialog-error", function(e) {
+        showDialogTemp(e, 'error');
+    })
+
+    document.addEventListener("he-dialog-warn", function(e) {
+        showDialogTemp(e, 'warn');
+    })
+
+    document.addEventListener("he-dialog-success", function(e) {
+        showDialogTemp(e, 'success');
     })
 });
