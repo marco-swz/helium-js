@@ -1,3 +1,11 @@
+function scss(text) {
+    return text;
+}
+
+function html(text) {
+    return text;
+}
+
 class HeliumDialog extends HTMLElement {
     static observedAttributes = [
         "he-open",
@@ -15,7 +23,7 @@ class HeliumDialog extends HTMLElement {
         let shadow = this.attachShadow({ mode: "open" });
         let sheet = new CSSStyleSheet();
 
-        sheet.replaceSync(`
+        sheet.replaceSync(scss`
             #he-diag-outer {
                 outline: none;
                 padding: 0;
@@ -231,7 +239,7 @@ class HeliumTabs extends HTMLElement {
         let shadow = this.attachShadow({ mode: "open" });
         let sheet = new CSSStyleSheet();
 
-        sheet.replaceSync(`
+        sheet.replaceSync(scss`
             #he-tabs-nav {
                 display: flex;
             }
@@ -435,7 +443,7 @@ class HeliumHelp extends HTMLElement {
         let shadow = this.attachShadow({ mode: "open" });
 
         let sheet = new CSSStyleSheet();
-        sheet.replaceSync(`
+        sheet.replaceSync(scss`
             #he-help-btn {
                 display: inline-block;
                 width: 1.2rem;
@@ -509,7 +517,7 @@ class HeliumMenu extends HTMLElement {
         let shadow = this.attachShadow({ mode: "open" });
 
         let sheet = new CSSStyleSheet();
-        sheet.replaceSync(`
+        sheet.replaceSync(scss`
 :host {
     position: relative;
     display: inline-block;
@@ -635,79 +643,79 @@ class HeliumButton extends HTMLElement {
         let shadow = this.attachShadow({ mode: "open" });
 
         let sheet = new CSSStyleSheet();
-        sheet.replaceSync(`
-:host {
-    --he-color-accent: #0082b4;
-}
+        sheet.replaceSync(scss`
+        :host {
+            --he-color-accent: #0082b4;
+        }
 
-#he-button {
-    border-radius: 2px;
-    color: black;
-    height: 35px;
-    padding: 0px 10px;
-    vertical-align: middle;
-    text-align: center;
-    border: 1px solid rgba(0, 0, 0, 0.2235294118);
-    font-size: 14px;
-    background-color: white;
-    outline-style: none;
-    box-shadow: none !important;
-    width: auto;
-    position: relative;
-}
+        #he-button {
+            border-radius: 2px;
+            color: black;
+            height: 35px;
+            padding: 0px 10px;
+            vertical-align: middle;
+            text-align: center;
+            border: 1px solid rgba(0, 0, 0, 0.2235294118);
+            font-size: 14px;
+            background-color: white;
+            outline-style: none;
+            box-shadow: none !important;
+            width: auto;
+            position: relative;
+        }
 
-#he-button[disabled] {
-    background-color: #d9d9d9;
-    color: #666666;
-    cursor: no-drop;
-    text-shadow: none;
-}
+        #he-button[disabled] {
+            background-color: #d9d9d9;
+            color: #666666;
+            cursor: no-drop;
+            text-shadow: none;
+        }
 
-#he-button:hover:enabled:not([he-loading]), 
-#he-button:active:enabled:not([he-loading]), 
-#he-button:focus:enabled:not([he-loading]) {
-    cursor: pointer;
-    text-shadow: 0px 0px 0.3px #0082b4;
-    border-color: var(--he-color-accent);
-    color: var(--he-color-accent);
-}
+        #he-button:hover:enabled:not([he-loading]), 
+        #he-button:active:enabled:not([he-loading]), 
+        #he-button:focus:enabled:not([he-loading]) {
+            cursor: pointer;
+            text-shadow: 0px 0px 0.3px #0082b4;
+            border-color: var(--he-color-accent);
+            color: var(--he-color-accent);
+        }
 
-#he-button:hover:enabled:not([he-loading]){
-    background-color: #0082b40d;
-}
+        #he-button:hover:enabled:not([he-loading]){
+            background-color: #0082b40d;
+        }
 
-#he-button[he-loading] {
-    background-color: #d9d9d9;
-    color: #6666668c;
-    cursor: no-drop;
-    text-shadow: none;
-}
+        #he-button[he-loading] {
+            background-color: #d9d9d9;
+            color: #6666668c;
+            cursor: no-drop;
+            text-shadow: none;
+        }
 
-#he-button[he-loading]::after {
-    content: "";
-    position: absolute;
-    width: 16px;
-    height: 16px;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    margin: auto;
-    border: 4px solid transparent;
-    border-top-color: var(--he-color-accent);
-    border-radius: 50%;
-    animation: button-loading-spinner 1s ease infinite;
-}
+        #he-button[he-loading]::after {
+            content: "";
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: auto;
+            border: 4px solid transparent;
+            border-top-color: var(--he-color-accent);
+            border-radius: 50%;
+            animation: button-loading-spinner 1s ease infinite;
+        }
 
-@keyframes button-loading-spinner {
-    from {
-        transform: rotate(0turn);
-    }
+        @keyframes button-loading-spinner {
+            from {
+                transform: rotate(0turn);
+            }
 
-    to {
-        transform: rotate(1turn);
-    }
-}
+            to {
+                transform: rotate(1turn);
+            }
+        }
         `);
 
         this.button = document.createElement('button');
@@ -814,27 +822,35 @@ class HeliumFormDialog extends HTMLElement {
         let shadow = this.attachShadow({ mode: "open" });
         let sheet = new CSSStyleSheet();
 
-        sheet.replaceSync(`
+        sheet.replaceSync(scss`
             #he-form {
                 display: grid;
                 grid-template-columns: max-content 1fr;
                 gap: 0.5rem;
+                margin: 0.5rem;
                 margin-bottom: 0.5rem;
             }
 
             #he-form input, #he-form select {
                 font-size: 16px;
                 padding: 3px 7px;
+                outline: none;
+                border: 1px solid grey;
+                background-color: whitesmoke;
+                border-radius: var(--he-form-dialog-radius-input, 2px);
+            }
+
+            #he-form input:focus, #he-form select:focus {
+                border-color: var(--he-form-dialog-clr-focus, black);
             }
 
             #footer-diag-edit he-button:first-child {
                 margin-right: 0.5rem;
             }
 
-            .invalid-input {
-                border-color: red;
+            #he-form .invalid-input {
+                border: 1px solid red;
             }
-            
         `);
 
         shadow.adoptedStyleSheets = [sheet];
@@ -950,6 +966,11 @@ class HeliumFormDialog extends HTMLElement {
      */
     _validateInput(input) {
         const pattern = input.pattern
+
+        if (input.required && input.value === '') {
+            return false;
+        }
+
         if (pattern == null) {
             return true;
         }
@@ -1008,7 +1029,7 @@ class HeliumFormDialog extends HTMLElement {
             label.innerHTML = labelText;
             this.form.append(label);
 
-            if (entry.options && entry.options.length > 0) {
+            if (entry.options && Object.keys(entry.options).length > 0) {
                 let select = document.createElement('select');
                 select.id = id;
                 select.name = entry.name;
@@ -1016,8 +1037,11 @@ class HeliumFormDialog extends HTMLElement {
                     select.append(document.createElement('option'));
                 }
 
-                for (const option of entry.options) {
-                    select.append(option.cloneNode(true));
+                for (const [value, text] of Object.entries(entry.options)) {
+                    const opt = document.createElement('option');
+                    opt.value = value;
+                    opt.innerHTML = text;
+                    select.append(opt);
                 }
                 this.form.append(select);
             } else {
@@ -1128,7 +1152,7 @@ class HeliumTable extends HTMLElement {
         let shadow = this.attachShadow({ mode: "open" });
 
         let sheet = new CSSStyleSheet();
-        sheet.replaceSync(`
+        sheet.replaceSync(scss`
         table {
             border-spacing: 0;
             border-collapse: separate;
@@ -1929,7 +1953,7 @@ class HeliumTable extends HTMLElement {
             if (options && options.length > 0) {
                 optionValues = [];
                 for (const option of options) {
-                    optionValues[option.name] = option.innerHTML;
+                    optionValues[option.value] = option.innerHTML;
                 }
             }
 
@@ -2078,11 +2102,10 @@ class HeliumTable extends HTMLElement {
 class HeliumCheck extends HTMLElement {
     static formAssociated = true;
     static observedAttributes = [
-        'title,'
+        'he-name',
+        'he-indeterminate',
     ];
 
-    /** @type {HTMLInputElement} */
-    check;
     /** @type {HTMLSpanElement} */
     mark;
     /** @type {ElementInternals} */
@@ -2090,85 +2113,87 @@ class HeliumCheck extends HTMLElement {
 
     constructor() {
         super();
-        this.internals = this.attachInternals();
         let shadow = this.attachShadow({ mode: "open" });
 
         let sheet = new CSSStyleSheet();
-        sheet.replaceSync(`
-.container {
-    display: block;
-    position: relative;
-    padding-left: 35px;
-    margin-bottom: 12px;
-    cursor: pointer;
-    <--font-size: 22px;-->
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
+        sheet.replaceSync(scss`
+        :host {
+            display: inline-block;
+            width: fit-content;
+        }
 
-.container input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
-}
+        .container {
+            display: block;
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
 
-.checkmark {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 25px;
-    width: 25px;
-    background-color: #eee;
-    transform: scale(var(--he-check-scale, 1)) translateY(-5px);
-}
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 25px;
+            width: 25px;
+            background-color: #eee;
+            border-radius: var(--he-check-radius, 3px);
+            transform: scale(var(--he-check-scale, 0.7)) translateY(-5px);
+        }
 
-.container:hover input ~ .checkmark {
-    background-color: var(--he-check-clr-check, #ccc);
-}
+        :host(:hover) .checkmark {
+            background-color: var(--he-check-clr-check, #ccc);
+        }
 
-.container input:checked ~ .checkmark {
-    background-color: var(--he-check-clr-box, #2196F3);
-}
+        :host(:state(checked)) .checkmark {
+            background-color: var(--he-check-clr-box, #2196F3);
+        }
 
-.checkmark:after {
-    content: "";
-    position: absolute;
-    display: none;
-}
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
 
-.container input:checked ~ .checkmark:after {
-    display: block;
-}
+        :host(:state(checked)) .checkmark:after {
+            display: block;
+        }
 
-.container .checkmark:after {
-    left: 9px;
-    top: 5px;
-    width: 5px;
-    height: 10px;
-    border: solid white;
-    border-width: 0 3px 3px 0;
-    -webkit-transform: rotate(45deg);
-    -ms-transform: rotate(45deg);
-    transform: rotate(45deg);
-} 
+        :host(:state(checked):state(indeterminate)) .checkmark:after {
+            display: block;
+            -webkit-transform: rotate(0deg);
+            -ms-transform: rotate(0deg);
+            transform: rotate(0deg);
+            height: 0px;
+            top: 11px;
+            width: 7px;
+            left: 7px;
+        }
+
+        .checkmark:after {
+            left: 8px;
+            top: 2px;
+            width: 5px;
+            height: 12px;
+            border: solid white;
+            border-width: 0 4px 4px 0;
+            -webkit-transform: rotate(45deg);
+            -ms-transform: rotate(45deg);
+            transform: rotate(45deg);
+        } 
         `);
 
-        let container = document.createElement('label');
+        let container = document.createElement('div');
         container.classList.add('container');
         container.innerHTML = this.innerHTML;
         this.innerHTML = '';
 
-        this.check = document.createElement('input');
-        this.check.type = 'checkbox';
-        container.append(this.check);
-
         this.mark = document.createElement('div');
         this.mark.classList.add('checkmark');
-        this.mark.onclick = () => this.internals.setFormValue('true');
         container.append(this.mark);
 
         shadow.append(container);
@@ -2176,6 +2201,44 @@ class HeliumCheck extends HTMLElement {
     }
 
     connectedCallback() {
+        this.internals = this.attachInternals();
+        this.addEventListener('click', () => this.toggle());
+    }
+
+    set checked(val) {
+        if (val) {
+            this.setAttribute('checked', true);
+            this.internals.states.add('checked');
+            this.internals.setFormValue('on', 'checked');
+        } else {
+            this.removeAttribute('checked');
+            this.internals.states.delete('checked');
+            this.internals.setFormValue(null);
+        }
+    }
+
+    get checked() {
+        return this.internals.states.has('checked');
+    }
+
+    set name(val) {
+        this.setAttribute('name', val);
+    }
+
+    get name() {
+        return this.getAttribute('name');
+    }
+
+    set indeterminate(val) {
+        if (val) {
+            this.internals.states.add('indeterminate');
+        } else {
+            this.internals.states.delete('indeterminate');
+        }
+    }
+
+    get indeterminate() {
+        return this.internals.states.has('indeterminate');
     }
 
     /**
@@ -2185,6 +2248,22 @@ class HeliumCheck extends HTMLElement {
      * @param {string} newValue The new attribute value
      */
     attributeChangedCallback(name, _oldValue, newValue) {
+        switch (name) {
+            case 'he-name':
+                this.name = newValue;
+                break;
+            case 'he-indeterminate':
+                if (newValue == null || newValue === 'false') {
+                    this.indeterminate = false;
+                } else {
+                    this.indeterminate= true;
+                }
+                break;
+        }
+    }
+
+    toggle() {
+        this.checked = !this.checked;
     }
 }
 
