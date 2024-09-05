@@ -632,6 +632,7 @@ class HeliumButton extends HTMLElement {
         'he-show-dialog',
         'he-close-dialog',
         'he-submit',
+        'he-input-invalid',
     ];
     /** @type {HTMLInputElement} */
     button;
@@ -752,6 +753,13 @@ class HeliumButton extends HTMLElement {
                 break;
             case 'he-submit':
                 this.addEventListener('click', () => this._submitForm())
+                break;
+            case 'he-input-invalid':
+                if (newValue) {
+                    this.disable();
+                } else {
+                    this.enable();
+                }
                 break;
             default:
                 if (newValue === null || newValue === 'false') {
@@ -932,7 +940,6 @@ class HeliumFormDialog extends HTMLElement {
 
         callbackBefore = callbackBefore ?? this.getAttribute('he-before-submit');
         if (callbackBefore) {
-            console.log(callbackBefore)
             fetchArgs = eval(callbackBefore + '(fetchArgs)');
         }
 
@@ -2300,6 +2307,124 @@ function showDialogTemp(evt, type) {
     diag.show();
 }
 
+class HeliumInput extends HTMLElement {
+    static formAssociated = true;
+    static observedAttributes = [
+        'pattern',
+        'required',
+        'he-report-validity',
+    ];
+
+    /** @type {HTMLInputElement} */
+    input;
+    /** @type {ElementInternals} */
+    internals;
+
+    constructor() {
+        super();
+        let shadow = this.attachShadow({ mode: "open" });
+
+        let sheet = new CSSStyleSheet();
+        sheet.replaceSync(scss`
+            :host {
+                display: inline-flex;
+            }
+
+            #inp-main {
+                outline: none;
+                background-color: var(--he-input-clr-bg, whitesmoke);
+                border: 1px solid lightgrey;
+                width: var(--he-input-width, 100%);
+                padding: 0.3rem 0.4rem;
+                font-size: var(--he-input-fs, 14px);
+                border-radius: 3px;
+            }
+
+            #inp-main:hover, #inp-main:focus {
+                border-color: var(--he-input-clr-border-hover, black);
+            }
+
+            #inp-main[valid=false] {
+                border-color: var(--he-input-clr-border-invalid, indianred);
+            }
+        `);
+
+        this.input = document.createElement('input');
+        this.input.type = 'text';
+        this.input.id = 'inp-main';
+        this.input.required = true;
+
+        shadow.append(this.input);
+        shadow.adoptedStyleSheets = [sheet];
+    }
+
+    connectedCallback() {
+        this.internals = this.attachInternals();
+        this.input.onchange = () => this.checkValidity.bind(this)();
+    }
+
+    checkValidity() {
+        const validity = this.input.validity;
+        if (validity.valid) {
+            this.input.setAttribute('valid', true);
+        } else {
+            this.input.setAttribute('valid', false);
+        }
+
+        const reportSelector = this.getAttribute('he-report-invalid');
+        if (reportSelector) {
+            console.assert(
+                this.id && this.id !== '',
+                'The input cannot report its validity if it has no ID'
+            );
+            const id = '#' + this.id;
+            const elems = document.querySelectorAll(reportSelector);
+            for (const elem of elems) {
+                const validList = elem.getAttribute('he-input-invalid') ?? '';
+                let validSet = new Set(validList.split(' '));
+                if (validity.valid) {
+                    validSet.delete(id)
+                } else {
+                    validSet.add(id);
+                }
+
+                if (validSet.size === 0) {
+                    elem.removeAttribute('he-input-invalid');
+                    continue;
+                }
+
+                elem.setAttribute('he-input-invalid', Array.from(validSet).join(' '));
+            }
+        }
+    }
+
+    set name(val) {
+        this.setAttribute('name', val);
+    }
+
+    get name() {
+        return this.getAttribute('name');
+    }
+
+    /**
+     * Callback for attribute changes of the web component.
+     * @param {string} name The attribute name
+     * @param {string} _oldValue The previous attribute value
+     * @param {string} newValue The new attribute value
+     */
+    attributeChangedCallback(name, _oldValue, newValue) {
+        switch (name) {
+            default:
+                if (newValue) {
+                    this.input.setAttribute(name, newValue);
+                } else {
+                    this.input.removeAttribute(name);
+                }
+                break;
+        }
+    }
+}
+
 document.addEventListener("DOMContentLoaded", function() {
     customElements.define("he-dialog", HeliumDialog);
     customElements.define("he-form-dialog", HeliumFormDialog);
@@ -2310,6 +2435,7 @@ document.addEventListener("DOMContentLoaded", function() {
     customElements.define("he-button", HeliumButton);
     customElements.define("he-table", HeliumTable);
     customElements.define("he-check", HeliumCheck);
+    customElements.define("he-input", HeliumInput);
 
     document.addEventListener("he-dialog", function(e) {
         showDialogTemp(e);
