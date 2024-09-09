@@ -6,6 +6,48 @@ function html(text) {
     return text;
 }
 
+function preventDefault(e) {
+    e.preventDefault();
+}
+
+function preventDefaultForScrollKeys(e) {
+    // left: 37, up: 38, right: 39, down: 40,
+    // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
+    var keys = { 37: 1, 38: 1, 39: 1, 40: 1 };
+    if (keys[e.keyCode]) {
+        preventDefault(e);
+        return false;
+    }
+}
+
+// modern Chrome requires { passive: false } when adding event
+var supportsPassive = false;
+try {
+    window.addEventListener("test", null, Object.defineProperty({}, 'passive', {
+        get: function() { supportsPassive = true; }
+    }));
+} catch (e) { }
+
+var wheelOpt = supportsPassive ? { passive: false } : false;
+var wheelEvent = 'onwheel' in document.createElement('div') ? 'wheel' : 'mousewheel';
+
+// call this to Disable
+function disableScroll() {
+    window.addEventListener('DOMMouseScroll', preventDefault, false); // older FF
+    window.addEventListener(wheelEvent, preventDefault, wheelOpt); // modern desktop
+    window.addEventListener('touchmove', preventDefault, wheelOpt); // mobile
+    window.addEventListener('keydown', preventDefaultForScrollKeys, false);
+}
+
+// call this to Enable
+function enableScroll() {
+    window.removeEventListener('DOMMouseScroll', preventDefault, false);
+    window.removeEventListener(wheelEvent, preventDefault, wheelOpt);
+    window.removeEventListener('touchmove', preventDefault, wheelOpt);
+    window.removeEventListener('keydown', preventDefaultForScrollKeys, false);
+}
+
+
 class HeliumDialog extends HTMLElement {
     static observedAttributes = [
         "he-open",
@@ -376,7 +418,7 @@ class HeliumTabs extends HTMLElement {
     }
 }
 
-class HeliumSelect extends HTMLElement {
+class HeliumSelect2 extends HTMLElement {
     static observedAttributes = [
         "allowClear",
         "amdLanguageBase",
@@ -645,10 +687,6 @@ class HeliumButton extends HTMLElement {
 
         let sheet = new CSSStyleSheet();
         sheet.replaceSync(scss`
-        :host {
-            --he-color-accent: #0082b4;
-        }
-
         #he-button {
             border-radius: 2px;
             color: black;
@@ -658,7 +696,7 @@ class HeliumButton extends HTMLElement {
             text-align: center;
             border: 1px solid rgba(0, 0, 0, 0.2235294118);
             font-size: 14px;
-            background-color: white;
+            background-color: var(--he-button-clr-bg, white);
             outline-style: none;
             box-shadow: none !important;
             width: auto;
@@ -676,13 +714,13 @@ class HeliumButton extends HTMLElement {
         #he-button:active:enabled:not([he-loading]), 
         #he-button:focus:enabled:not([he-loading]) {
             cursor: pointer;
-            text-shadow: 0px 0px 0.3px #0082b4;
-            border-color: var(--he-color-accent);
-            color: var(--he-color-accent);
+            text-shadow: 0px 0px 0.3px var(--he-button-clr-border-hover);
+            border-color: var(--he-button-clr-border-hover, black);
+            color: var(--he-button-clr-border-hover, black);
         }
 
         #he-button:hover:enabled:not([he-loading]){
-            background-color: #0082b40d;
+            background-color: color-mix(in srgb,var(--he-button-clr-bg, white),black 2%)
         }
 
         #he-button[he-loading] {
@@ -703,7 +741,7 @@ class HeliumButton extends HTMLElement {
             bottom: 0;
             margin: auto;
             border: 4px solid transparent;
-            border-top-color: var(--he-color-accent);
+            border-top-color: var(--he-button-clr-spinner, black);
             border-radius: 50%;
             animation: button-loading-spinner 1s ease infinite;
         }
@@ -2311,7 +2349,9 @@ class HeliumInput extends HTMLElement {
     static formAssociated = true;
     static observedAttributes = [
         'pattern',
+        'he-pattern',
         'required',
+        'he-required',
         'he-report-validity',
     ];
 
@@ -2360,9 +2400,16 @@ class HeliumInput extends HTMLElement {
 
     connectedCallback() {
         this.internals = this.attachInternals();
-        this.input.onchange = () => this.checkValidity.bind(this)();
+        this.input.onchange = () => this.inputChangedCallback.bind(this)();
     }
 
+    focus() {
+        this.input.focus();
+    }
+
+    /**
+     * @returns boolean
+     */
     checkValidity() {
         const validity = this.input.validity;
         if (validity.valid) {
@@ -2396,6 +2443,8 @@ class HeliumInput extends HTMLElement {
                 elem.setAttribute('he-input-invalid', Array.from(validSet).join(' '));
             }
         }
+
+        return validity.valid;
     }
 
     set name(val) {
@@ -2423,7 +2472,305 @@ class HeliumInput extends HTMLElement {
                 break;
         }
     }
+
+    inputChangedCallback() {
+        if (this.checkValidity()) {
+            this.internals.setFormValue(this.input.value);
+        }
+    }
 }
+
+class HeliumPopover extends HTMLElement {
+    static observedAttributes = [
+        'he-attach',
+        'he-position',
+        'he-open,',
+        'he-trigger',
+    ];
+    /** @type {HTMLDivElement} */
+    popover;
+    /** @type {?HTMLElement} */
+    attach;
+
+    constructor() {
+        super();
+        let shadow = this.attachShadow({ mode: "open" });
+
+        let sheet = new CSSStyleSheet();
+        sheet.replaceSync(scss`
+            :host {
+                border: 1px solid black;
+                position: fixed;
+                margin-top: var(--he-popover-outer-gap, 0.2rem);
+                margin-buttom: var(--he-popover-outer-gap, 0.2rem);
+                box-shadow: 1px 1px 5px #808080c9;
+                z-index: 10;
+            }
+
+        `);
+
+        this.popover = document.createElement('div');
+        this.popover.id = 'popover';
+        this.popover.style.display = 'none';
+
+        const slot = document.createElement('slot');
+        slot.name = 'content';
+        this.popover.append(slot);
+
+        shadow.append(this.popover);
+        shadow.adoptedStyleSheets = [sheet];
+    }
+
+    connectedCallback() {
+        const attachElem = this.getAttribute('he-attach');
+        if (attachElem == null) {
+            throw new Error('Ho attachment element defined!');
+        }
+
+        this.attach = document.querySelector(attachElem);
+        if (this.attach == null) {
+            throw new Error('Attachment element not found!');
+        }
+
+        window.addEventListener('click', () => this.hide.bind(this)())
+        this.addEventListener('click', (e) => e.stopPropagation())
+
+        const trigger = this.getAttribute('he-trigger') ?? 'click';
+        this.attach.addEventListener(trigger, (e) => this.triggeredCallback.bind(this)(e));
+    }
+
+    /**
+     * Callback for attribute changes of the web component.
+     * @param {string} name The attribute name
+     * @param {string} _oldValue The previous attribute value
+     * @param {string} newValue The new attribute value
+     */
+    attributeChangedCallback(name, _oldValue, newValue) {
+        switch (name) {
+            case 'he-open':
+                if (newValue == null || newValue === 'false') {
+                    this.popover.hide();
+                } else {
+                    this.popover.show();
+                }
+
+                break;
+            default:
+                break;
+        }
+    }
+
+    hide() {
+        this.removeAttribute('he-open');
+        this.moveToTarget(this.attach, 'bottom-right');
+        this.popover.style.display = 'none';
+    }
+
+    show() {
+        this.moveToTarget(this.attach, 'bottom-right');
+        this.popover.style.display = '';
+        this.setAttribute('he-open', 'true');
+    }
+
+    /**
+     * 
+     * @param {InputEvent} e 
+     * @returns void
+     */
+    triggeredCallback(e) {
+        e.stopPropagation();
+        const open = this.getAttribute('he-open')
+        if (open == null || open === 'false') {
+            this.show();
+        } else {
+            this.hide();
+        }
+    }
+
+    /**
+     * @param {HTMLElement} elem 
+     * @returns void
+     */
+    moveToTarget(elem, position) {
+        const rect = elem.getBoundingClientRect();
+        this.style.left = rect.left + 'px';
+        this.style.top = rect.top + 'px';
+
+        switch (position) {
+            case 'bottom-right':
+                this.style.left = rect.left + 'px';
+                this.style.top = rect.bottom + 'px';
+                break;
+            default:
+                throw new Error('Invalid position');
+        }
+
+    }
+}
+
+class HeliumSelect extends HTMLElement {
+    static formAssociated = true;
+    static observedAttributes = [
+    ];
+    /** @type {HTMLDivElement} */
+    popover;
+    /** @type {HTMLInputElement} */
+    filter;
+    /** @type {HTMLElement} */
+    options;
+    /** @type {ElementInternals} */
+    internals;
+
+    constructor() {
+        super();
+        let shadow = this.attachShadow({ mode: "open" });
+        this.internals = this.attachInternals();
+
+        let sheet = new CSSStyleSheet();
+        sheet.replaceSync(scss`
+            #inp {
+                background-color: var(--he-select-clr-bg, whitesmoke);
+                border: 1px solid lightgrey;
+                width: var(--he-select-width, 100%);
+                padding: 0.3rem 0.4rem;
+                font-size: var(--he-select-fs, 14px);
+                border-radius: 3px;
+                outline: none;
+                text-align: left;
+            }
+
+
+            #popover {
+                inset: unset;
+                outline: none;
+                border: 1px solid grey;
+                border-radius: var(--he-select-border-radius, 3px);
+                margin-top: 3px;
+            }
+
+            #cont-options {
+                display: flex;
+                flex-direction: column;
+                gap: 0.2rem;
+                padding: 0.2rem;
+                background-color: var(--he-select-clr-bg, white);
+                cursor: pointer;
+                max-height: 50px;
+                overflow: auto;
+                overscroll-behavior: contain;
+            }
+
+            #cont-options option:hover {
+                background-color: var(--he-select-clr-bg-hover, whitesmoke);
+            }
+
+            #filter {
+                width: 100%;
+            }
+        `);
+
+        this.input = document.createElement('button');
+        this.input.id = 'inp';
+        this.input.innerHTML = 'Hello';
+        this.input.setAttribute('popovertarget', 'popover');
+
+        this.filter = document.createElement('he-input');
+        this.filter.id = 'filter';
+        this.filter.onchange = () => this.changedFilterCallback.bind(this)();
+
+        //this.popover = document.createElement('he-popover');
+        this.popover = document.createElement('div');
+        this.popover.id = 'popover';
+        this.popover.popover = '';
+        this.popover.append(this.filter);
+
+        this.popover.addEventListener("beforetoggle", (e) => this.toggledPopoverCallback.bind(this)(e));
+
+        shadow.append(this.input);
+        shadow.append(this.popover);
+        shadow.adoptedStyleSheets = [sheet];
+    }
+
+    connectedCallback() {
+        if (this.id == null || this.id === '') {
+            throw new Error('This elements needs an ID!');
+        }
+        this.popover.setAttribute('he-attach', '#' + this.id);
+
+        this.options = document.createElement('div');
+        this.options.id = 'cont-options';
+        this.options.slot = 'content';
+
+        for (const opt of this.querySelectorAll('option')) {
+            opt.onclick = (e) => this.clickedOptionCallback.bind(this)(e);
+            this.options.append(opt);
+        }
+
+        this.popover.append(this.options);
+    }
+
+    changedFilterCallback() {
+        const filterVal = this.filter.value.toLowerCase();
+
+        for (const option of this.options.children) {
+            if (option.value.toLowerCase().includes(filterVal)) {
+                option.style.display = '';
+            } else {
+                option.style.display = 'none';
+            }
+        }
+    }
+
+    toggledPopoverCallback(e) {
+        if (e.newState === "open") {
+            const rect = this.getBoundingClientRect();
+            const position = this.getAttribute('he-position') ?? 'bottom-right';
+            this.popover.style.width = this.input.offsetWidth + 'px';
+
+            switch (position) {
+                case 'bottom-right':
+                    this.popover.style.left = rect.left + 'px';
+                    this.popover.style.top = rect.bottom + 'px';
+                    break;
+                default:
+                    throw new Error('Invalid position');
+            }
+            this.filter.focus();
+        } else {
+        }
+
+    }
+
+    clickedOptionCallback(e) {
+        this.popover.hidePopover();
+
+        const target = e.currentTarget;
+        this.input.innerHTML = target.innerHTML;
+        this.value = target.value;
+        this.internals.setFormValue(this.value);
+    }
+
+    /**
+     * Callback for attribute changes of the web component.
+     * @param {string} name The attribute name
+     * @param {string} _oldValue The previous attribute value
+     * @param {string} newValue The new attribute value
+     */
+    attributeChangedCallback(name, _oldValue, newValue) {
+        switch (name) {
+            case 'he-open':
+                if (newValue == null || newValue === 'false') {
+                    this.popover.hidePopover();
+                } else {
+                    this.popover.showPopover();
+                }
+                break;
+            default:
+                break;
+        }
+    }
+}
+
 
 document.addEventListener("DOMContentLoaded", function() {
     customElements.define("he-dialog", HeliumDialog);
@@ -2436,6 +2783,7 @@ document.addEventListener("DOMContentLoaded", function() {
     customElements.define("he-table", HeliumTable);
     customElements.define("he-check", HeliumCheck);
     customElements.define("he-input", HeliumInput);
+    customElements.define("he-popover", HeliumPopover);
 
     document.addEventListener("he-dialog", function(e) {
         showDialogTemp(e);
