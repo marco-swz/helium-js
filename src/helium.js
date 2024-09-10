@@ -20,6 +20,55 @@ function preventDefaultForScrollKeys(e) {
     }
 }
 
+/**
+ * Returns the amount of pixels between the element and
+ * the bottom of the screen.
+ * @param {HTMLElement} element
+ * @returns number
+ */
+function heSpaceBelow(element) {
+    const elementRect = element.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - elementRect.bottom;
+    return spaceBelow;
+}
+
+/**
+ * 
+ * @param {HTMLElement} elem
+ * @param {HTMLElement} target
+ * @param {string} position
+ * @param {number} offset
+ * @returns void
+ */
+function hePositionRelative(elem, target, position, offset=0) {
+    const rect = target.getBoundingClientRect();
+
+    switch (position) {
+        case 'bottom-right':
+            elem.style.left = rect.left + 'px';
+            elem.style.top = rect.bottom + offset + 'px';
+            break;
+        case 'top-right':
+            elem.style.top = '';
+            elem.style.left = rect.left + 'px';
+            elem.style.top = rect.top - elem.offsetHeight - offset + 'px';
+            break;
+        default:
+            throw new Error('Invalid position');
+    }
+}
+
+function heDisableBodyScroll() {
+    const width = window.innerWidth - document.body.offsetWidth;
+    document.body.style.overflow = 'hidden';
+    document.body.style.paddingRight = width + 'px';
+}
+
+function heEnableBodyScroll() {
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+}
+
 // modern Chrome requires { passive: false } when adding event
 var supportsPassive = false;
 try {
@@ -715,7 +764,7 @@ class HeliumButton extends HTMLElement {
         #he-button:focus:enabled:not([he-loading]) {
             cursor: pointer;
             text-shadow: 0px 0px 0.3px var(--he-button-clr-border-hover);
-            border-color: var(--he-button-clr-border-hover, black);
+            border-color: var(--he-button-clr-border-hover, grey);
             color: var(--he-button-clr-border-hover, black);
         }
 
@@ -744,6 +793,22 @@ class HeliumButton extends HTMLElement {
             border-top-color: var(--he-button-clr-spinner, black);
             border-radius: 50%;
             animation: button-loading-spinner 1s ease infinite;
+        }
+
+        #he-button[he-ok]::after {
+            content: "";
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: auto;
+            border: 4px solid transparent;
+            border-bottom-color: var(--he-button-clr-spinner, black);
+            border-right-color: var(--he-button-clr-spinner, black);
+            transform: rotate(45deg);
         }
 
         @keyframes button-loading-spinner {
@@ -2353,6 +2418,7 @@ class HeliumInput extends HTMLElement {
         'required',
         'he-required',
         'he-report-validity',
+        'type',
     ];
 
     /** @type {HTMLInputElement} */
@@ -2368,6 +2434,39 @@ class HeliumInput extends HTMLElement {
         sheet.replaceSync(scss`
             :host {
                 display: inline-flex;
+                position: relative;
+            }
+
+            :host[he-loading]::after {
+                content: "";
+                position: absolute;
+                width: 12px;
+                height: 12px;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                margin: auto 10px auto auto;
+                border: 3px solid darkgrey;
+                border-radius: 50%;
+                border-bottom-color: var(--he-input-clr-spinner, black);
+                animation: button-loading-spinner 1s ease infinite;
+            }
+
+            :host[he-ok]::after {
+                content: "";
+                position: absolute;
+                width: 10px;
+                height: 15px;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                margin: auto 10px auto auto;
+                border: 3px solid transparent;
+                border-bottom-color: var(--he-input-clr-ok, black);
+                border-right-color: var(--he-input-clr-ok, black);
+                transform: rotate(45deg);
             }
 
             #inp-main {
@@ -2377,22 +2476,31 @@ class HeliumInput extends HTMLElement {
                 width: var(--he-input-width, 100%);
                 padding: 0.3rem 0.4rem;
                 font-size: var(--he-input-fs, 14px);
-                border-radius: 3px;
+                border-radius: var(--he-input-border-radius, 3px);
             }
 
             #inp-main:hover, #inp-main:focus {
-                border-color: var(--he-input-clr-border-hover, black);
+                border-color: var(--he-input-clr-border-hover, grey);
             }
 
             #inp-main[valid=false] {
                 border-color: var(--he-input-clr-border-invalid, indianred);
+            }
+
+            @keyframes button-loading-spinner {
+                from {
+                    transform: rotate(0turn);
+                }
+
+                to {
+                    transform: rotate(1turn);
+                }
             }
         `);
 
         this.input = document.createElement('input');
         this.input.type = 'text';
         this.input.id = 'inp-main';
-        this.input.required = true;
 
         shadow.append(this.input);
         shadow.adoptedStyleSheets = [sheet];
@@ -2455,6 +2563,14 @@ class HeliumInput extends HTMLElement {
         return this.getAttribute('name');
     }
 
+    set value(val) {
+        this.input.value = val;
+    }
+
+    get value() {
+        return this.input.value;
+    }
+
     /**
      * Callback for attribute changes of the web component.
      * @param {string} name The attribute name
@@ -2463,6 +2579,12 @@ class HeliumInput extends HTMLElement {
      */
     attributeChangedCallback(name, _oldValue, newValue) {
         switch (name) {
+            case 'type':
+                if (newValue == 'hidden') {
+                    this.style.display = 'none';
+                } else {
+                    this.style.display = '';
+                }
             default:
                 if (newValue) {
                     this.input.setAttribute(name, newValue);
@@ -2611,15 +2733,20 @@ class HeliumPopover extends HTMLElement {
 class HeliumSelect extends HTMLElement {
     static formAssociated = true;
     static observedAttributes = [
+        'he-open',
     ];
     /** @type {HTMLDivElement} */
     popover;
-    /** @type {HTMLInputElement} */
+    /** @type {HeliumInput} */
     filter;
     /** @type {HTMLElement} */
     options;
     /** @type {ElementInternals} */
     internals;
+    /** @type {number | TimerHandler} */
+    _filterTimeout = 0;
+    /** @type {boolean} This flag prevents recursive calls in popover callback */
+    _disableAttrCallback = false;
 
     constructor() {
         super();
@@ -2629,6 +2756,7 @@ class HeliumSelect extends HTMLElement {
         let sheet = new CSSStyleSheet();
         sheet.replaceSync(scss`
             #inp {
+                position: relative;
                 background-color: var(--he-select-clr-bg, whitesmoke);
                 border: 1px solid lightgrey;
                 width: var(--he-select-width, 100%);
@@ -2639,44 +2767,61 @@ class HeliumSelect extends HTMLElement {
                 text-align: left;
             }
 
+            #inp::after {
+                content: "";
+                position: absolute;
+                width: 4px;
+                height: 4px;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                margin: auto 10px auto auto;
+                border: 2px solid transparent;
+                border-bottom-color: var(--he-select-clr-arrow, black);
+                border-right-color: var(--he-select-clr-arrow, black);
+                transform: rotate(45deg) translateY(-2.5px);
+            }
 
             #popover {
                 inset: unset;
                 outline: none;
                 border: 1px solid grey;
                 border-radius: var(--he-select-border-radius, 3px);
-                margin-top: 3px;
             }
 
             #cont-options {
                 display: flex;
                 flex-direction: column;
-                gap: 0.2rem;
-                padding: 0.2rem;
                 background-color: var(--he-select-clr-bg, white);
-                cursor: pointer;
-                max-height: 50px;
+                max-height: 300px;
                 overflow: auto;
                 overscroll-behavior: contain;
             }
 
-            #cont-options option:hover {
+            #cont-options option {
+                padding: 5px 4px;
+                border-radius: 3px;
+            }
+
+            #cont-options option:hover:not(:disabled) {
                 background-color: var(--he-select-clr-bg-hover, whitesmoke);
+                cursor: pointer;
             }
 
             #filter {
+                --he-input-border-radius: 2px;
                 width: 100%;
             }
         `);
 
         this.input = document.createElement('button');
         this.input.id = 'inp';
-        this.input.innerHTML = 'Hello';
         this.input.setAttribute('popovertarget', 'popover');
 
         this.filter = document.createElement('he-input');
         this.filter.id = 'filter';
-        this.filter.onchange = () => this.changedFilterCallback.bind(this)();
+        this.filter.onkeyup = () => this.changedFilterCallback.bind(this)();
 
         //this.popover = document.createElement('he-popover');
         this.popover = document.createElement('div');
@@ -2684,10 +2829,11 @@ class HeliumSelect extends HTMLElement {
         this.popover.popover = '';
         this.popover.append(this.filter);
 
-        this.popover.addEventListener("beforetoggle", (e) => this.toggledPopoverCallback.bind(this)(e));
+        this.popover.addEventListener("beforetoggle", (e) => this.beforetoggledPopoverCallback.bind(this)(e));
+        this.popover.addEventListener("toggle", (e) => this.toggledPopoverCallback.bind(this)(e));
 
-        shadow.append(this.input);
         shadow.append(this.popover);
+        shadow.append(this.input);
         shadow.adoptedStyleSheets = [sheet];
     }
 
@@ -2706,48 +2852,104 @@ class HeliumSelect extends HTMLElement {
             this.options.append(opt);
         }
 
+        // This is an empty whitespace character. 
+        // It keeps the correct height of the input element.
+        this.input.innerHTML = '‎';
         this.popover.append(this.options);
+        this.select(0);
     }
 
     changedFilterCallback() {
-        const filterVal = this.filter.value.toLowerCase();
+        window.clearTimeout(this._filterTimeout);
 
-        for (const option of this.options.children) {
-            if (option.value.toLowerCase().includes(filterVal)) {
-                option.style.display = '';
-            } else {
-                option.style.display = 'none';
+        this._filterTimeout = setTimeout(() => {
+            const filterVal = this.filter.value.toLowerCase();
+
+            for (const option of this.options.children) {
+                if (filterVal.length === 0 || (option.value !== '' && option.innerText.toLowerCase().includes(filterVal))) {
+                    option.style.display = '';
+                } else {
+                    option.style.display = 'none';
+                }
             }
+        }, 500);
+    }
+
+    beforetoggledPopoverCallback(e) {
+        this._disableAttrCallback = true
+        if (e.newState === "open") {
+            this.setAttribute('he-open', '');
+            this.popover.style.visibility = 'hidden';
+        } else {
+            heEnableBodyScroll();
+            this.removeAttribute('he-open');
         }
+        this._disableAttrCallback = false;
     }
 
     toggledPopoverCallback(e) {
         if (e.newState === "open") {
-            const rect = this.getBoundingClientRect();
-            const position = this.getAttribute('he-position') ?? 'bottom-right';
-            this.popover.style.width = this.input.offsetWidth + 'px';
-
-            switch (position) {
-                case 'bottom-right':
-                    this.popover.style.left = rect.left + 'px';
-                    this.popover.style.top = rect.bottom + 'px';
-                    break;
-                default:
-                    throw new Error('Invalid position');
+            let positionDefault = 'bottom-right';
+            if (heSpaceBelow(this) < this.popover.offsetHeight + 20) {
+                positionDefault = 'top-right';
             }
+            const position = this.getAttribute('he-position') ?? positionDefault;
+            hePositionRelative(this.popover, this.input, position, 6);
+            // Manually compensate for the margins with the number
+            this.popover.style.width = this.input.offsetWidth - 7 + 'px';
+            heDisableBodyScroll();
+            this.popover.style.visibility = '';
             this.filter.focus();
         } else {
-        }
+            this.filter.value = '';
 
+            for (const option of this.options.children) {
+                option.style.display = '';
+            }
+        }
+    }
+
+    /** 
+     * @param {number} optionIndex
+     * @returns void
+     */
+    select(optionIndex) {
+        const option = this.options.children[optionIndex];
+        console.assert(option != null, 'No option with the given index!');
+        this._select(option);
+    }
+
+    /** 
+     * @param {HTMLOptionElement} option
+     * @returns void
+     */
+    _select(option) {
+        this.input.innerHTML = option.innerHTML;
+        this.value = option.value;
+        if (this.selection != null) {
+            this.selection.removeAttribute('selected');
+        }
+        this.selection = option;
+        this.selection.setAttribute('selected', '');
+        this.internals.setFormValue(this.value);
+    }
+
+    open() {
+        this.popover.showPopover();
+    }
+
+    close() {
+        this.popover.hidePopover();
+    }
+
+    toggle() {
+        this.popover.togglePopover();
     }
 
     clickedOptionCallback(e) {
         this.popover.hidePopover();
-
         const target = e.currentTarget;
-        this.input.innerHTML = target.innerHTML;
-        this.value = target.value;
-        this.internals.setFormValue(this.value);
+        this._select(target);
     }
 
     /**
@@ -2757,6 +2959,9 @@ class HeliumSelect extends HTMLElement {
      * @param {string} newValue The new attribute value
      */
     attributeChangedCallback(name, _oldValue, newValue) {
+        if (this._disableAttrCallback) {
+            return;
+        }
         switch (name) {
             case 'he-open':
                 if (newValue == null || newValue === 'false') {
