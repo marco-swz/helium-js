@@ -69,40 +69,59 @@ function heEnableBodyScroll() {
     document.body.style.paddingRight = '';
 }
 
-// modern Chrome requires { passive: false } when adding event
-var supportsPassive = false;
-try {
-    window.addEventListener("test", null, Object.defineProperty({}, 'passive', {
-        get: function() { supportsPassive = true; }
-    }));
-} catch (e) { }
+function showDialogTemp(evt, type) {
+    /** @type {HeliumDialog} */
+    let diag = document.querySelector('#he-dialog-temp');
+    if (diag === null) {
+        diag = document.createElement('he-dialog');
+        diag.id = 'he-dialog-temp';
+        switch (type) {
+            case 'error':
+                diag.style.setProperty('--he-dialog-clr-title', 'indianred');
+                diag.setAttribute('title', 'Fehler');
+                break;
+            case 'warn':
+                diag.style.setProperty('--he-dialog-clr-title', 'orange');
+                diag.setAttribute('title', 'Warnung');
+                break;
+            case 'success':
+                diag.style.setProperty('--he-dialog-clr-title', 'seagreen');
+                diag.setAttribute('title', 'Erfolg');
+                break;
+            default:
+                diag.style.removeProperty('--he-dialog-clr-title');
+                diag.removeAttribute('title');
+                break;
+        }
+        document.body.append(diag);
+    }
 
-var wheelOpt = supportsPassive ? { passive: false } : false;
-var wheelEvent = 'onwheel' in document.createElement('div') ? 'wheel' : 'mousewheel';
-
-// call this to Disable
-function disableScroll() {
-    window.addEventListener('DOMMouseScroll', preventDefault, false); // older FF
-    window.addEventListener(wheelEvent, preventDefault, wheelOpt); // modern desktop
-    window.addEventListener('touchmove', preventDefault, wheelOpt); // mobile
-    window.addEventListener('keydown', preventDefaultForScrollKeys, false);
+    if (evt.detail && evt.detail.value) {
+        diag.setBody(evt.detail.value);
+    }
+    diag.show();
 }
 
-// call this to Enable
-function enableScroll() {
-    window.removeEventListener('DOMMouseScroll', preventDefault, false);
-    window.removeEventListener(wheelEvent, preventDefault, wheelOpt);
-    window.removeEventListener('touchmove', preventDefault, wheelOpt);
-    window.removeEventListener('keydown', preventDefaultForScrollKeys, false);
+function showToastTemp(evt, type) {
+    /** @type {HeliumToast} */
+    let $toast = document.querySelector('#he-toast-temp');
+    if ($toast === null) {
+        $toast = document.createElement('he-toast');
+        $toast.id = 'he-toast-temp';
+        $toast.setAttribute('position', 'top-right');
+        document.body.append($toast);
+    }
+
+    $toast.showToast(evt.detail.value, type);
 }
 
 
 class HeliumDialog extends HTMLElement {
     static observedAttributes = [
-        "he-open",
-        "he-title",
-        "he-close-icon",
-        "he-close-button",
+        "open",
+        "title",
+        "close-icon",
+        "close-button",
     ];
     /** @type {HTMLDialogElement} */
     dialog;
@@ -246,7 +265,7 @@ class HeliumDialog extends HTMLElement {
      * @param {string} newValue The new attribute value
      */
     attributeChangedCallback(name, _oldValue, newValue) {
-        if (name === "he-open") {
+        if (name === "open") {
             if (newValue === "true") {
                 this.dialog.showModal();
             } else {
@@ -254,11 +273,11 @@ class HeliumDialog extends HTMLElement {
             }
         }
 
-        if (name === "he-title") {
+        if (name === "title") {
             this.title.innerText = newValue;
         }
 
-        if (name === "he-close-button") {
+        if (name === "lose-button") {
             if (newValue === "true") {
                 this.shadowRoot.querySelector('#he-btn-close').style.visibility = 'visible';
                 this.shadowRoot.querySelector('#he-diag-footer').style.visibility = 'visible';
@@ -268,7 +287,7 @@ class HeliumDialog extends HTMLElement {
             }
         }
 
-        if (name === "he-close-icon") {
+        if (name === "close-icon") {
             if (newValue === "true") {
                 this.shadowRoot.querySelector('#he-btn-close').style.visibility = 'visible';
             } else {
@@ -318,7 +337,7 @@ class HeliumDialog extends HTMLElement {
 
 class HeliumTabs extends HTMLElement {
     static observedAttributes = [
-        "he-tab",
+        "tab",
     ];
     /** @type {HTMLElement} */
     navBar;
@@ -382,7 +401,7 @@ class HeliumTabs extends HTMLElement {
      */
     attributeChangedCallback(name, _oldValue, newValue) {
         switch (name) {
-            case 'he-tab':
+            case 'tab':
                 this.showTab(Number(newValue));
                 break;
         }
@@ -401,7 +420,7 @@ class HeliumTabs extends HTMLElement {
         let tabNr = 0;
 
         for (const elem of slot.assignedElements()) {
-            const tabTitle = elem.getAttribute('he-title') ?? `Tab ${tabNr}`;
+            const tabTitle = elem.getAttribute('title') ?? `Tab ${tabNr}`;
 
             const checkId = 'he-tabs-check' + tabNr;
             /** @type {HTMLLabelElement} */
@@ -432,7 +451,7 @@ class HeliumTabs extends HTMLElement {
             tabNr++;
         }
 
-        self.showTab(self.getAttribute('he-tab') ?? 0);
+        self.showTab(self.getAttribute('tab') ?? 0);
     }
 
     /**
@@ -719,11 +738,11 @@ class HeliumButton extends HTMLElement {
         'formenctype',
         'formmethod',
         'formnovalidate',
-        'he-loading',
-        'he-show-dialog',
-        'he-close-dialog',
-        'he-submit',
-        'he-input-invalid',
+        'loading',
+        'show-dialog',
+        'close-dialog',
+        'submit',
+        'input-invalid',
     ];
     /** @type {HTMLInputElement} */
     button;
@@ -736,6 +755,10 @@ class HeliumButton extends HTMLElement {
 
         let sheet = new CSSStyleSheet();
         sheet.replaceSync(scss`
+        :host {
+            text-wrap: nowrap;
+        }
+
         #he-button {
             border-radius: 2px;
             color: black;
@@ -759,27 +782,27 @@ class HeliumButton extends HTMLElement {
             text-shadow: none;
         }
 
-        #he-button:hover:enabled:not([he-loading]), 
-        #he-button:active:enabled:not([he-loading]), 
-        #he-button:focus:enabled:not([he-loading]) {
+        #he-button:hover:enabled:not([loading]), 
+        #he-button:active:enabled:not([loading]), 
+        #he-button:focus:enabled:not([loading]) {
             cursor: pointer;
             text-shadow: 0px 0px 0.3px var(--he-button-clr-border-hover);
             border-color: var(--he-button-clr-border-hover, grey);
             color: var(--he-button-clr-border-hover, black);
         }
 
-        #he-button:hover:enabled:not([he-loading]){
+        #he-button:hover:enabled:not([loading]){
             background-color: color-mix(in srgb,var(--he-button-clr-bg, white),black 2%)
         }
 
-        #he-button[he-loading] {
+        #he-button[loading] {
             background-color: #d9d9d9;
             color: #6666668c;
             cursor: no-drop;
             text-shadow: none;
         }
 
-        #he-button[he-loading]::after {
+        #he-button[loading]::after {
             content: "";
             position: absolute;
             width: 16px;
@@ -795,7 +818,7 @@ class HeliumButton extends HTMLElement {
             animation: button-loading-spinner 1s ease infinite;
         }
 
-        #he-button[he-ok]::after {
+        #he-button[ok]::after {
             content: "";
             position: absolute;
             width: 16px;
@@ -842,22 +865,22 @@ class HeliumButton extends HTMLElement {
      */
     attributeChangedCallback(name, _oldValue, newValue) {
         switch (name) {
-            case 'he-show-dialog':
+            case 'show-dialog':
                 this.removeEventListener('click', this._showDialog);
                 if (newValue !== null) {
                     this.listenerClick = this.addEventListener('click', this._showDialog);
                 }
                 break;
-            case 'he-close-dialog':
+            case 'close-dialog':
                 this.removeEventListener('click', this._hideDialog);
                 if (newValue !== null) {
                     this.listenerClick = this.addEventListener('click', this._closeDialog());
                 }
                 break;
-            case 'he-submit':
+            case 'submit':
                 this.addEventListener('click', () => this._submitForm())
                 break;
-            case 'he-input-invalid':
+            case 'input-invalid':
                 if (newValue) {
                     this.disable();
                 } else {
@@ -880,9 +903,9 @@ class HeliumButton extends HTMLElement {
      */
     loading(showLoading) {
         if (showLoading == null || showLoading) {
-            this.setAttribute('he-loading', true);
+            this.setAttribute('loading', true);
         } else {
-            this.removeAttribute('he-loading');
+            this.removeAttribute('loading');
         }
     }
 
@@ -901,29 +924,29 @@ class HeliumButton extends HTMLElement {
     }
 
     _submitForm() {
-        const id = this.getAttribute('he-submit');
+        const id = this.getAttribute('submit');
         const form = document.querySelector(id);
         console.assert(form == null, `No form found with ID ${id}`)
         form.submit();
     }
 
     _showDialog() {
-        const diag = document.querySelector(this.getAttribute('he-show-dialog'));
+        const diag = document.querySelector(this.getAttribute('show-dialog'));
         diag.showModal();
     }
 
     _closeDialog() {
-        const diag = document.querySelector(this.getAttribute('he-close-dialog'));
+        const diag = document.querySelector(this.getAttribute('close-dialog'));
         diag.close();
     }
 }
 
 class HeliumFormDialog extends HTMLElement {
     static observedAttributes = [
-        "he-open",
-        "he-title",
-        "he-close-icon",
-        "he-close-button",
+        "open",
+        "title",
+        "close-icon",
+        "close-button",
     ];
     /** @type {HeliumDialog} */
     dialog;
@@ -961,6 +984,11 @@ class HeliumFormDialog extends HTMLElement {
 
             #he-form .invalid-input {
                 border: 1px solid red;
+            }
+
+            #he-form label {
+                display: flex;
+                align-items: center;
             }
         `);
 
@@ -1029,24 +1057,23 @@ class HeliumFormDialog extends HTMLElement {
         }
 
         endpoint = endpoint
-            ?? this.getAttribute('he-endpoint')
+            ?? this.getAttribute('-endpoint')
             ?? this.getAttribute('action');
 
         fetchArgs = fetchArgs ?? {};
         fetchArgs.method = fetchArgs.method
-            ?? this.getAttribute('he-method')
             ?? this.getAttribute('method')
             ?? 'POST';
         fetchArgs.headers = fetchArgs.headers
-            ?? this.getAttribute('he-headers');
+            ?? this.getAttribute('headers');
         fetchArgs.body = JSON.stringify(values);
 
-        callbackBefore = callbackBefore ?? this.getAttribute('he-before-submit');
+        callbackBefore = callbackBefore ?? this.getAttribute('before-submit');
         if (callbackBefore) {
             fetchArgs = eval(callbackBefore + '(fetchArgs)');
         }
 
-        callbackAfter = callbackAfter ?? this.getAttribute('he-after-submit');
+        callbackAfter = callbackAfter ?? this.getAttribute('after-submit');
 
         this.dialog.querySelector('#btn-save').loading();
 
@@ -1089,8 +1116,9 @@ class HeliumFormDialog extends HTMLElement {
         return regex.test(input.value);
     }
 
-    clear() {
-        for (const input of this.form.querySelectorAll('input')) {
+    reset() {
+        for (const input of this.form.querySelectorAll('he-input')) {
+            console.log(input.value);
             input.value = '';
         }
     }
@@ -1228,8 +1256,8 @@ class HeliumFormDialog extends HTMLElement {
 
 class HeliumTable extends HTMLElement {
     static observedAttributes = [
-        'he-endpoint',
-        'he-pagination',
+        'endpoint',
+        'pagination',
     ];
 
     /** @type {?string} */
@@ -1461,16 +1489,16 @@ class HeliumTable extends HTMLElement {
             display: none;
         }
 
-        table[he-loading] {
+        table[loading] {
             pointer-events: none;
             cursor: no-drop;
         }
 
-        table[he-loading] tbody {
+        table[loading] tbody {
             position: relative;
         }
 
-        table[he-loading] tbody::after {
+        table[loading] tbody::after {
             content: "";
             position: absolute;
             height: 100%;
@@ -1518,7 +1546,7 @@ class HeliumTable extends HTMLElement {
 
         const columns = this.querySelectorAll('th');
         for (let column of columns) {
-            let colName = column.getAttribute('he-column') ?? column.innerText;
+            let colName = column.getAttribute('column') ?? column.innerText;
 
             let contHeaderCell = document.createElement('div');
             let contFilter = document.createElement('div');
@@ -1532,7 +1560,7 @@ class HeliumTable extends HTMLElement {
             contFilter.append(spanName);
 
             let contSorters = this._renderSorters(colName);
-            column.setAttribute('he-column', colName);
+            column.setAttribute('column', colName);
             contHeaderCell.append(contSorters);
             column.append(contHeaderCell);
             rowColNames.append(column);
@@ -1560,7 +1588,7 @@ class HeliumTable extends HTMLElement {
                 inpFilter.autocomplete = 'off';
                 inpFilter.placeholder = ' ';
                 inpFilter.classList.add('inp-filter');
-                inpFilter.value = column.getAttribute('he-filter') ?? '';
+                inpFilter.value = column.getAttribute('filter') ?? '';
                 inpFilter.onchange = (e) => this._filterChangeCallback(e);
                 contFilter.prepend(inpFilter);
             }
@@ -1588,8 +1616,8 @@ class HeliumTable extends HTMLElement {
             for (let i = 0; i < columns.length; ++i) {
                 const cell = row.children[i];
                 const column = columns[i]
-                const data = cell.getAttribute('he-data') ?? cell.innerText;
-                const colName = column.getAttribute('he-column') ?? column.innerText;
+                const data = cell.getAttribute('data') ?? cell.innerText;
+                const colName = column.getAttribute('column') ?? column.innerText;
                 rowData[colName] = data;
             }
             let rowRendered = this._renderRow(rowData);
@@ -1654,7 +1682,7 @@ class HeliumTable extends HTMLElement {
      * @returns {?HTMLCollection<HTMLOptionElement>}
      */
     _getColumnOptions(column) {
-        let selector = column.getAttribute('he-options');
+        let selector = column.getAttribute('options');
 
         /** @type {HTMLDataListElement} */
         let list = document.querySelector('datalist' + selector);
@@ -1681,7 +1709,7 @@ class HeliumTable extends HTMLElement {
 
         let values = [];
         for (const row of this.body.children) {
-            values.push([row.children[colIdx].getAttribute('he-data'), row]);
+            values.push([row.children[colIdx].getAttribute('data'), row]);
         }
 
         let newOrder = isDesc
@@ -1709,8 +1737,8 @@ class HeliumTable extends HTMLElement {
             filter.parentElement.parentElement.parentElement
         );
         for (const row of this.body.children) {
-            const data = row.children[colIdx].getAttribute('he-data');
-            let hideMask = row.getAttribute('he-mask') ?? 0;
+            const data = row.children[colIdx].getAttribute('data');
+            let hideMask = row.getAttribute('mask') ?? 0;
 
             if (data.toLowerCase().includes(filterValue)) {
                 // Clear bit for column filter
@@ -1720,7 +1748,7 @@ class HeliumTable extends HTMLElement {
                 hideMask |= 1 << colIdx;
             }
 
-            row.setAttribute('he-mask', hideMask);
+            row.setAttribute('mask', hideMask);
 
             if (hideMask > 0) {
                 row.style.visibility = 'collapse';
@@ -1734,7 +1762,7 @@ class HeliumTable extends HTMLElement {
      * @returns {NodeListOf<HTMLTableCellElement>}
      */
     _getColumns() {
-        return this.shadowRoot.querySelectorAll('th[he-column]')
+        return this.shadowRoot.querySelectorAll('th[column]')
     }
 
     /**
@@ -1776,12 +1804,12 @@ class HeliumTable extends HTMLElement {
         row.onclick = (e) => this._rowClickCallback.bind(this)(e);
 
         for (let column of this._getColumns()) {
-            let colName = column.getAttribute('he-column');
-            let colType = column.getAttribute('he-type');
+            let colName = column.getAttribute('column');
+            let colType = column.getAttribute('type');
             let cell = document.createElement('td');
             let val = data[colName] ?? '';
             cell.innerHTML = this._renderCellText(colType, val);
-            cell.setAttribute('he-data', val);
+            cell.setAttribute('data', val);
             cell.title = val;
 
             row.append(cell);
@@ -1791,9 +1819,9 @@ class HeliumTable extends HTMLElement {
     }
 
     showDialogNew() {
-        this.diagEdit.clear();
+        this.diagEdit.reset();
         this.editRequestType = 'POST';
-        this.diagEdit.setAttribute('he-title', 'Erstellen');
+        this.diagEdit.setAttribute('title', 'Erstellen');
         this.diagEdit.showModal();
     }
 
@@ -1810,7 +1838,7 @@ class HeliumTable extends HTMLElement {
         this.dataOld = data;
         this.idsEdit = [row.id];
         this.editRequestType = 'PATCH';
-        this.diagEdit.setAttribute('he-title', 'Bearbeiten');
+        this.diagEdit.setAttribute('title', 'Bearbeiten');
         this.diagEdit.showModal();
     }
 
@@ -1825,15 +1853,15 @@ class HeliumTable extends HTMLElement {
 
         this.diagEdit.setValues(data);
         this.editRequestType = 'POST';
-        this.diagEdit.setAttribute('he-title', 'Duplizieren');
+        this.diagEdit.setAttribute('title', 'Duplizieren');
         this.diagEdit.showModal();
     }
 
     loading(enable = true) {
         if (enable) {
-            this.body.parentElement.setAttribute('he-loading', true);
+            this.body.parentElement.setAttribute('loading', true);
         } else {
-            this.body.parentElement.removeAttribute('he-loading');
+            this.body.parentElement.removeAttribute('loading');
         }
     }
 
@@ -1896,10 +1924,10 @@ class HeliumTable extends HTMLElement {
             let cell = row.children[i + 1];
             let column = columns[i];
 
-            const colName = column.getAttribute('he-column');
+            const colName = column.getAttribute('column');
             data[colName] = returnDisplayValues
                 ? cell.innerText
-                : cell.getAttribute('he-data');
+                : cell.getAttribute('data');
         }
 
         return data;
@@ -1946,11 +1974,11 @@ class HeliumTable extends HTMLElement {
      */
     attributeChangedCallback(name, _oldValue, newValue) {
         switch (name) {
-            case 'he-endpoint':
+            case 'endpoint':
                 this.endpoint = newValue;
                 break;
 
-            case 'he-pagination':
+            case 'pagination':
                 this.pagination = Number(newValue);
                 break;
         }
@@ -1969,8 +1997,8 @@ class HeliumTable extends HTMLElement {
 
         let columns = this._getColumns();
         for (let i = 0; i < columns.length; ++i) {
-            const colName = columns[i].getAttribute('he-column');
-            const colType = columns[i].getAttribute('he-type') ?? 'text';
+            const colName = columns[i].getAttribute('column');
+            const colType = columns[i].getAttribute('type') ?? 'text';
             const val = newData[colName];
             if (val == null) {
                 continue;
@@ -1978,7 +2006,7 @@ class HeliumTable extends HTMLElement {
 
             // `+1` because of checkbox
             let cell = row.children[i + 1];
-            cell.setAttribute('he-data', val);
+            cell.setAttribute('data', val);
             cell.innerHTML = this._renderCellText(colType, val);
         }
     }
@@ -2067,16 +2095,16 @@ class HeliumTable extends HTMLElement {
                 }
             }
 
-            if (column.getAttribute('he-noedit') === 'true') {
+            if (column.getAttribute('no-edit') === 'true') {
                 continue;
             }
 
             data.push({
-                name: column.getAttribute('he-column'),
-                required: column.getAttribute('he-required') === 'true',
+                name: column.getAttribute('column'),
+                required: column.getAttribute('required') === 'true',
                 label: column.querySelector('span').innerHTML,
-                placeholder: column.getAttribute('he-default'),
-                pattern: column.getAttribute('he-pattern'),
+                placeholder: column.getAttribute('default'),
+                pattern: column.getAttribute('pattern'),
                 options: optionValues,
             })
         }
@@ -2085,9 +2113,9 @@ class HeliumTable extends HTMLElement {
         let dialog = document.createElement('he-form-dialog');
         dialog.renderRows(data);
 
-        dialog.setAttribute('he-endpoint', this.endpoint);
-        dialog.setAttribute('he-before-submit', `document.querySelector('#${this.id}').formEditBeforeSubmitCallback`);
-        dialog.setAttribute('he-after-submit', `document.querySelector('#${this.id}').formEditAfterSubmitCallback`);
+        dialog.setAttribute('endpoint', this.endpoint);
+        dialog.setAttribute('before-submit', `document.querySelector('#${this.id}').formEditBeforeSubmitCallback`);
+        dialog.setAttribute('after-submit', `document.querySelector('#${this.id}').formEditAfterSubmitCallback`);
         return dialog;
     }
 
@@ -2212,8 +2240,8 @@ class HeliumTable extends HTMLElement {
 class HeliumCheck extends HTMLElement {
     static formAssociated = true;
     static observedAttributes = [
-        'he-name',
-        'he-indeterminate',
+        'name',
+        'indeterminate',
     ];
 
     /** @type {HTMLSpanElement} */
@@ -2359,10 +2387,10 @@ class HeliumCheck extends HTMLElement {
      */
     attributeChangedCallback(name, _oldValue, newValue) {
         switch (name) {
-            case 'he-name':
+            case 'name':
                 this.name = newValue;
                 break;
-            case 'he-indeterminate':
+            case 'indeterminate':
                 if (newValue == null || newValue === 'false') {
                     this.indeterminate = false;
                 } else {
@@ -2377,47 +2405,12 @@ class HeliumCheck extends HTMLElement {
     }
 }
 
-function showDialogTemp(evt, type) {
-    /** @type {HeliumDialog} */
-    let diag = document.querySelector('#he-dialog-temp');
-    if (diag === null) {
-        diag = document.createElement('he-dialog');
-        diag.id = 'he-dialog-temp';
-        switch (type) {
-            case 'error':
-                diag.style.setProperty('--he-dialog-clr-title', 'indianred');
-                diag.setAttribute('he-title', 'Fehler');
-                break;
-            case 'warn':
-                diag.style.setProperty('--he-dialog-clr-title', 'orange');
-                diag.setAttribute('he-title', 'Warnung');
-                break;
-            case 'success':
-                diag.style.setProperty('--he-dialog-clr-title', 'seagreen');
-                diag.setAttribute('he-title', 'Erfolg');
-                break;
-            default:
-                diag.style.removeProperty('--he-dialog-clr-title');
-                diag.removeAttribute('he-title');
-                break;
-        }
-        document.body.append(diag);
-    }
-
-    if (evt.detail && evt.detail.value) {
-        diag.setBody(evt.detail.value);
-    }
-    diag.show();
-}
-
 class HeliumInput extends HTMLElement {
     static formAssociated = true;
     static observedAttributes = [
         'pattern',
-        'he-pattern',
         'required',
-        'he-required',
-        'he-report-validity',
+        'report-validity',
         'type',
     ];
 
@@ -2437,7 +2430,7 @@ class HeliumInput extends HTMLElement {
                 position: relative;
             }
 
-            :host[he-loading]::after {
+            :host[loading]::after {
                 content: "";
                 position: absolute;
                 width: 12px;
@@ -2453,7 +2446,7 @@ class HeliumInput extends HTMLElement {
                 animation: button-loading-spinner 1s ease infinite;
             }
 
-            :host[he-ok]::after {
+            :host[ok]::after {
                 content: "";
                 position: absolute;
                 width: 10px;
@@ -2500,6 +2493,7 @@ class HeliumInput extends HTMLElement {
 
         this.input = document.createElement('input');
         this.input.type = 'text';
+        this.input.autocomplete = false;
         this.input.id = 'inp-main';
 
         shadow.append(this.input);
@@ -2509,6 +2503,7 @@ class HeliumInput extends HTMLElement {
     connectedCallback() {
         this.internals = this.attachInternals();
         this.input.onchange = () => this.inputChangedCallback.bind(this)();
+        this.value = this.innerHTML;
     }
 
     focus() {
@@ -2526,7 +2521,7 @@ class HeliumInput extends HTMLElement {
             this.input.setAttribute('valid', false);
         }
 
-        const reportSelector = this.getAttribute('he-report-invalid');
+        const reportSelector = this.getAttribute('report-invalid');
         if (reportSelector) {
             console.assert(
                 this.id && this.id !== '',
@@ -2535,7 +2530,7 @@ class HeliumInput extends HTMLElement {
             const id = '#' + this.id;
             const elems = document.querySelectorAll(reportSelector);
             for (const elem of elems) {
-                const validList = elem.getAttribute('he-input-invalid') ?? '';
+                const validList = elem.getAttribute('input-invalid') ?? '';
                 let validSet = new Set(validList.split(' '));
                 if (validity.valid) {
                     validSet.delete(id)
@@ -2544,15 +2539,19 @@ class HeliumInput extends HTMLElement {
                 }
 
                 if (validSet.size === 0) {
-                    elem.removeAttribute('he-input-invalid');
+                    elem.removeAttribute('input-invalid');
                     continue;
                 }
 
-                elem.setAttribute('he-input-invalid', Array.from(validSet).join(' '));
+                elem.setAttribute('input-invalid', Array.from(validSet).join(' '));
             }
         }
 
         return validity.valid;
+    }
+
+    formResetCallback() {
+        this.input.value = "";
     }
 
     set name(val) {
@@ -2565,6 +2564,7 @@ class HeliumInput extends HTMLElement {
 
     set value(val) {
         this.input.value = val;
+        this.internals.setFormValue(val);
     }
 
     get value() {
@@ -2580,7 +2580,7 @@ class HeliumInput extends HTMLElement {
     attributeChangedCallback(name, _oldValue, newValue) {
         switch (name) {
             case 'type':
-                if (newValue == 'hidden') {
+                if (newValue === 'hidden') {
                     this.style.display = 'none';
                 } else {
                     this.style.display = '';
@@ -2604,10 +2604,10 @@ class HeliumInput extends HTMLElement {
 
 class HeliumPopover extends HTMLElement {
     static observedAttributes = [
-        'he-attach',
-        'he-position',
-        'he-open,',
-        'he-trigger',
+        'attach',
+        'position',
+        'open,',
+        'trigger',
     ];
     /** @type {HTMLDivElement} */
     popover;
@@ -2644,7 +2644,7 @@ class HeliumPopover extends HTMLElement {
     }
 
     connectedCallback() {
-        const attachElem = this.getAttribute('he-attach');
+        const attachElem = this.getAttribute('attach');
         if (attachElem == null) {
             throw new Error('Ho attachment element defined!');
         }
@@ -2657,7 +2657,7 @@ class HeliumPopover extends HTMLElement {
         window.addEventListener('click', () => this.hide.bind(this)())
         this.addEventListener('click', (e) => e.stopPropagation())
 
-        const trigger = this.getAttribute('he-trigger') ?? 'click';
+        const trigger = this.getAttribute('trigger') ?? 'click';
         this.attach.addEventListener(trigger, (e) => this.triggeredCallback.bind(this)(e));
     }
 
@@ -2669,7 +2669,7 @@ class HeliumPopover extends HTMLElement {
      */
     attributeChangedCallback(name, _oldValue, newValue) {
         switch (name) {
-            case 'he-open':
+            case 'open':
                 if (newValue == null || newValue === 'false') {
                     this.popover.hide();
                 } else {
@@ -2683,7 +2683,7 @@ class HeliumPopover extends HTMLElement {
     }
 
     hide() {
-        this.removeAttribute('he-open');
+        this.removeAttribute('open');
         this.moveToTarget(this.attach, 'bottom-right');
         this.popover.style.display = 'none';
     }
@@ -2691,7 +2691,7 @@ class HeliumPopover extends HTMLElement {
     show() {
         this.moveToTarget(this.attach, 'bottom-right');
         this.popover.style.display = '';
-        this.setAttribute('he-open', 'true');
+        this.setAttribute('open', 'true');
     }
 
     /**
@@ -2701,7 +2701,7 @@ class HeliumPopover extends HTMLElement {
      */
     triggeredCallback(e) {
         e.stopPropagation();
-        const open = this.getAttribute('he-open')
+        const open = this.getAttribute('open')
         if (open == null || open === 'false') {
             this.show();
         } else {
@@ -2733,7 +2733,8 @@ class HeliumPopover extends HTMLElement {
 class HeliumSelect extends HTMLElement {
     static formAssociated = true;
     static observedAttributes = [
-        'he-open',
+        'open',
+        'search',
     ];
     /** @type {HTMLDivElement} */
     popover;
@@ -2755,16 +2756,28 @@ class HeliumSelect extends HTMLElement {
 
         let sheet = new CSSStyleSheet();
         sheet.replaceSync(scss`
+            :host {
+                height: fit-content;
+                width: fit-content;
+            }
+
             #inp {
                 position: relative;
                 background-color: var(--he-select-clr-bg, whitesmoke);
                 border: 1px solid lightgrey;
-                width: var(--he-select-width, 100%);
+                width: 100%;
                 padding: 0.3rem 0.4rem;
                 font-size: var(--he-select-fs, 14px);
                 border-radius: 3px;
                 outline: none;
                 text-align: left;
+                padding-right: 25px;
+                text-wrap: nowrap;
+            }
+
+            #inp:hover, #inp:focus {
+                cursor: pointer;
+                border-color: var(--he-select-clr-border-hover, grey);
             }
 
             #inp::after {
@@ -2804,6 +2817,10 @@ class HeliumSelect extends HTMLElement {
                 border-radius: 3px;
             }
 
+            #cont-options option[selected] {
+                background-color: var(--he-select-clr-bg-hover, whitesmoke);
+            }
+
             #cont-options option:hover:not(:disabled) {
                 background-color: var(--he-select-clr-bg-hover, whitesmoke);
                 cursor: pointer;
@@ -2821,6 +2838,7 @@ class HeliumSelect extends HTMLElement {
 
         this.filter = document.createElement('he-input');
         this.filter.id = 'filter';
+        this.filter.style.display = 'none';
         this.filter.onkeyup = () => this.changedFilterCallback.bind(this)();
 
         //this.popover = document.createElement('he-popover');
@@ -2841,7 +2859,7 @@ class HeliumSelect extends HTMLElement {
         if (this.id == null || this.id === '') {
             throw new Error('This elements needs an ID!');
         }
-        this.popover.setAttribute('he-attach', '#' + this.id);
+        this.popover.setAttribute('attach', '#' + this.id);
 
         this.options = document.createElement('div');
         this.options.id = 'cont-options';
@@ -2878,11 +2896,11 @@ class HeliumSelect extends HTMLElement {
     beforetoggledPopoverCallback(e) {
         this._disableAttrCallback = true
         if (e.newState === "open") {
-            this.setAttribute('he-open', '');
+            this.setAttribute('open', '');
             this.popover.style.visibility = 'hidden';
         } else {
             heEnableBodyScroll();
-            this.removeAttribute('he-open');
+            this.removeAttribute('open');
         }
         this._disableAttrCallback = false;
     }
@@ -2893,7 +2911,7 @@ class HeliumSelect extends HTMLElement {
             if (heSpaceBelow(this) < this.popover.offsetHeight + 20) {
                 positionDefault = 'top-right';
             }
-            const position = this.getAttribute('he-position') ?? positionDefault;
+            const position = this.getAttribute('position') ?? positionDefault;
             hePositionRelative(this.popover, this.input, position, 6);
             // Manually compensate for the margins with the number
             this.popover.style.width = this.input.offsetWidth - 7 + 'px';
@@ -2963,19 +2981,249 @@ class HeliumSelect extends HTMLElement {
             return;
         }
         switch (name) {
-            case 'he-open':
+            case 'open':
                 if (newValue == null || newValue === 'false') {
                     this.popover.hidePopover();
                 } else {
                     this.popover.showPopover();
                 }
                 break;
+            case 'filter':
+                if (newValue == null || newValue === 'false') {
+                    this.filter.style.display = "none";
+                } else {
+                    this.filter.style.display = "";
+                }
             default:
                 break;
         }
     }
 }
 
+class HeliumToast extends HTMLElement {
+    static observedAttributes = [
+        'position',
+    ];
+    /** @type {HTMLDivElement} */
+    $contToasts;
+
+    constructor() {
+        super();
+        let shadow = this.attachShadow({ mode: "open" });
+        this.internals = this.attachInternals();
+
+        let sheet = new CSSStyleSheet();
+        sheet.replaceSync(scss`
+            :host {
+                position: fixed;
+                top: unset;
+                right: unset;
+                left: 50%;
+                bottom: 10px;
+                transform: translateX(-50%);
+                width: 300px;
+            }
+
+            :host([position=bottom-right]) {
+                top: unset;
+                left: unset;
+                bottom: 10px;
+                right: 10px;
+                transform: unset;
+            }
+
+            :host([position=bottom-left]) {
+                top: unset;
+                right: unset;
+                bottom: 10px;
+                left: 10px;
+                transform: unset;
+            }
+
+            :host([position=top-left]) {
+                bottom: unset;
+                right: unset;
+                top: 10px;
+                left: 10px;
+                transform: unset;
+            }
+
+            :host([position=top-right]) {
+                bottom: unset;
+                left: unset;
+                top: 10px;
+                right: 10px;
+                transform: unset;
+            }
+
+            :host([position=top]) {
+                bottom: unset;
+                right: unset;
+                top: 10px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            #contToasts {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            #toast {
+                border: 1px solid grey;
+                border-radius: var(--he-toast-radius-border, 3px);
+                background-color: var(--he-toast-clr-bg, white);
+                z-index: 10;
+            }
+
+            #bar {
+                width: 100%;
+                height: 5px;
+                background-color: red;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            #bar[type=warn] {
+                background-color: var(--he-toast-bg-bar-warn, orange);
+            }
+
+            #bar[type=error] {
+                background-color: var(--he-toast-bg-bar-error, indianred);
+            }
+
+            #bar[type=success] {
+                background-color: var(--he-toast-bg-bar-success, seagreen);
+            }
+
+            #contMain {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            #contText {
+                padding: 1rem 2rem;
+                font-size: 16px;
+            }
+
+            #btnClose {
+                border-radius: 50%;
+                font-size: 20px;
+                font-weight: 500;
+                margin-right: 10px;
+                border-radius: 50%;
+                width: 35px;
+                height: 35px;
+                text-align: center;
+                vertical-align: middle;
+            }
+
+            #btnClose:hover {
+                background-color: whitesmoke;
+            }
+        `);
+
+        this.$contToasts = document.createElement('div');
+        this.$contToasts.id = 'contToasts';
+
+        shadow.append(this.$contToasts);
+        shadow.adoptedStyleSheets = [sheet];
+    }
+
+    connectedCallback() {
+    }
+
+    /**
+     * @param {string} content
+     * @param {null|'info'|'warn'|'error'} type 
+     * @returns {HTMLDivElement}
+     */
+    _renderToast(content,type) {
+        const duration = this.getAttribute('timeout-ms') ?? 4000;
+
+        const $toast = document.createElement('div');
+        $toast.id = 'toast';
+
+        const $bar = document.createElement('div');
+        $bar.id = 'bar';
+        $bar.style.width = '0%';
+        $bar.setAttribute('type', type);
+        const animation = $bar.animate(
+            [
+                { width: '100%' },
+                { width: '0%' },
+            ], {
+                duration: duration,
+            }
+        )
+        animation.onfinish = () => this.hideToast($toast);
+        $toast.append($bar);
+
+        const $contMain = document.createElement('div');
+        $contMain.id = 'contMain';
+        $toast.append($contMain);
+
+        const $contText = document.createElement('div');
+        $contText.id = 'contText';
+        $contText.innerHTML = content;
+        $contMain.append($contText);
+
+        const $btnClose = document.createElement('div');
+        $btnClose.id = 'btnClose';
+        $btnClose.onclick = () => this.hideToast($toast);
+        $btnClose.innerHTML = 'x';
+
+        $contMain.append($btnClose);
+
+        return $toast;
+    }
+
+    showToast(message, type) {
+        const $toast = this._renderToast(message, type);
+        $toast.animate(
+            [
+                { opacity: '0' },
+                { opacity: '1' },
+            ], {
+                duration: 200,
+            }
+        )
+
+        const position = this.getAttribute('position') ?? '';
+        if (position.includes('top')) {
+            this.$contToasts.prepend($toast);
+        } else {
+            this.$contToasts.append($toast);
+        }
+    }
+
+    hideToast($toast) {
+        const animation = $toast.animate(
+            [
+                { opacity: '1' },
+                { opacity: '0' },
+            ], {
+                duration: 200,
+            }
+        )
+        animation.onfinish = () => $toast.remove();
+    }
+
+    /**
+     * Callback for attribute changes of the web component.
+     * @param {string} name The attribute name
+     * @param {string} _oldValue The previous attribute value
+     * @param {string} newValue The new attribute value
+     */
+    attributeChangedCallback(name, _oldValue, newValue) {
+        switch (name) {
+            default:
+                break;
+        }
+    }
+}
 
 document.addEventListener("DOMContentLoaded", function() {
     customElements.define("he-dialog", HeliumDialog);
@@ -2989,6 +3237,23 @@ document.addEventListener("DOMContentLoaded", function() {
     customElements.define("he-check", HeliumCheck);
     customElements.define("he-input", HeliumInput);
     customElements.define("he-popover", HeliumPopover);
+    customElements.define("he-toast", HeliumToast);
+
+    document.addEventListener("he-toast", function(e) {
+        showToastTemp(e);
+    })
+
+    document.addEventListener("he-toast-error", function(e) {
+        showToastTemp(e, 'error');
+    })
+
+    document.addEventListener("he-toast-warn", function(e) {
+        showToastTemp(e, 'warn');
+    })
+
+    document.addEventListener("he-toast-success", function(e) {
+        showToastTemp(e, 'success');
+    })
 
     document.addEventListener("he-dialog", function(e) {
         showDialogTemp(e);
