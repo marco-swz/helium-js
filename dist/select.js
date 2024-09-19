@@ -1,4 +1,4 @@
-export class HeliumSelect extends HTMLElement {
+class HeliumSelect extends HTMLElement {
     static formAssociated = true;
     static observedAttributes = [
         'open',
@@ -162,7 +162,7 @@ export class HeliumSelect extends HTMLElement {
     }
 
     beforetoggledPopoverCallback(e) {
-        this._disableAttrCallback = true
+        this._disableAttrCallback = true;
         if (e.newState === "open") {
             this.setAttribute('open', '');
             this.popover.style.visibility = 'hidden';
@@ -262,8 +262,6 @@ export class HeliumSelect extends HTMLElement {
                 } else {
                     this.filter.style.display = "";
                 }
-            default:
-                break;
         }
     }
 }
@@ -271,3 +269,5 @@ export class HeliumSelect extends HTMLElement {
 document.addEventListener("DOMContentLoaded", function() {
     customElements.define("he-select", HeliumSelect);
 });
+
+export { HeliumSelect };

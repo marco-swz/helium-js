@@ -1,4 +1,4 @@
-export class HeliumMenu extends HTMLElement {
+class HeliumMenu extends HTMLElement {
     static observedAttributes = [
         'title,'
     ];
@@ -77,7 +77,7 @@ export class HeliumMenu extends HTMLElement {
             if (elem.slot === 'button') {
                 elem.addEventListener('click', e => {
                     if (this.fnClose == null) {
-                        this.open.bind(this)()
+                        this.open.bind(this)();
                     }
                 });
             }
@@ -112,3 +112,5 @@ export class HeliumMenu extends HTMLElement {
 document.addEventListener("DOMContentLoaded", function() {
     customElements.define("he-menu", HeliumMenu);
 });
+
+export { HeliumMenu };

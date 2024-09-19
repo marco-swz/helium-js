@@ -1,16 +1,16 @@
-function scss(text) {
+export function scss(text) {
     return text;
 }
 
-function html(text) {
+export function html(text) {
     return text;
 }
 
-function preventDefault(e) {
+export function preventDefault(e) {
     e.preventDefault();
 }
 
-function preventDefaultForScrollKeys(e) {
+export function preventDefaultForScrollKeys(e) {
     // left: 37, up: 38, right: 39, down: 40,
     // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
     var keys = { 37: 1, 38: 1, 39: 1, 40: 1 };
@@ -26,7 +26,7 @@ function preventDefaultForScrollKeys(e) {
  * @param {HTMLElement} element
  * @returns number
  */
-function heSpaceBelow(element) {
+export function heSpaceBelow(element) {
     const elementRect = element.getBoundingClientRect();
     const spaceBelow = window.innerHeight - elementRect.bottom;
     return spaceBelow;
@@ -40,7 +40,7 @@ function heSpaceBelow(element) {
  * @param {number} offset
  * @returns void
  */
-function hePositionRelative(elem, target, position, offset=0) {
+export function hePositionRelative(elem, target, position, offset=0) {
     const rect = target.getBoundingClientRect();
 
     switch (position) {
@@ -58,13 +58,13 @@ function hePositionRelative(elem, target, position, offset=0) {
     }
 }
 
-function heDisableBodyScroll() {
+export function heDisableBodyScroll() {
     const width = window.innerWidth - document.body.offsetWidth;
     document.body.style.overflow = 'hidden';
     document.body.style.paddingRight = width + 'px';
 }
 
-function heEnableBodyScroll() {
+export function heEnableBodyScroll() {
     document.body.style.overflow = '';
     document.body.style.paddingRight = '';
 }

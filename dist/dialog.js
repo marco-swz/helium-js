@@ -1,7 +1,8 @@
-//import sheet from './dialog.css' assert { type: "css" };
-import { scss } from './utils.js';
+import { s as scss } from './utils-B65AITo8.js';
 
-export class HeliumDialog extends HTMLElement {
+//import sheet from './dialog.css' assert { type: "css" };
+
+class HeliumDialog extends HTMLElement {
     static observedAttributes = [
         "open",
         "he-title",
@@ -137,10 +138,10 @@ export class HeliumDialog extends HTMLElement {
     connectedCallback() {
         this.addEventListener("he-dialog-show", function() {
             this.show();
-        })
+        });
         this.addEventListener("he-dialog-close", function() {
             this.close();
-        })
+        });
     }
 
     /**
@@ -257,16 +258,18 @@ customElements.define("he-dialog", HeliumDialog);
 
 document.addEventListener("he-dialog", function(e) {
     showDialogTemp(e);
-})
+});
 
 document.addEventListener("he-dialog-error", function(e) {
     showDialogTemp(e, 'error');
-})
+});
 
 document.addEventListener("he-dialog-warn", function(e) {
     showDialogTemp(e, 'warn');
-})
+});
 
 document.addEventListener("he-dialog-success", function(e) {
     showDialogTemp(e, 'success');
-})
+});
+
+export { HeliumDialog };

@@ -1,4 +1,4 @@
-export class HeliumTabs extends HTMLElement {
+class HeliumTabs extends HTMLElement {
     static observedAttributes = [
         "tab",
     ];
@@ -152,3 +152,5 @@ export class HeliumTabs extends HTMLElement {
 document.addEventListener("DOMContentLoaded", function() {
     customElements.define("he-tabs", HeliumTabs);
 });
+
+export { HeliumTabs };

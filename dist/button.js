@@ -1,6 +1,6 @@
-import { scss } from './utils.js';
+import { s as scss } from './utils-B65AITo8.js';
 
-export class HeliumButton extends HTMLElement {
+class HeliumButton extends HTMLElement {
     static observedAttributes = [
         'value',
         'name',
@@ -121,7 +121,7 @@ export class HeliumButton extends HTMLElement {
         `);
 
         this.button = document.createElement('button');
-        this.button.id = 'he-button'
+        this.button.id = 'he-button';
 
         shadow.append(this.button);
         shadow.adoptedStyleSheets = [sheet];
@@ -153,7 +153,7 @@ export class HeliumButton extends HTMLElement {
                 }
                 break;
             case 'submit':
-                this.addEventListener('click', () => this._submitForm())
+                this.addEventListener('click', () => this._submitForm());
                 break;
             case 'input-invalid':
                 if (newValue) {
@@ -201,7 +201,7 @@ export class HeliumButton extends HTMLElement {
     _submitForm() {
         const id = this.getAttribute('submit');
         const form = document.querySelector(id);
-        console.assert(form == null, `No form found with ID ${id}`)
+        console.assert(form == null, `No form found with ID ${id}`);
         form.submit();
     }
 
@@ -217,3 +217,5 @@ export class HeliumButton extends HTMLElement {
 }
 
 customElements.define("he-button", HeliumButton);
+
+export { HeliumButton };

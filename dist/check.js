@@ -1,6 +1,6 @@
-import { scss } from './utils.js';
+import { s as scss } from './utils-B65AITo8.js';
 
-export class HeliumCheck extends HTMLElement {
+class HeliumCheck extends HTMLElement {
     static formAssociated = true;
     static observedAttributes = [
         'name',
@@ -172,3 +172,5 @@ export class HeliumCheck extends HTMLElement {
 document.addEventListener("DOMContentLoaded", function() {
     customElements.define("he-check", HeliumCheck);
 });
+
+export { HeliumCheck };

@@ -1,16 +1,30 @@
 import terser from '@rollup/plugin-terser';
+import css from 'rollup-plugin-css-only';
+
 export default {
-    input: 'src/main.js',
+    input: [
+        'src/table.js',
+        'src/button.js',
+        'src/dialog.js',
+        'src/menu.js',
+        'src/input.js',
+        'src/check.js',
+        'src/form_dialog.js',
+        'src/select.js',
+        'src/tabs.js',
+        'src/toast.js',
+        'src/helium.js',
+    ],
     output: [
         {
-            file: 'dist/bundle.js',
-            format: 'iife'
+            dir: 'dist',
+            format: 'module',
         },
-        {
-            file: 'dist/bundle.min.js',
-            format: 'iife',
-            name: 'version',
-            plugins: [terser()]
-        },
-    ]
+        //{
+        //    file: 'dist-min',
+        //    format: 'module',
+        //    plugins: [terser()]
+        //},
+    ],
+    plugins: [css({ modules: true })],
 };

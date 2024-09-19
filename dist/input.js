@@ -1,4 +1,4 @@
-export class HeliumInput extends HTMLElement {
+class HeliumInput extends HTMLElement {
     static formAssociated = true;
     static observedAttributes = [
         'pattern',
@@ -126,7 +126,7 @@ export class HeliumInput extends HTMLElement {
                 const validList = elem.getAttribute('input-invalid') ?? '';
                 let validSet = new Set(validList.split(' '));
                 if (validity.valid) {
-                    validSet.delete(id)
+                    validSet.delete(id);
                 } else {
                     validSet.add(id);
                 }
@@ -198,3 +198,5 @@ export class HeliumInput extends HTMLElement {
 document.addEventListener("DOMContentLoaded", function() {
     customElements.define("he-input", HeliumInput);
 });
+
+export { HeliumInput };

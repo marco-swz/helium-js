@@ -1,8 +1,10 @@
-import { scss } from './utils.js';
-import { HeliumFormDialog } from './form_dialog.js';
-import { HeliumCheck } from './check.js';
+import { s as scss } from './utils-B65AITo8.js';
+import './form_dialog.js';
+import './check.js';
+import './button.js';
+import './dialog.js';
 
-export class HeliumTable extends HTMLElement {
+class HeliumTable extends HTMLElement {
     static observedAttributes = [
         'endpoint',
         'pagination',
@@ -295,7 +297,7 @@ export class HeliumTable extends HTMLElement {
 
             let contHeaderCell = document.createElement('div');
             let contFilter = document.createElement('div');
-            contFilter.classList.add('cont-filter')
+            contFilter.classList.add('cont-filter');
             contHeaderCell.append(contFilter);
 
             let spanName = document.createElement('span');
@@ -359,7 +361,7 @@ export class HeliumTable extends HTMLElement {
             let rowData = {};
             for (let i = 0; i < columns.length; ++i) {
                 const cell = row.children[i];
-                const column = columns[i]
+                const column = columns[i];
                 const data = cell.getAttribute('data') ?? cell.innerText;
                 const colName = column.getAttribute('column') ?? column.innerText;
                 rowData[colName] = data;
@@ -414,7 +416,7 @@ export class HeliumTable extends HTMLElement {
         labelSortDesc.append(radioSortDesc);
 
         let contSorters = document.createElement('div');
-        contSorters.classList.add('cont-sorters')
+        contSorters.classList.add('cont-sorters');
         contSorters.append(labelSortAsc);
         contSorters.append(labelSortDesc);
 
@@ -535,7 +537,7 @@ export class HeliumTable extends HTMLElement {
      */
     _renderRow(data) {
         let inpCheck = document.createElement('he-check');
-        inpCheck.name = 'rows[]'
+        inpCheck.name = 'rows[]';
         inpCheck.value = data['id'] ?? '';
         inpCheck.classList.add('check-row');
         let cellCheck = document.createElement('td');
@@ -613,7 +615,7 @@ export class HeliumTable extends HTMLElement {
 
         let request = {
             data: [],
-        }
+        };
 
         for (let check of checks) {
             let row = check.parentElement.parentElement;
@@ -645,7 +647,7 @@ export class HeliumTable extends HTMLElement {
                         if (delStatus) {
                             checks[i].parentElement.parentElement.remove();
                         }
-                    })
+                    });
                 })
                 .catch(errorMsg => { console.log(errorMsg); });
             return;
@@ -692,7 +694,7 @@ export class HeliumTable extends HTMLElement {
         let formData = new FormData(this.form);
 
         if (this.pagination != null) {
-            formData.append('offset', this.offset)
+            formData.append('offset', this.offset);
             formData.append('count', this.pagination + 1);
         }
 
@@ -849,7 +851,7 @@ export class HeliumTable extends HTMLElement {
                 placeholder: column.getAttribute('default'),
                 pattern: column.getAttribute('pattern'),
                 options: optionValues,
-            })
+            });
         }
 
         /** @type {HeliumFormDialog} */
@@ -879,7 +881,7 @@ export class HeliumTable extends HTMLElement {
         request.headers = {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
-        }
+        };
 
         request.body = JSON.stringify(request.body);
 
@@ -979,3 +981,5 @@ export class HeliumTable extends HTMLElement {
 }
 
 customElements.define("he-table", HeliumTable);
+
+export { HeliumTable };

@@ -1,8 +1,8 @@
-import { HeliumButton } from './button.js';
-import { HeliumDialog } from './dialog.js';
-import { scss } from './utils.js';
+import './button.js';
+import './dialog.js';
+import { s as scss } from './utils-B65AITo8.js';
 
-export class HeliumFormDialog extends HTMLElement {
+class HeliumFormDialog extends HTMLElement {
     static observedAttributes = [
         "open",
         "he-title",
@@ -71,7 +71,7 @@ export class HeliumFormDialog extends HTMLElement {
         btnSave.innerHTML = 'Speichern';
         btnSave.id = 'btn-save';
         btnSave.onclick = () => this.submit.bind(this)();
-        footer.append(btnSave)
+        footer.append(btnSave);
 
         let btnClose = document.createElement('he-button');
         btnClose.innerHTML = 'Schließen';
@@ -84,10 +84,10 @@ export class HeliumFormDialog extends HTMLElement {
     connectedCallback() {
         this.addEventListener("he-dialog-show", function() {
             this.show();
-        })
+        });
         this.addEventListener("he-dialog-close", function() {
             this.close();
-        })
+        });
     }
 
     getValues(validate = true) {
@@ -163,7 +163,7 @@ export class HeliumFormDialog extends HTMLElement {
      * @returns boolean
      */
     _validateInput(input) {
-        const pattern = input.pattern
+        const pattern = input.pattern;
 
         if (input.required && input.value === '') {
             return false;
@@ -316,3 +316,5 @@ export class HeliumFormDialog extends HTMLElement {
 }
 
 customElements.define("he-form-dialog", HeliumFormDialog);
+
+export { HeliumFormDialog };

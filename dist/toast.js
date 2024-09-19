@@ -1,4 +1,4 @@
-export class HeliumToast extends HTMLElement {
+class HeliumToast extends HTMLElement {
     static observedAttributes = [
         'position',
     ];
@@ -155,7 +155,7 @@ export class HeliumToast extends HTMLElement {
             ], {
                 duration: duration,
             }
-        )
+        );
         animation.onfinish = () => this.hideToast($toast);
         $toast.append($bar);
 
@@ -187,7 +187,7 @@ export class HeliumToast extends HTMLElement {
             ], {
                 duration: 200,
             }
-        )
+        );
 
         const position = this.getAttribute('position') ?? '';
         if (position.includes('top')) {
@@ -205,7 +205,7 @@ export class HeliumToast extends HTMLElement {
             ], {
                 duration: 200,
             }
-        )
+        );
         animation.onfinish = () => $toast.remove();
     }
 
@@ -216,10 +216,6 @@ export class HeliumToast extends HTMLElement {
      * @param {string} newValue The new attribute value
      */
     attributeChangedCallback(name, _oldValue, newValue) {
-        switch (name) {
-            default:
-                break;
-        }
     }
 }
 
@@ -241,18 +237,20 @@ document.addEventListener("DOMContentLoaded", function() {
 
     document.addEventListener("he-toast", function(e) {
         showToastTemp(e);
-    })
+    });
 
     document.addEventListener("he-toast-error", function(e) {
         showToastTemp(e, 'error');
-    })
+    });
 
     document.addEventListener("he-toast-warn", function(e) {
         showToastTemp(e, 'warn');
-    })
+    });
 
     document.addEventListener("he-toast-success", function(e) {
         showToastTemp(e, 'success');
-    })
+    });
 
 });
+
+export { HeliumToast };
