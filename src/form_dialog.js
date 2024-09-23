@@ -118,7 +118,7 @@ export class HeliumFormDialog extends HTMLElement {
         }
 
         endpoint = endpoint
-            ?? this.getAttribute('-endpoint')
+            ?? this.getAttribute('endpoint')
             ?? this.getAttribute('action');
 
         fetchArgs = fetchArgs ?? {};
@@ -178,10 +178,7 @@ export class HeliumFormDialog extends HTMLElement {
     }
 
     reset() {
-        for (const input of this.form.querySelectorAll('he-input')) {
-            console.log(input.value);
-            input.value = '';
-        }
+        this.form.reset();
     }
 
     /**
@@ -289,10 +286,14 @@ export class HeliumFormDialog extends HTMLElement {
 
     /**
      * Opens the dialog.
+     * @param {boolean} [reset=false] 
      * @returns Self
      */
-    show() {
-        this.dialog.show();
+    show(reset=false) {
+        if (reset) {
+            this.reset();
+        }
+        this.dialog.show(empty);
         return this;
     }
 

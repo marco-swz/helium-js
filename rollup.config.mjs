@@ -17,14 +17,14 @@ export default {
     ],
     output: [
         {
-            dir: 'dist',
+            dir: 'dist/0.5.0',
             format: 'module',
         },
-        //{
-        //    file: 'dist-min',
-        //    format: 'module',
-        //    plugins: [terser()]
-        //},
+        {
+            dir: 'dist-min/0.5.0',
+            format: 'module',
+            plugins: [terser()]
+        },
     ],
     plugins: [css({ modules: true })],
 };

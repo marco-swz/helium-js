@@ -122,13 +122,14 @@ export class HeliumTable extends HTMLElement {
 
         thead .inp-filter {
             margin: 0;
-            padding: 0px 5px;
+            padding: 1px 5px;
             font-size: 0.9rem;
             font-weight: 500;
             background-color: transparent;
+            border-radius: 2px;
             outline: none;
             border: 0;
-            color: white;
+            color: black;
             width: 100%;
             -webkit-appearance: none;
             -moz-appearance: none;
@@ -153,15 +154,15 @@ export class HeliumTable extends HTMLElement {
         thead .inp-filter:focus,
         .cont-filter input:not(:placeholder-shown),
         .cont-filter select:has(option:checked:not([value=""])) {
-            background-color: #00000026;
-            transform: translateY(5px);
+            background-color: whitesmoke;
+            transform: translateY(9px);
             font-weight: 600;
         }
 
         thead .inp-filter:focus + .span-colname, 
         .cont-filter input:not(:placeholder-shown) + .span-colname,
         .cont-filter select:has(option:checked:not([value=""])) + .span-colname {
-            transform: translateY(-11px);
+            transform: translateY(-3px);
             font-size: 0.7rem;
             opacity: 1;
         }
@@ -616,7 +617,7 @@ export class HeliumTable extends HTMLElement {
         }
 
         for (let check of checks) {
-            let row = check.parentElement.parentElement;
+            let row = check.closest('tr');
             let data = this._getRowData(row);
             request.data.push(data);
         }
@@ -637,13 +638,13 @@ export class HeliumTable extends HTMLElement {
         if (this.endpoint != null) {
             fetch(this.endpoint, {
                 method: 'DELETE',
-                body: request,
+                body: JSON.stringify(request),
             })
                 .then(resp => resp.json())
                 .then(data => {
-                    data.foreach((delStatus, i) => {
-                        if (delStatus) {
-                            checks[i].parentElement.parentElement.remove();
+                    data.forEach((delError, i) => {
+                        if (!delError) {
+                            checks[i].closest('tr').remove();
                         }
                     })
                 })
@@ -657,6 +658,8 @@ export class HeliumTable extends HTMLElement {
     }
 
     /**
+     * @param {HTMLTableRowElement} row The table row to get the values from
+     * @param {boolean} [returnDisplayValues=false] If `true`, returns the visible values instead of the `data` values
      * @returns {Object.<string, string>}
      */
     _getRowData(row, returnDisplayValues = false) {
@@ -882,7 +885,6 @@ export class HeliumTable extends HTMLElement {
         }
 
         request.body = JSON.stringify(request.body);
-
         return request;
     }
 
