@@ -3,25 +3,16 @@
     padding: 0;
     border-radius: 3px;
     border: 0;
-    box-shadow:0 5px 10px 0 #80808054;
 }
 
 #he-icon-close {
     font-weight: 900;
-    width: 30px;
-    aspect-ratio: 1;
-    height: fit-content;
+    width: 20px;
     text-align: center;
     cursor: pointer;
+    padding: 0.15rem;
     border-radius: 50%;
     font-family: cursive;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-#he-icon-close:hover {
-    background-color: whitesmoke;
 }
 
 #he-diag-inner {
@@ -41,8 +32,9 @@
 #he-diag-header {
     display: flex;
     justify-content: space-between;
-    padding: 3px 15px;
-    padding-top: 10px;
+    background-color: var(--he-dialog-clr-title, #0082b4);
+    color: var(--he-dialog-clr-title-text, white);
+    padding: 3px 10px;
 }
 
 #he-diag-footer {
@@ -55,7 +47,6 @@
 #he-title {
     display: flex;
     font-weight: 500;
-    font-size: 1.5rem;
     align-items: center;
 }
 
@@ -92,3 +83,4 @@
         background-color: #0082b40d;
     }
 }
+

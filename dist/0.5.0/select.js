@@ -1,3 +1,7 @@
+import { h as heEnableBodyScroll, a as heSpaceBelow, b as hePositionRelative, c as heDisableBodyScroll } from './utils-B1ZZEmwz.js';
+
+const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\r\n    height: fit-content;\r\n    width: fit-content;\r\n    font-size: 14px;\r\n    min-width: 60px;\r\n}\r\n\r\n#inp {\r\n    position: relative;\r\n    background-color: var(--he-select-clr-bg, whitesmoke);\r\n    border: 1px solid lightgrey;\r\n    width: inherit;\r\n    height: inherit;\r\n    min-width: inherit;\r\n    padding: 0.3rem 0.4rem;\r\n    border-radius: 3px;\r\n    outline: none;\r\n    text-align: left;\r\n    padding-right: 25px;\r\n    text-wrap: nowrap;\r\n}\r\n\r\n#inp:hover, #inp:focus {\r\n    cursor: pointer;\r\n    border-color: var(--he-select-clr-border-hover, grey);\r\n}\r\n\r\n#inp::after {\r\n    content: \"\";\r\n    position: absolute;\r\n    width: 4px;\r\n    height: 4px;\r\n    top: 0;\r\n    left: 0;\r\n    right: 0;\r\n    bottom: 0;\r\n    margin: auto 10px auto auto;\r\n    border: 2px solid transparent;\r\n    border-bottom-color: var(--he-select-clr-arrow, black);\r\n    border-right-color: var(--he-select-clr-arrow, black);\r\n    transform: rotate(45deg) translateY(-2.5px);\r\n}\r\n\r\n#popover {\r\n    inset: unset;\r\n    outline: none;\r\n    border: 1px solid grey;\r\n    border-radius: var(--he-select-border-radius, 3px);\r\n    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);\r\n}\r\n\r\n#cont-options {\r\n    display: flex;\r\n    flex-direction: column;\r\n    background-color: var(--he-select-clr-bg, white);\r\n    max-height: 300px;\r\n    overflow: auto;\r\n    overscroll-behavior: contain;\r\n}\r\n\r\n#cont-options option {\r\n    padding: 5px 4px;\r\n    border-radius: 3px;\r\n}\r\n\r\n#cont-options option[selected] {\r\n    background-color: var(--he-select-clr-bg-hover, whitesmoke);\r\n}\r\n\r\n#cont-options option:hover:not(:disabled) {\r\n    background-color: var(--he-select-clr-bg-hover, whitesmoke);\r\n    cursor: pointer;\r\n}\r\n\r\n#filter {\r\n    --he-input-border-radius: 2px;\r\n    width: 100%;\r\n}\r\n\r\n");
+
 class HeliumSelect extends HTMLElement {
     static formAssociated = true;
     static observedAttributes = [
@@ -21,84 +25,6 @@ class HeliumSelect extends HTMLElement {
         super();
         let shadow = this.attachShadow({ mode: "open" });
         this.internals = this.attachInternals();
-
-        let sheet = new CSSStyleSheet();
-        sheet.replaceSync(scss`
-            :host {
-                height: fit-content;
-                width: fit-content;
-            }
-
-            #inp {
-                position: relative;
-                background-color: var(--he-select-clr-bg, whitesmoke);
-                border: 1px solid lightgrey;
-                width: 100%;
-                padding: 0.3rem 0.4rem;
-                font-size: var(--he-select-fs, 14px);
-                border-radius: 3px;
-                outline: none;
-                text-align: left;
-                padding-right: 25px;
-                text-wrap: nowrap;
-            }
-
-            #inp:hover, #inp:focus {
-                cursor: pointer;
-                border-color: var(--he-select-clr-border-hover, grey);
-            }
-
-            #inp::after {
-                content: "";
-                position: absolute;
-                width: 4px;
-                height: 4px;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                margin: auto 10px auto auto;
-                border: 2px solid transparent;
-                border-bottom-color: var(--he-select-clr-arrow, black);
-                border-right-color: var(--he-select-clr-arrow, black);
-                transform: rotate(45deg) translateY(-2.5px);
-            }
-
-            #popover {
-                inset: unset;
-                outline: none;
-                border: 1px solid grey;
-                border-radius: var(--he-select-border-radius, 3px);
-            }
-
-            #cont-options {
-                display: flex;
-                flex-direction: column;
-                background-color: var(--he-select-clr-bg, white);
-                max-height: 300px;
-                overflow: auto;
-                overscroll-behavior: contain;
-            }
-
-            #cont-options option {
-                padding: 5px 4px;
-                border-radius: 3px;
-            }
-
-            #cont-options option[selected] {
-                background-color: var(--he-select-clr-bg-hover, whitesmoke);
-            }
-
-            #cont-options option:hover:not(:disabled) {
-                background-color: var(--he-select-clr-bg-hover, whitesmoke);
-                cursor: pointer;
-            }
-
-            #filter {
-                --he-input-border-radius: 2px;
-                width: 100%;
-            }
-        `);
 
         this.input = document.createElement('button');
         this.input.id = 'inp';

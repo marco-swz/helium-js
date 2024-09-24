@@ -1,13 +1,16 @@
 import './button.js';
+import './input.js';
 import './dialog.js';
-import { s as scss } from './utils-B65AITo8.js';
+import './select.js';
+import './utils-B1ZZEmwz.js';
+
+const sheet = new CSSStyleSheet();sheet.replaceSync("#he-form {\r\n    display: grid;\r\n    grid-template-columns: max-content 1fr;\r\n    gap: 0.5rem;\r\n    margin: 0.5rem;\r\n    margin-bottom: 0.5rem;\r\n}\r\n\r\n#footer-diag-edit he-button:first-child {\r\n    margin-right: 0.5rem;\r\n}\r\n\r\n#he-form he-select, #he-form he-input {\r\n    width: 100%;\r\n}\r\n\r\n#he-form label {\r\n    display: flex;\r\n    align-items: center;\r\n}\r\n");
 
 class HeliumFormDialog extends HTMLElement {
     static observedAttributes = [
         "open",
         "he-title",
         "close-icon",
-        "close-button",
     ];
     /** @type {HeliumDialog} */
     dialog;
@@ -15,43 +18,6 @@ class HeliumFormDialog extends HTMLElement {
     constructor() {
         super();
         let shadow = this.attachShadow({ mode: "open" });
-        let sheet = new CSSStyleSheet();
-
-        sheet.replaceSync(scss`
-            #he-form {
-                display: grid;
-                grid-template-columns: max-content 1fr;
-                gap: 0.5rem;
-                margin: 0.5rem;
-                margin-bottom: 0.5rem;
-            }
-
-            #he-form input, #he-form select {
-                font-size: 16px;
-                padding: 3px 7px;
-                outline: none;
-                border: 1px solid grey;
-                background-color: whitesmoke;
-                border-radius: var(--he-form-dialog-radius-input, 2px);
-            }
-
-            #he-form input:focus, #he-form select:focus {
-                border-color: var(--he-form-dialog-clr-focus, black);
-            }
-
-            #footer-diag-edit he-button:first-child {
-                margin-right: 0.5rem;
-            }
-
-            #he-form .invalid-input {
-                border: 1px solid red;
-            }
-
-            #he-form label {
-                display: flex;
-                align-items: center;
-            }
-        `);
 
         shadow.adoptedStyleSheets = [sheet];
 
@@ -72,11 +38,6 @@ class HeliumFormDialog extends HTMLElement {
         btnSave.id = 'btn-save';
         btnSave.onclick = () => this.submit.bind(this)();
         footer.append(btnSave);
-
-        let btnClose = document.createElement('he-button');
-        btnClose.innerHTML = 'Schließen';
-        btnClose.onclick = () => this.dialog.close();
-        footer.append(btnClose);
 
         shadow.append(this.dialog);
     }
@@ -159,22 +120,11 @@ class HeliumFormDialog extends HTMLElement {
 
     /**
      * 
-     * @param {HTMLInputElement} input
+     * @param {HeliumInput} input
      * @returns boolean
      */
     _validateInput(input) {
-        const pattern = input.pattern;
-
-        if (input.required && input.value === '') {
-            return false;
-        }
-
-        if (pattern == null) {
-            return true;
-        }
-
-        const regex = new RegExp(pattern);
-        return regex.test(input.value);
+        return input.checkValidity()
     }
 
     reset() {
@@ -226,11 +176,14 @@ class HeliumFormDialog extends HTMLElement {
             this.form.append(label);
 
             if (entry.options && Object.keys(entry.options).length > 0) {
-                let select = document.createElement('select');
+                /** @type {HeliumSelect} */
+                let select = document.createElement('he-select');
                 select.id = id;
                 select.name = entry.name;
                 if (!entry.required) {
-                    select.append(document.createElement('option'));
+                    let option = document.createElement('option');
+                    option.innerHTML = '‎';
+                    select.append(option);
                 }
 
                 for (const [value, text] of Object.entries(entry.options)) {
@@ -241,7 +194,7 @@ class HeliumFormDialog extends HTMLElement {
                 }
                 this.form.append(select);
             } else {
-                let input = document.createElement('input');
+                let input = document.createElement('he-input');
                 input.required = entry.required;
                 input.id = id;
                 input.name = entry.name;
@@ -266,9 +219,9 @@ class HeliumFormDialog extends HTMLElement {
         const input = e.currentTarget;
         const isValid = this._validateInput(input);
         if (isValid) {
-            input.classList.remove('invalid-input');
+            input.removeAttribute('invalid');
         } else {
-            input.classList.add('invalid-input');
+            input.setAttribute('invalid', true);
         }
 
         return isValid;

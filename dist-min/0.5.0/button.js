@@ -1,4 +1,4 @@
-import{s as t}from"./utils-SpbzPs7e.js";class e extends HTMLElement{static observedAttributes=["value","name","form","popovertarget","popovertargetaction","disabled","form","formtarget","formenctype","formmethod","formnovalidate","loading","show-dialog","close-dialog","submit","input-invalid"];button;listenerClick=null;constructor(){super();let e=this.attachShadow({mode:"open"}),o=new CSSStyleSheet;o.replaceSync(t`
+import{s as t}from"./utils-DMShwPAW.js";class e extends HTMLElement{static observedAttributes=["value","name","form","popovertarget","popovertargetaction","disabled","form","formtarget","formenctype","formmethod","formnovalidate","loading","show-dialog","close-dialog","submit","input-invalid"];button;listenerClick=null;constructor(){super();let e=this.attachShadow({mode:"open"}),o=new CSSStyleSheet;o.replaceSync(t`
         :host {
             text-wrap: nowrap;
         }

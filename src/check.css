@@ -1,0 +1,58 @@
+:host {
+    display: inline-block;
+    height: 20px;
+    aspect-ratio: 1;
+    border-radius: var(--he-check-radius, 3px);
+}
+
+.container {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    border-radius: inherit;
+}
+
+.checkmark {
+    height: 100%;
+    width: 100%;
+    background-color: #eee;
+    border-radius: inherit;
+}
+
+:host(:hover) .checkmark {
+    background-color: var(--he-check-clr-hover, lightgrey);
+}
+
+:host(:state(checked)) .checkmark {
+    background-color: var(--he-check-clr-checked, grey);
+}
+
+:host(:state(checked)) .checkmark:after {
+    display: block;
+}
+
+:host(:state(checked):state(indeterminate)) .checkmark:after {
+    display: block;
+    -webkit-transform: translate(50%, 200%);
+    -ms-transform: translate(50%, 200%);
+    transform: translate(50%, 200%);
+    height: 0;
+    width: 30%;
+}
+
+.checkmark:after {
+    content: "";
+    display: none;
+    height: 50%;
+    aspect-ratio: 0.3;
+    border: solid white;
+    border-width: 0 4px 4px 0;
+    -webkit-transform: translate(var(--he-check-left-shift, 100%), var(--he-check-top-shift, 10%)) rotate(45deg);
+    -ms-transform: translate(var(--he-check-left-shift, 100%), var(--he-check-top-shift, 10%)) rotate(45deg);
+    transform: translate(var(--he-check-left-shift, 100%), var(--he-check-top-shift, 10%)) rotate(45deg);
+} 

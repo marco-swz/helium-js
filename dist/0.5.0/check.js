@@ -1,4 +1,4 @@
-import { s as scss } from './utils-B65AITo8.js';
+const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\r\n    display: inline-block;\r\n    height: 20px;\r\n    aspect-ratio: 1;\r\n    border-radius: var(--he-check-radius, 3px);\r\n}\r\n\r\n.container {\r\n    display: block;\r\n    width: 100%;\r\n    height: 100%;\r\n    cursor: pointer;\r\n    -webkit-user-select: none;\r\n    -moz-user-select: none;\r\n    -ms-user-select: none;\r\n    user-select: none;\r\n    border-radius: inherit;\r\n}\r\n\r\n.checkmark {\r\n    height: 100%;\r\n    width: 100%;\r\n    background-color: #eee;\r\n    border-radius: inherit;\r\n}\r\n\r\n:host(:hover) .checkmark {\r\n    background-color: var(--he-check-clr-hover, lightgrey);\r\n}\r\n\r\n:host(:state(checked)) .checkmark {\r\n    background-color: var(--he-check-clr-checked, grey);\r\n}\r\n\r\n:host(:state(checked)) .checkmark:after {\r\n    display: block;\r\n}\r\n\r\n:host(:state(checked):state(indeterminate)) .checkmark:after {\r\n    display: block;\r\n    -webkit-transform: translate(50%, 200%);\r\n    -ms-transform: translate(50%, 200%);\r\n    transform: translate(50%, 200%);\r\n    height: 0;\r\n    width: 30%;\r\n}\r\n\r\n.checkmark:after {\r\n    content: \"\";\r\n    display: none;\r\n    height: 50%;\r\n    aspect-ratio: 0.3;\r\n    border: solid white;\r\n    border-width: 0 4px 4px 0;\r\n    -webkit-transform: translate(var(--he-check-left-shift, 100%), var(--he-check-top-shift, 10%)) rotate(45deg);\r\n    -ms-transform: translate(var(--he-check-left-shift, 100%), var(--he-check-top-shift, 10%)) rotate(45deg);\r\n    transform: translate(var(--he-check-left-shift, 100%), var(--he-check-top-shift, 10%)) rotate(45deg);\r\n} \r\n");
 
 class HeliumCheck extends HTMLElement {
     static formAssociated = true;
@@ -15,78 +15,6 @@ class HeliumCheck extends HTMLElement {
     constructor() {
         super();
         let shadow = this.attachShadow({ mode: "open" });
-
-        let sheet = new CSSStyleSheet();
-        sheet.replaceSync(scss`
-        :host {
-            display: inline-block;
-            width: fit-content;
-        }
-
-        .container {
-            display: block;
-            position: relative;
-            padding-left: 25px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-
-        .checkmark {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 25px;
-            width: 25px;
-            background-color: #eee;
-            border-radius: var(--he-check-radius, 3px);
-            transform: scale(var(--he-check-scale, 0.7)) translateY(-5px);
-        }
-
-        :host(:hover) .checkmark {
-            background-color: var(--he-check-clr-hover, lightgrey);
-        }
-
-        :host(:state(checked)) .checkmark {
-            background-color: var(--he-check-clr-checked, grey);
-        }
-
-        .checkmark:after {
-            content: "";
-            position: absolute;
-            display: none;
-        }
-
-        :host(:state(checked)) .checkmark:after {
-            display: block;
-        }
-
-        :host(:state(checked):state(indeterminate)) .checkmark:after {
-            display: block;
-            -webkit-transform: rotate(0deg);
-            -ms-transform: rotate(0deg);
-            transform: rotate(0deg);
-            height: 0px;
-            top: 11px;
-            width: 7px;
-            left: 7px;
-        }
-
-        .checkmark:after {
-            left: 8px;
-            top: 2px;
-            width: 5px;
-            height: 12px;
-            border: solid white;
-            border-width: 0 4px 4px 0;
-            -webkit-transform: rotate(45deg);
-            -ms-transform: rotate(45deg);
-            transform: rotate(45deg);
-        } 
-        `);
 
         let container = document.createElement('div');
         container.classList.add('container');

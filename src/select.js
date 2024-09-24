@@ -1,3 +1,6 @@
+import sheet from './select.css';
+import { heSpaceBelow, hePositionRelative, heEnableBodyScroll, heDisableBodyScroll } from "./utils.js";
+
 export class HeliumSelect extends HTMLElement {
     static formAssociated = true;
     static observedAttributes = [
@@ -21,84 +24,6 @@ export class HeliumSelect extends HTMLElement {
         super();
         let shadow = this.attachShadow({ mode: "open" });
         this.internals = this.attachInternals();
-
-        let sheet = new CSSStyleSheet();
-        sheet.replaceSync(scss`
-            :host {
-                height: fit-content;
-                width: fit-content;
-            }
-
-            #inp {
-                position: relative;
-                background-color: var(--he-select-clr-bg, whitesmoke);
-                border: 1px solid lightgrey;
-                width: 100%;
-                padding: 0.3rem 0.4rem;
-                font-size: var(--he-select-fs, 14px);
-                border-radius: 3px;
-                outline: none;
-                text-align: left;
-                padding-right: 25px;
-                text-wrap: nowrap;
-            }
-
-            #inp:hover, #inp:focus {
-                cursor: pointer;
-                border-color: var(--he-select-clr-border-hover, grey);
-            }
-
-            #inp::after {
-                content: "";
-                position: absolute;
-                width: 4px;
-                height: 4px;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                margin: auto 10px auto auto;
-                border: 2px solid transparent;
-                border-bottom-color: var(--he-select-clr-arrow, black);
-                border-right-color: var(--he-select-clr-arrow, black);
-                transform: rotate(45deg) translateY(-2.5px);
-            }
-
-            #popover {
-                inset: unset;
-                outline: none;
-                border: 1px solid grey;
-                border-radius: var(--he-select-border-radius, 3px);
-            }
-
-            #cont-options {
-                display: flex;
-                flex-direction: column;
-                background-color: var(--he-select-clr-bg, white);
-                max-height: 300px;
-                overflow: auto;
-                overscroll-behavior: contain;
-            }
-
-            #cont-options option {
-                padding: 5px 4px;
-                border-radius: 3px;
-            }
-
-            #cont-options option[selected] {
-                background-color: var(--he-select-clr-bg-hover, whitesmoke);
-            }
-
-            #cont-options option:hover:not(:disabled) {
-                background-color: var(--he-select-clr-bg-hover, whitesmoke);
-                cursor: pointer;
-            }
-
-            #filter {
-                --he-input-border-radius: 2px;
-                width: 100%;
-            }
-        `);
 
         this.input = document.createElement('button');
         this.input.id = 'inp';

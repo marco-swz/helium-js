@@ -1,5 +1,5 @@
 import terser from '@rollup/plugin-terser';
-import css from 'rollup-plugin-css-only';
+import css from "rollup-plugin-import-css";
 
 export default {
     input: [
@@ -26,5 +26,5 @@ export default {
             plugins: [terser()]
         },
     ],
-    plugins: [css({ modules: true })],
+    plugins: [ css({ modules: true, alwaysOutput: true }) ],
 };

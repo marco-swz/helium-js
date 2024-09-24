@@ -1,6 +1,4 @@
-import { s as scss } from './utils-B65AITo8.js';
-
-//import sheet from './dialog.css' assert { type: "css" };
+const sheet = new CSSStyleSheet();sheet.replaceSync("#he-diag-outer {\r\n    outline: none;\r\n    padding: 0;\r\n    border-radius: 3px;\r\n    border: 0;\r\n    box-shadow:0 5px 10px 0 #80808054;\r\n}\r\n\r\n#he-icon-close {\r\n    font-weight: 900;\r\n    width: 30px;\r\n    aspect-ratio: 1;\r\n    height: fit-content;\r\n    text-align: center;\r\n    cursor: pointer;\r\n    border-radius: 50%;\r\n    font-family: cursive;\r\n    display: flex;\r\n    justify-content: center;\r\n    align-items: center;\r\n}\r\n\r\n#he-icon-close:hover {\r\n    background-color: whitesmoke;\r\n}\r\n\r\n#he-diag-inner {\r\n    min-height: 100px;\r\n    min-width: 200px;\r\n    display: flex;\r\n    flex-direction: column;\r\n    justify-content: space-between;\r\n}\r\n\r\n#he-diag-body {\r\n    padding-left: 10px;\r\n    padding-right: 10px;\r\n    padding-top: 10px;\r\n}\r\n\r\n#he-diag-header {\r\n    display: flex;\r\n    justify-content: space-between;\r\n    padding: 3px 15px;\r\n    padding-top: 10px;\r\n}\r\n\r\n#he-diag-footer {\r\n    display: flex;\r\n    justify-content: flex-end;\r\n    padding: 10px;\r\n    gap: 5px;\r\n}\r\n\r\n#he-title {\r\n    display: flex;\r\n    font-weight: 500;\r\n    font-size: 1.5rem;\r\n    align-items: center;\r\n}\r\n\r\n#he-diag-footer input[type=button] {\r\n    border-radius: 3px;\r\n    color: black;\r\n    height: 35px;\r\n    padding: 0px 10px;\r\n    vertical-align: middle;\r\n    text-align: center;\r\n    border: 1px solid rgba(0, 0, 0, 0.2235294118);\r\n    font-size: 14px;\r\n    background-color: white;\r\n    outline-style: none;\r\n    box-shadow: none !important;\r\n    width: auto;\r\n    visibility: collapse;\r\n\r\n    &[disabled] {\r\n        background-color: #d9d9d9;\r\n        color: #666666;\r\n        cursor: no-drop;\r\n        text-shadow: none;\r\n    }\r\n\r\n    &:hover:enabled, &:active:enabled, &:focus:enabled {\r\n        cursor: pointer;\r\n        text-shadow: 0px 0px 0.3px #0082b4;\r\n        border-color: var(--he-color-accent, #0082b4);\r\n        color: var(--he-color-accent, #0082b4);\r\n    }\r\n\r\n    &:hover:enabled{\r\n        background-color: #0082b40d;\r\n    }\r\n}\r\n");
 
 class HeliumDialog extends HTMLElement {
     static observedAttributes = [
@@ -18,102 +16,13 @@ class HeliumDialog extends HTMLElement {
         super();
         let shadow = this.attachShadow({ mode: "open" });
 
-        let sheet = new CSSStyleSheet();
-        sheet.replaceSync(scss`
-#he-diag-outer {
-    outline: none;
-    padding: 0;
-    border-radius: 3px;
-    border: 0;
-}
-
-#he-icon-close {
-    font-weight: 900;
-    width: 20px;
-    text-align: center;
-    cursor: pointer;
-    padding: 0.15rem;
-    border-radius: 50%;
-    font-family: cursive;
-}
-
-#he-diag-inner {
-    min-height: 100px;
-    min-width: 200px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-#he-diag-body {
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-top: 10px;
-}
-
-#he-diag-header {
-    display: flex;
-    justify-content: space-between;
-    background-color: var(--he-dialog-clr-title, #0082b4);
-    color: var(--he-dialog-clr-title-text, white);
-    padding: 3px 10px;
-}
-
-#he-diag-footer {
-    display: flex;
-    justify-content: flex-end;
-    padding: 10px;
-    gap: 5px;
-}
-
-#he-title {
-    display: flex;
-    font-weight: 500;
-    align-items: center;
-}
-
-#he-diag-footer input[type=button] {
-    border-radius: 3px;
-    color: black;
-    height: 35px;
-    padding: 0px 10px;
-    vertical-align: middle;
-    text-align: center;
-    border: 1px solid rgba(0, 0, 0, 0.2235294118);
-    font-size: 14px;
-    background-color: white;
-    outline-style: none;
-    box-shadow: none !important;
-    width: auto;
-    visibility: collapse;
-
-    &[disabled] {
-        background-color: #d9d9d9;
-        color: #666666;
-        cursor: no-drop;
-        text-shadow: none;
-    }
-
-    &:hover:enabled, &:active:enabled, &:focus:enabled {
-        cursor: pointer;
-        text-shadow: 0px 0px 0.3px #0082b4;
-        border-color: var(--he-color-accent, #0082b4);
-        color: var(--he-color-accent, #0082b4);
-    }
-
-    &:hover:enabled{
-        background-color: #0082b40d;
-    }
-}
-        `);
-
         shadow.adoptedStyleSheets = [sheet];
         shadow.innerHTML = `
             <dialog id="he-diag-outer">
                 <div id="he-diag-inner">
                     <div id="he-diag-header">
                         <div id="he-title"></div>
-                        <div id="he-icon-close">X</div>
+                        <div id="he-icon-close"><span>X</span></div>
                     </div>
                     <div id="he-diag-body">
                         <slot name="body"></slot>
@@ -163,7 +72,7 @@ class HeliumDialog extends HTMLElement {
             this.title.innerText = newValue;
         }
 
-        if (name === "lose-button") {
+        if (name === "close-button") {
             if (newValue === "true") {
                 this.shadowRoot.querySelector('#he-btn-close').style.visibility = 'visible';
                 this.shadowRoot.querySelector('#he-diag-footer').style.visibility = 'visible';

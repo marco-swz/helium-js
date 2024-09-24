@@ -1,3 +1,5 @@
+const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\r\n    position: fixed;\r\n    top: unset;\r\n    right: unset;\r\n    left: 50%;\r\n    bottom: 10px;\r\n    transform: translateX(-50%);\r\n    width: 300px;\r\n}\r\n\r\n:host([position=bottom-right]) {\r\n    top: unset;\r\n    left: unset;\r\n    bottom: 10px;\r\n    right: 10px;\r\n    transform: unset;\r\n}\r\n\r\n:host([position=bottom-left]) {\r\n    top: unset;\r\n    right: unset;\r\n    bottom: 10px;\r\n    left: 10px;\r\n    transform: unset;\r\n}\r\n\r\n:host([position=top-left]) {\r\n    bottom: unset;\r\n    right: unset;\r\n    top: 10px;\r\n    left: 10px;\r\n    transform: unset;\r\n}\r\n\r\n:host([position=top-right]) {\r\n    bottom: unset;\r\n    left: unset;\r\n    top: 10px;\r\n    right: 10px;\r\n    transform: unset;\r\n}\r\n\r\n:host([position=top]) {\r\n    bottom: unset;\r\n    right: unset;\r\n    top: 10px;\r\n    left: 50%;\r\n    transform: translateX(-50%);\r\n}\r\n\r\n#contToasts {\r\n    display: flex;\r\n    flex-direction: column;\r\n    gap: 10px;\r\n}\r\n\r\n#toast {\r\n    border: 1px solid grey;\r\n    border-radius: var(--he-toast-radius-border, 3px);\r\n    background-color: var(--he-toast-clr-bg, white);\r\n    z-index: 10;\r\n    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);\r\n}\r\n\r\n#bar {\r\n    width: 100%;\r\n    height: 5px;\r\n    background-color: red;\r\n    margin-right: auto;\r\n}\r\n\r\n#bar[type=warn] {\r\n    background-color: var(--he-toast-bg-bar-warn, orange);\r\n}\r\n\r\n#bar[type=error] {\r\n    background-color: var(--he-toast-bg-bar-error, indianred);\r\n}\r\n\r\n#bar[type=success] {\r\n    background-color: var(--he-toast-bg-bar-success, seagreen);\r\n}\r\n\r\n#contMain {\r\n    display: flex;\r\n    justify-content: space-between;\r\n    align-items: center;\r\n}\r\n\r\n#contText {\r\n    padding: 1rem 2rem;\r\n    font-size: 16px;\r\n}\r\n\r\n#btnClose {\r\n    border-radius: 50%;\r\n    font-size: 20px;\r\n    font-weight: 500;\r\n    margin-right: 10px;\r\n    border-radius: 50%;\r\n    width: 35px;\r\n    height: 35px;\r\n    text-align: center;\r\n    vertical-align: middle;\r\n    cursor: pointer;\r\n}\r\n\r\n#btnClose:hover {\r\n    background-color: whitesmoke;\r\n}\r\n");
+
 class HeliumToast extends HTMLElement {
     static observedAttributes = [
         'position',
@@ -10,118 +12,6 @@ class HeliumToast extends HTMLElement {
         let shadow = this.attachShadow({ mode: "open" });
         this.internals = this.attachInternals();
 
-        let sheet = new CSSStyleSheet();
-        sheet.replaceSync(scss`
-            :host {
-                position: fixed;
-                top: unset;
-                right: unset;
-                left: 50%;
-                bottom: 10px;
-                transform: translateX(-50%);
-                width: 300px;
-            }
-
-            :host([position=bottom-right]) {
-                top: unset;
-                left: unset;
-                bottom: 10px;
-                right: 10px;
-                transform: unset;
-            }
-
-            :host([position=bottom-left]) {
-                top: unset;
-                right: unset;
-                bottom: 10px;
-                left: 10px;
-                transform: unset;
-            }
-
-            :host([position=top-left]) {
-                bottom: unset;
-                right: unset;
-                top: 10px;
-                left: 10px;
-                transform: unset;
-            }
-
-            :host([position=top-right]) {
-                bottom: unset;
-                left: unset;
-                top: 10px;
-                right: 10px;
-                transform: unset;
-            }
-
-            :host([position=top]) {
-                bottom: unset;
-                right: unset;
-                top: 10px;
-                left: 50%;
-                transform: translateX(-50%);
-            }
-
-            #contToasts {
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            #toast {
-                border: 1px solid grey;
-                border-radius: var(--he-toast-radius-border, 3px);
-                background-color: var(--he-toast-clr-bg, white);
-                z-index: 10;
-            }
-
-            #bar {
-                width: 100%;
-                height: 5px;
-                background-color: red;
-                margin-left: auto;
-                margin-right: auto;
-            }
-
-            #bar[type=warn] {
-                background-color: var(--he-toast-bg-bar-warn, orange);
-            }
-
-            #bar[type=error] {
-                background-color: var(--he-toast-bg-bar-error, indianred);
-            }
-
-            #bar[type=success] {
-                background-color: var(--he-toast-bg-bar-success, seagreen);
-            }
-
-            #contMain {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-            #contText {
-                padding: 1rem 2rem;
-                font-size: 16px;
-            }
-
-            #btnClose {
-                border-radius: 50%;
-                font-size: 20px;
-                font-weight: 500;
-                margin-right: 10px;
-                border-radius: 50%;
-                width: 35px;
-                height: 35px;
-                text-align: center;
-                vertical-align: middle;
-            }
-
-            #btnClose:hover {
-                background-color: whitesmoke;
-            }
-        `);
 
         this.$contToasts = document.createElement('div');
         this.$contToasts.id = 'contToasts';
@@ -180,14 +70,14 @@ class HeliumToast extends HTMLElement {
 
     showToast(message, type) {
         const $toast = this._renderToast(message, type);
-        $toast.animate(
-            [
-                { opacity: '0' },
-                { opacity: '1' },
-            ], {
-                duration: 200,
-            }
-        );
+        //$toast.animate(
+        //    [
+        //        { opacity: '0' },
+        //        { opacity: '1' },
+        //    ], {
+        //        duration: 200,
+        //    }
+        //)
 
         const position = this.getAttribute('position') ?? '';
         if (position.includes('top')) {

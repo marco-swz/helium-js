@@ -1,4 +1,4 @@
-import { scss } from './utils.js';
+import sheet from "./check.css";
 
 export class HeliumCheck extends HTMLElement {
     static formAssociated = true;
@@ -15,78 +15,6 @@ export class HeliumCheck extends HTMLElement {
     constructor() {
         super();
         let shadow = this.attachShadow({ mode: "open" });
-
-        let sheet = new CSSStyleSheet();
-        sheet.replaceSync(scss`
-        :host {
-            display: inline-block;
-            width: fit-content;
-        }
-
-        .container {
-            display: block;
-            position: relative;
-            padding-left: 25px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-
-        .checkmark {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 25px;
-            width: 25px;
-            background-color: #eee;
-            border-radius: var(--he-check-radius, 3px);
-            transform: scale(var(--he-check-scale, 0.7)) translateY(-5px);
-        }
-
-        :host(:hover) .checkmark {
-            background-color: var(--he-check-clr-hover, lightgrey);
-        }
-
-        :host(:state(checked)) .checkmark {
-            background-color: var(--he-check-clr-checked, grey);
-        }
-
-        .checkmark:after {
-            content: "";
-            position: absolute;
-            display: none;
-        }
-
-        :host(:state(checked)) .checkmark:after {
-            display: block;
-        }
-
-        :host(:state(checked):state(indeterminate)) .checkmark:after {
-            display: block;
-            -webkit-transform: rotate(0deg);
-            -ms-transform: rotate(0deg);
-            transform: rotate(0deg);
-            height: 0px;
-            top: 11px;
-            width: 7px;
-            left: 7px;
-        }
-
-        .checkmark:after {
-            left: 8px;
-            top: 2px;
-            width: 5px;
-            height: 12px;
-            border: solid white;
-            border-width: 0 4px 4px 0;
-            -webkit-transform: rotate(45deg);
-            -ms-transform: rotate(45deg);
-            transform: rotate(45deg);
-        } 
-        `);
 
         let container = document.createElement('div');
         container.classList.add('container');

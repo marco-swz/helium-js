@@ -1,0 +1,85 @@
+:host {
+    display: inline-flex;
+    position: relative;
+    border-radius: 3px;
+    background-color: whitesmoke;
+    width: 100%;
+    height: fit-content;
+    font-size: 14px;
+    border: 1px solid lightgrey;
+}
+
+:host(:hover), :host(:focus) {
+    border-color: var(--he-input-clr-border-hover, grey);
+}
+
+:host([invalid]) {
+    border-color: indianred;
+}
+
+:host([invalid]:hover) {
+    border-color: indianred;
+}
+
+:host([loading])::after {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto 10px auto auto;
+    border: 3px solid darkgrey;
+    border-radius: 50%;
+    border-bottom-color: var(--he-input-clr-spinner, black);
+    animation: button-loading-spinner 1s ease infinite;
+}
+
+:host([ok])::after {
+    content: "";
+    position: absolute;
+    width: 10px;
+    height: 15px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto 10px auto auto;
+    border: 3px solid transparent;
+    border-bottom-color: var(--he-input-clr-ok, black);
+    border-right-color: var(--he-input-clr-ok, black);
+    transform: rotate(45deg);
+}
+
+#inp-main {
+    outline: none;
+    background-color: inherit;
+    width: inherit;
+    font-size:inherit;
+    border-radius: inherit;
+    border: none;
+    padding: 0.3rem 0.4rem;
+    cursor: inherit;
+}
+
+:host([readonly]:hover), :host([readonly]:focus),
+:host([disabled]:hover), :host([disabled]:focus) {
+    border-color: var(--he-input-clr-border-hover, lightgrey);
+}
+
+:host([readonly]), :host([disabled]) {
+    cursor: default
+}
+
+@keyframes button-loading-spinner {
+    from {
+        transform: rotate(0turn);
+    }
+
+    to {
+        transform: rotate(1turn);
+    }
+}
+

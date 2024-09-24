@@ -1,3 +1,5 @@
+import sheet from "./input.css";
+
 export class HeliumInput extends HTMLElement {
     static formAssociated = true;
     static observedAttributes = [
@@ -5,6 +7,8 @@ export class HeliumInput extends HTMLElement {
         'required',
         'report-validity',
         'type',
+        'disabled',
+        'readonly',
     ];
 
     /** @type {HTMLInputElement} */
@@ -15,74 +19,6 @@ export class HeliumInput extends HTMLElement {
     constructor() {
         super();
         let shadow = this.attachShadow({ mode: "open" });
-
-        let sheet = new CSSStyleSheet();
-        sheet.replaceSync(scss`
-            :host {
-                display: inline-flex;
-                position: relative;
-            }
-
-            :host[loading]::after {
-                content: "";
-                position: absolute;
-                width: 12px;
-                height: 12px;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                margin: auto 10px auto auto;
-                border: 3px solid darkgrey;
-                border-radius: 50%;
-                border-bottom-color: var(--he-input-clr-spinner, black);
-                animation: button-loading-spinner 1s ease infinite;
-            }
-
-            :host[ok]::after {
-                content: "";
-                position: absolute;
-                width: 10px;
-                height: 15px;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                margin: auto 10px auto auto;
-                border: 3px solid transparent;
-                border-bottom-color: var(--he-input-clr-ok, black);
-                border-right-color: var(--he-input-clr-ok, black);
-                transform: rotate(45deg);
-            }
-
-            #inp-main {
-                outline: none;
-                background-color: var(--he-input-clr-bg, whitesmoke);
-                border: 1px solid lightgrey;
-                width: var(--he-input-width, 100%);
-                padding: 0.3rem 0.4rem;
-                font-size: var(--he-input-fs, 14px);
-                border-radius: var(--he-input-border-radius, 3px);
-            }
-
-            #inp-main:hover, #inp-main:focus {
-                border-color: var(--he-input-clr-border-hover, grey);
-            }
-
-            #inp-main[valid=false] {
-                border-color: var(--he-input-clr-border-invalid, indianred);
-            }
-
-            @keyframes button-loading-spinner {
-                from {
-                    transform: rotate(0turn);
-                }
-
-                to {
-                    transform: rotate(1turn);
-                }
-            }
-        `);
 
         this.input = document.createElement('input');
         this.input.type = 'text';
@@ -109,9 +45,9 @@ export class HeliumInput extends HTMLElement {
     checkValidity() {
         const validity = this.input.validity;
         if (validity.valid) {
-            this.input.setAttribute('valid', true);
+            this.removeAttribute('invalid');
         } else {
-            this.input.setAttribute('valid', false);
+            this.setAttribute('invalid', true);
         }
 
         const reportSelector = this.getAttribute('report-invalid');

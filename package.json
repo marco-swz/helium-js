@@ -4,6 +4,7 @@
     "devDependencies": {
         "@rollup/plugin-terser": "^0.4.4",
         "@wwa/rollup-plugin-terser": "^1.1.2",
-        "rollup-plugin-css-only": "^4.5.2"
+        "rollup-plugin-css-only": "^4.5.2",
+        "rollup-plugin-import-css": "^3.5.2"
     }
 }

@@ -1,0 +1,79 @@
+:host {
+    height: fit-content;
+    width: fit-content;
+    font-size: 14px;
+    min-width: 60px;
+}
+
+#inp {
+    position: relative;
+    background-color: var(--he-select-clr-bg, whitesmoke);
+    border: 1px solid lightgrey;
+    width: inherit;
+    height: inherit;
+    min-width: inherit;
+    padding: 0.3rem 0.4rem;
+    border-radius: 3px;
+    outline: none;
+    text-align: left;
+    padding-right: 25px;
+    text-wrap: nowrap;
+}
+
+#inp:hover, #inp:focus {
+    cursor: pointer;
+    border-color: var(--he-select-clr-border-hover, grey);
+}
+
+#inp::after {
+    content: "";
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto 10px auto auto;
+    border: 2px solid transparent;
+    border-bottom-color: var(--he-select-clr-arrow, black);
+    border-right-color: var(--he-select-clr-arrow, black);
+    transform: rotate(45deg) translateY(-2.5px);
+}
+
+#popover {
+    inset: unset;
+    outline: none;
+    border: 1px solid grey;
+    border-radius: var(--he-select-border-radius, 3px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+#cont-options {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--he-select-clr-bg, white);
+    max-height: 300px;
+    overflow: auto;
+    overscroll-behavior: contain;
+}
+
+#cont-options option {
+    padding: 5px 4px;
+    border-radius: 3px;
+}
+
+#cont-options option[selected] {
+    background-color: var(--he-select-clr-bg-hover, whitesmoke);
+}
+
+#cont-options option:hover:not(:disabled) {
+    background-color: var(--he-select-clr-bg-hover, whitesmoke);
+    cursor: pointer;
+}
+
+#filter {
+    --he-input-border-radius: 2px;
+    width: 100%;
+}
+
