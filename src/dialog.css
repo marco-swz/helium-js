@@ -84,8 +84,8 @@
     &:hover:enabled, &:active:enabled, &:focus:enabled {
         cursor: pointer;
         text-shadow: 0px 0px 0.3px #0082b4;
-        border-color: var(--he-color-accent, #0082b4);
-        color: var(--he-color-accent, #0082b4);
+        border-color: #0082b4;
+        color: #0082b4;
     }
 
     &:hover:enabled{

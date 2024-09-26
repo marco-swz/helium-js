@@ -1,4 +1,3 @@
-import { scss } from './utils.js';
 import { HeliumFormDialog } from './form_dialog.js';
 import { HeliumCheck } from './check.js';
 import sheet from './table.css';

@@ -1,11 +1,41 @@
-const sheet = new CSSStyleSheet();sheet.replaceSync("#he-diag-outer {\r\n    outline: none;\r\n    padding: 0;\r\n    border-radius: 3px;\r\n    border: 0;\r\n    box-shadow:0 5px 10px 0 #80808054;\r\n}\r\n\r\n#he-icon-close {\r\n    font-weight: 900;\r\n    width: 30px;\r\n    aspect-ratio: 1;\r\n    height: fit-content;\r\n    text-align: center;\r\n    cursor: pointer;\r\n    border-radius: 50%;\r\n    font-family: cursive;\r\n    display: flex;\r\n    justify-content: center;\r\n    align-items: center;\r\n}\r\n\r\n#he-icon-close:hover {\r\n    background-color: whitesmoke;\r\n}\r\n\r\n#he-diag-inner {\r\n    min-height: 100px;\r\n    min-width: 200px;\r\n    display: flex;\r\n    flex-direction: column;\r\n    justify-content: space-between;\r\n}\r\n\r\n#he-diag-body {\r\n    padding-left: 10px;\r\n    padding-right: 10px;\r\n    padding-top: 10px;\r\n}\r\n\r\n#he-diag-header {\r\n    display: flex;\r\n    justify-content: space-between;\r\n    padding: 3px 15px;\r\n    padding-top: 10px;\r\n}\r\n\r\n#he-diag-footer {\r\n    display: flex;\r\n    justify-content: flex-end;\r\n    padding: 10px;\r\n    gap: 5px;\r\n}\r\n\r\n#he-title {\r\n    display: flex;\r\n    font-weight: 500;\r\n    font-size: 1.5rem;\r\n    align-items: center;\r\n}\r\n\r\n#he-diag-footer input[type=button] {\r\n    border-radius: 3px;\r\n    color: black;\r\n    height: 35px;\r\n    padding: 0px 10px;\r\n    vertical-align: middle;\r\n    text-align: center;\r\n    border: 1px solid rgba(0, 0, 0, 0.2235294118);\r\n    font-size: 14px;\r\n    background-color: white;\r\n    outline-style: none;\r\n    box-shadow: none !important;\r\n    width: auto;\r\n    visibility: collapse;\r\n\r\n    &[disabled] {\r\n        background-color: #d9d9d9;\r\n        color: #666666;\r\n        cursor: no-drop;\r\n        text-shadow: none;\r\n    }\r\n\r\n    &:hover:enabled, &:active:enabled, &:focus:enabled {\r\n        cursor: pointer;\r\n        text-shadow: 0px 0px 0.3px #0082b4;\r\n        border-color: var(--he-color-accent, #0082b4);\r\n        color: var(--he-color-accent, #0082b4);\r\n    }\r\n\r\n    &:hover:enabled{\r\n        background-color: #0082b40d;\r\n    }\r\n}\r\n");
+const sheet = new CSSStyleSheet();sheet.replaceSync("#he-diag-outer {\r\n    outline: none;\r\n    padding: 0;\r\n    border-radius: 3px;\r\n    border: 0;\r\n    box-shadow:0 5px 10px 0 #80808054;\r\n}\r\n\r\n#he-icon-close {\r\n    font-weight: 900;\r\n    width: 30px;\r\n    aspect-ratio: 1;\r\n    height: fit-content;\r\n    text-align: center;\r\n    cursor: pointer;\r\n    border-radius: 50%;\r\n    font-family: cursive;\r\n    display: flex;\r\n    justify-content: center;\r\n    align-items: center;\r\n}\r\n\r\n#he-icon-close:hover {\r\n    background-color: whitesmoke;\r\n}\r\n\r\n#he-diag-inner {\r\n    min-height: 100px;\r\n    min-width: 200px;\r\n    display: flex;\r\n    flex-direction: column;\r\n    justify-content: space-between;\r\n}\r\n\r\n#he-diag-body {\r\n    padding-left: 10px;\r\n    padding-right: 10px;\r\n    padding-top: 10px;\r\n}\r\n\r\n#he-diag-header {\r\n    display: flex;\r\n    justify-content: space-between;\r\n    padding: 3px 15px;\r\n    padding-top: 10px;\r\n}\r\n\r\n#he-diag-footer {\r\n    display: flex;\r\n    justify-content: flex-end;\r\n    padding: 10px;\r\n    gap: 5px;\r\n}\r\n\r\n#he-title {\r\n    display: flex;\r\n    font-weight: 500;\r\n    font-size: 1.5rem;\r\n    align-items: center;\r\n}\r\n\r\n#he-diag-footer input[type=button] {\r\n    border-radius: 3px;\r\n    color: black;\r\n    height: 35px;\r\n    padding: 0px 10px;\r\n    vertical-align: middle;\r\n    text-align: center;\r\n    border: 1px solid rgba(0, 0, 0, 0.2235294118);\r\n    font-size: 14px;\r\n    background-color: white;\r\n    outline-style: none;\r\n    box-shadow: none !important;\r\n    width: auto;\r\n    visibility: collapse;\r\n\r\n    &[disabled] {\r\n        background-color: #d9d9d9;\r\n        color: #666666;\r\n        cursor: no-drop;\r\n        text-shadow: none;\r\n    }\r\n\r\n    &:hover:enabled, &:active:enabled, &:focus:enabled {\r\n        cursor: pointer;\r\n        text-shadow: 0px 0px 0.3px #0082b4;\r\n        border-color: #0082b4;\r\n        color: #0082b4;\r\n    }\r\n\r\n    &:hover:enabled{\r\n        background-color: #0082b40d;\r\n    }\r\n}\r\n");
 
+/**
+ * Will open the targeted dialog.
+ * @event HeliumDialog#he-dialog-show
+ * @type {object}
+ */
+
+/**
+ * Will close the targeted dialog.
+ * @event HeliumDialog#he-dialog-close
+ * @type {object}
+ */
+
+/** A dialog with no content.
+ * The content is filled using slots.
+ * 
+ * @element he-dialog
+ *
+ * @attr {on|off} open - If set, the dialog is open (will open if not)
+ * @attr title-text - The text in the title of the dialog
+ * @attr {on|off} hide-close-icon - If set, hides the close icon in the top-right corner
+ * @attr {on|off} show-close-button - If set, shows a button in the footer to close the dialog
+ *
+ * @slot body - The body of the dialog
+ * @slot footer - The foote of the dialog. This is where buttons are commonly placed.
+ *
+ * @listens HeliumDialog#he-dialog-show
+ * @listens HeliumDialog#he-dialog-close
+ *
+ * @extends HTMLElement
+ */
 class HeliumDialog extends HTMLElement {
     static observedAttributes = [
         "open",
-        "he-title",
-        "close-icon",
-        "close-button",
+        "title-text",
+        "hide-close-icon",
+        "show-close-button",
     ];
     /** @type {HTMLDialogElement} */
     dialog;
@@ -68,12 +98,12 @@ class HeliumDialog extends HTMLElement {
             }
         }
 
-        if (name === "he-title") {
+        if (name === "title-text") {
             this.title.innerText = newValue;
         }
 
-        if (name === "close-button") {
-            if (newValue === "true") {
+        if (name === "show-close-button") {
+            if (newValue != null) {
                 this.shadowRoot.querySelector('#he-btn-close').style.visibility = 'visible';
                 this.shadowRoot.querySelector('#he-diag-footer').style.visibility = 'visible';
             } else {
@@ -82,11 +112,11 @@ class HeliumDialog extends HTMLElement {
             }
         }
 
-        if (name === "close-icon") {
-            if (newValue === "true") {
-                this.shadowRoot.querySelector('#he-btn-close').style.visibility = 'visible';
-            } else {
+        if (name === "hide-close-icon") {
+            if (newValue != null) {
                 this.shadowRoot.querySelector('#he-btn-close').style.visibility = 'collapse';
+            } else {
+                this.shadowRoot.querySelector('#he-btn-close').style.visibility = 'visible';
             }
         }
     }
@@ -163,22 +193,24 @@ function showDialogTemp(evt, type) {
     diag.show();
 }
 
-customElements.define("he-dialog", HeliumDialog);
+if (!customElements.get('he-dialog')) {
+    customElements.define("he-dialog", HeliumDialog);
 
-document.addEventListener("he-dialog", function(e) {
-    showDialogTemp(e);
-});
+    document.addEventListener("he-dialog", function(e) {
+        showDialogTemp(e);
+    });
 
-document.addEventListener("he-dialog-error", function(e) {
-    showDialogTemp(e, 'error');
-});
+    document.addEventListener("he-dialog-error", function(e) {
+        showDialogTemp(e, 'error');
+    });
 
-document.addEventListener("he-dialog-warn", function(e) {
-    showDialogTemp(e, 'warn');
-});
+    document.addEventListener("he-dialog-warn", function(e) {
+        showDialogTemp(e, 'warn');
+    });
 
-document.addEventListener("he-dialog-success", function(e) {
-    showDialogTemp(e, 'success');
-});
+    document.addEventListener("he-dialog-success", function(e) {
+        showDialogTemp(e, 'success');
+    });
+}
 
 export { HeliumDialog };
