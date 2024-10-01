@@ -193,6 +193,7 @@ export class HeliumFormDialog extends HTMLElement {
      *   pattern: ?string,
      *   required: ?boolean,
      *   placeholder: ?string,
+     *   hidden: ?boolean,
      *   value: ?string,
      *   options: ?Object<string, string>
      * }>} data
@@ -202,16 +203,19 @@ export class HeliumFormDialog extends HTMLElement {
         this.form.innerHTML = '';
 
         data.forEach((entry, i) => {
+            let id = `edit-${i}`;
             let labelText = entry.label;
+
             if (entry.required) {
                 labelText += '*';
             }
 
-            let id = `edit-${i}`;
-            let label = document.createElement('label');
-            label.for = id;
-            label.innerHTML = labelText;
-            this.form.append(label);
+            if (!entry.hidden) {
+                let label = document.createElement('label');
+                label.for = id;
+                label.innerHTML = labelText;
+                this.form.append(label);
+            }
 
             if (entry.options && Object.keys(entry.options).length > 0) {
                 /** @type {HeliumSelect} */
@@ -222,6 +226,10 @@ export class HeliumFormDialog extends HTMLElement {
                     let option = document.createElement('option');
                     option.innerHTML = '‎';
                     select.append(option);
+                }
+
+                if (entry.hidden) {
+                    input.style.visibility = 'collapse';
                 }
 
                 for (const [value, text] of Object.entries(entry.options)) {
@@ -243,6 +251,9 @@ export class HeliumFormDialog extends HTMLElement {
                 }
                 if (entry.placeholder != null) {
                     input.placeholder = entry.placeholder;
+                }
+                if (entry.hidden) {
+                    input.type = 'hidden';
                 }
                 this.form.append(input);
             }

@@ -1,6 +1,53 @@
-import { h as heEnableBodyScroll, a as heSpaceBelow, b as hePositionRelative, c as heDisableBodyScroll } from './utils-B1ZZEmwz.js';
-
 const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\r\n    height: fit-content;\r\n    width: fit-content;\r\n    font-size: 14px;\r\n    min-width: 60px;\r\n}\r\n\r\n#inp {\r\n    position: relative;\r\n    background-color: var(--he-select-clr-bg, whitesmoke);\r\n    border: 1px solid lightgrey;\r\n    width: inherit;\r\n    height: inherit;\r\n    min-width: inherit;\r\n    padding: 0.3rem 0.4rem;\r\n    border-radius: 3px;\r\n    outline: none;\r\n    text-align: left;\r\n    padding-right: 25px;\r\n    text-wrap: nowrap;\r\n}\r\n\r\n#inp:hover, #inp:focus {\r\n    cursor: pointer;\r\n    border-color: var(--he-select-clr-border-hover, grey);\r\n}\r\n\r\n#inp::after {\r\n    content: \"\";\r\n    position: absolute;\r\n    width: 4px;\r\n    height: 4px;\r\n    top: 0;\r\n    left: 0;\r\n    right: 0;\r\n    bottom: 0;\r\n    margin: auto 10px auto auto;\r\n    border: 2px solid transparent;\r\n    border-bottom-color: var(--he-select-clr-arrow, black);\r\n    border-right-color: var(--he-select-clr-arrow, black);\r\n    transform: rotate(45deg) translateY(-2.5px);\r\n}\r\n\r\n#popover {\r\n    inset: unset;\r\n    outline: none;\r\n    border: 1px solid grey;\r\n    border-radius: var(--he-select-border-radius, 3px);\r\n    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);\r\n}\r\n\r\n#cont-options {\r\n    display: flex;\r\n    flex-direction: column;\r\n    background-color: var(--he-select-clr-bg, white);\r\n    max-height: 300px;\r\n    overflow: auto;\r\n    overscroll-behavior: contain;\r\n}\r\n\r\n#cont-options option {\r\n    padding: 5px 4px;\r\n    border-radius: 3px;\r\n}\r\n\r\n#cont-options option[selected] {\r\n    background-color: var(--he-select-clr-bg-hover, whitesmoke);\r\n}\r\n\r\n#cont-options option:hover:not(:disabled) {\r\n    background-color: var(--he-select-clr-bg-hover, whitesmoke);\r\n    cursor: pointer;\r\n}\r\n\r\n#filter {\r\n    --he-input-border-radius: 2px;\r\n    width: 100%;\r\n}\r\n\r\n");
+
+/**
+ * Returns the amount of pixels between the element and
+ * the bottom of the screen.
+ * @param {HTMLElement} element
+ * @returns number
+ */
+function heSpaceBelow(element) {
+    const elementRect = element.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - elementRect.bottom;
+    return spaceBelow;
+}
+
+/**
+ * 
+ * @param {HTMLElement} elem
+ * @param {HTMLElement} target
+ * @param {string} position
+ * @param {number} offset
+ * @returns void
+ */
+function hePositionRelative(elem, target, position, offset=0) {
+    const rect = target.getBoundingClientRect();
+
+    switch (position) {
+        case 'bottom-right':
+            elem.style.left = rect.left + 'px';
+            elem.style.top = rect.bottom + offset + 'px';
+            break;
+        case 'top-right':
+            elem.style.top = '';
+            elem.style.left = rect.left + 'px';
+            elem.style.top = rect.top - elem.offsetHeight - offset + 'px';
+            break;
+        default:
+            throw new Error('Invalid position');
+    }
+}
+
+function heDisableBodyScroll() {
+    const width = window.innerWidth - document.body.offsetWidth;
+    document.body.style.overflow = 'hidden';
+    document.body.style.paddingRight = width + 'px';
+}
+
+function heEnableBodyScroll() {
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+}
 
 class HeliumSelect extends HTMLElement {
     static formAssociated = true;

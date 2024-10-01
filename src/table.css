@@ -42,8 +42,11 @@ thead td {
 }
 
 thead td:first-child {
+    display: flex;;
+    align-items: center;;
     padding: 3px 15px;
     border-radius: 0;
+    width: fit-content;
 }
 
 thead td:last-child {
@@ -147,6 +150,12 @@ tbody td {
     padding: 5px 15px;
     vertical-align: middle;
     width: 0;
+}
+
+tbody td:first-child {
+    display: flex;
+    align-items: center;
+    width: fit-content;
 }
 
 tbody td xmp {

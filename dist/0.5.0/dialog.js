@@ -25,8 +25,8 @@ const sheet = new CSSStyleSheet();sheet.replaceSync("#he-diag-outer {\r\n    out
  * @slot body - The body of the dialog
  * @slot footer - The foote of the dialog. This is where buttons are commonly placed.
  *
- * @listens HeliumDialog#he-dialog-show
- * @listens HeliumDialog#he-dialog-close
+ * @listens HeliumDialog#he-dialog-show - Shows the dialog
+ * @listens HeliumDialog#he-dialog-close - Closes the dialog
  *
  * @extends HTMLElement
  */
@@ -37,17 +37,23 @@ class HeliumDialog extends HTMLElement {
         "hide-close-icon",
         "show-close-button",
     ];
-    /** @type {HTMLDialogElement} */
-    dialog;
-    /** @type {HTMLDivElement} */
-    title;
+    /** 
+     * The underlying dialog element.
+     * @type {HTMLDialogElement} 
+     */
+    $dialog;
+    /** 
+     * The element holding the title.
+     * @type {HTMLDivElement} 
+     */
+    $title;
 
     constructor() {
         super();
-        let shadow = this.attachShadow({ mode: "open" });
+        let $shadow = this.attachShadow({ mode: "open" });
 
-        shadow.adoptedStyleSheets = [sheet];
-        shadow.innerHTML = `
+        $shadow.adoptedStyleSheets = [sheet];
+        $shadow.innerHTML = `
             <dialog id="he-diag-outer">
                 <div id="he-diag-inner">
                     <div id="he-diag-header">
@@ -64,14 +70,14 @@ class HeliumDialog extends HTMLElement {
             </dialog>
         `;
 
-        let body = shadow.querySelector('#he-diag-body');
-        body.append(...this.children);
+        let $body = $shadow.querySelector('#he-diag-body');
+        $body.append(...this.children);
 
-        let icon = shadow.querySelector('#he-icon-close');
-        icon.onclick = () => shadow.querySelector('#he-diag-outer').close();
+        let $icon = $shadow.querySelector('#he-icon-close');
+        $icon.onclick = () => $shadow.querySelector('#he-diag-outer').close();
 
-        this.dialog = shadow.querySelector('#he-diag-outer');
-        this.title = shadow.querySelector('#he-title');
+        this.dialog = $shadow.querySelector('#he-diag-outer');
+        this.$title = $shadow.querySelector('#he-title');
     }
 
     connectedCallback() {
@@ -92,14 +98,14 @@ class HeliumDialog extends HTMLElement {
     attributeChangedCallback(name, _oldValue, newValue) {
         if (name === "open") {
             if (newValue === "true") {
-                this.dialog.showModal();
+                this.$dialog.showModal();
             } else {
-                this.dialog.close();
+                this.$dialog.close();
             }
         }
 
         if (name === "title-text") {
-            this.title.innerText = newValue;
+            this.$title.innerText = newValue;
         }
 
         if (name === "show-close-button") {
@@ -126,7 +132,7 @@ class HeliumDialog extends HTMLElement {
      * @returns Self
      */
     show() {
-        this.dialog.showModal();
+        this.$dialog.showModal();
         return this;
     }
 
@@ -135,7 +141,7 @@ class HeliumDialog extends HTMLElement {
      * @returns Self
      */
     showModal() {
-        this.dialog.showModal();
+        this.$dialog.showModal();
         return this;
     }
 
@@ -144,7 +150,7 @@ class HeliumDialog extends HTMLElement {
      * @return Self
      */
     close() {
-        this.dialog.close();
+        this.$dialog.close();
         return this;
     }
 
@@ -154,43 +160,43 @@ class HeliumDialog extends HTMLElement {
      * @returns Self
      */
     setBody(content) {
-        const slot = this.shadowRoot.querySelector('#he-diag-body slot[name=body]');
-        slot.innerHTML = content;
+        const $slot = this.shadowRoot.querySelector('#he-diag-body slot[name=body]');
+        $slot.innerHTML = content;
         return this;
     }
 }
 
 function showDialogTemp(evt, type) {
     /** @type {HeliumDialog} */
-    let diag = document.querySelector('#he-dialog-temp');
-    if (diag === null) {
-        diag = document.createElement('he-dialog');
-        diag.id = 'he-dialog-temp';
+    let $diag = document.querySelector('#he-dialog-temp');
+    if ($diag === null) {
+        $diag = document.createElement('he-dialog');
+        $diag.id = 'he-dialog-temp';
         switch (type) {
             case 'error':
-                diag.style.setProperty('--he-dialog-clr-title', 'indianred');
-                diag.setAttribute('title', 'Fehler');
+                $diag.style.setProperty('--he-dialog-clr-title', 'indianred');
+                $diag.setAttribute('title', 'Fehler');
                 break;
             case 'warn':
-                diag.style.setProperty('--he-dialog-clr-title', 'orange');
-                diag.setAttribute('title', 'Warnung');
+                $diag.style.setProperty('--he-dialog-clr-title', 'orange');
+                $diag.setAttribute('title', 'Warnung');
                 break;
             case 'success':
-                diag.style.setProperty('--he-dialog-clr-title', 'seagreen');
-                diag.setAttribute('title', 'Erfolg');
+                $diag.style.setProperty('--he-dialog-clr-title', 'seagreen');
+                $diag.setAttribute('title', 'Erfolg');
                 break;
             default:
-                diag.style.removeProperty('--he-dialog-clr-title');
-                diag.removeAttribute('title');
+                $diag.style.removeProperty('--he-dialog-clr-title');
+                $diag.removeAttribute('title');
                 break;
         }
-        document.body.append(diag);
+        document.body.append($diag);
     }
 
     if (evt.detail && evt.detail.value) {
-        diag.setBody(evt.detail.value);
+        $diag.setBody(evt.detail.value);
     }
-    diag.show();
+    $diag.show();
 }
 
 if (!customElements.get('he-dialog')) {

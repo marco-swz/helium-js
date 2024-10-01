@@ -1,135 +1,90 @@
-import { scss } from './utils.js';
+import sheet from './button.css';
 
+/**
+ * A button with included loading animation.
+ *
+ * @attr he-input-invalid - One or more IDs of `HeliumInput` elements. 
+ * The attribute is set by the inputs themself if they are invalid.
+ * This behavior is activated by he `report-validtity` attribute of the `HeliumInput`.
+ * @attr show-dialog - Calls `.showModal()` on the specified element(s) if the button is pressed.
+ * @attr close-dialog - Calls `.close()` on the specified element(s) if the button is pressed.
+ *
+ * @cssprop [--he-button-cursor-loading = default] - The cursor style when in `loading` state
+ * @cssprop [--he-button-cursor-hover = pointer] - The cursor style when hovering
+ * @cssprop [--he-button-cursor-disabled = not-allowed] - The cursor style when in `disabled` state
+ *
+ * @extends HTMLElement
+ * @todo Add all css variables to doc
+ */
 export class HeliumButton extends HTMLElement {
     static observedAttributes = [
-        'value',
-        'name',
-        'form',
         'popovertarget',
         'popovertargetaction',
-        'disabled',
         'form',
         'formtarget',
         'formenctype',
         'formmethod',
         'formnovalidate',
-        'loading',
         'show-dialog',
         'close-dialog',
         'submit',
-        'input-invalid',
+        'he-input-invalid',
     ];
     /** @type {HTMLInputElement} */
-    button;
+    $button;
     /** @type {?EventListener} */
     listenerClick = null;
+    /** @type {ElementInternals} */
+    internals;
 
     constructor() {
         super();
         let shadow = this.attachShadow({ mode: "open" });
 
-        let sheet = new CSSStyleSheet();
-        sheet.replaceSync(scss`
-        :host {
-            text-wrap: nowrap;
-        }
+        this.$button = document.createElement('button');
+        this.$button.id = 'he-button'
 
-        #he-button {
-            border-radius: 2px;
-            color: black;
-            height: 35px;
-            padding: 0px 10px;
-            vertical-align: middle;
-            text-align: center;
-            border: 1px solid rgba(0, 0, 0, 0.2235294118);
-            font-size: 14px;
-            background-color: var(--he-button-clr-bg, white);
-            outline-style: none;
-            box-shadow: none !important;
-            width: auto;
-            position: relative;
-        }
-
-        #he-button[disabled] {
-            background-color: #d9d9d9;
-            color: #666666;
-            cursor: no-drop;
-            text-shadow: none;
-        }
-
-        #he-button:hover:enabled:not([loading]), 
-        #he-button:active:enabled:not([loading]), 
-        #he-button:focus:enabled:not([loading]) {
-            cursor: pointer;
-            text-shadow: 0px 0px 0.3px var(--he-button-clr-border-hover);
-            border-color: var(--he-button-clr-border-hover, grey);
-            color: var(--he-button-clr-border-hover, black);
-        }
-
-        #he-button:hover:enabled:not([loading]){
-            background-color: color-mix(in srgb,var(--he-button-clr-bg, white),black 2%)
-        }
-
-        #he-button[loading] {
-            background-color: #d9d9d9;
-            color: #6666668c;
-            cursor: no-drop;
-            text-shadow: none;
-        }
-
-        #he-button[loading]::after {
-            content: "";
-            position: absolute;
-            width: 16px;
-            height: 16px;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            margin: auto;
-            border: 4px solid transparent;
-            border-top-color: var(--he-button-clr-spinner, black);
-            border-radius: 50%;
-            animation: button-loading-spinner 1s ease infinite;
-        }
-
-        #he-button[ok]::after {
-            content: "";
-            position: absolute;
-            width: 16px;
-            height: 16px;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            margin: auto;
-            border: 4px solid transparent;
-            border-bottom-color: var(--he-button-clr-spinner, black);
-            border-right-color: var(--he-button-clr-spinner, black);
-            transform: rotate(45deg);
-        }
-
-        @keyframes button-loading-spinner {
-            from {
-                transform: rotate(0turn);
-            }
-
-            to {
-                transform: rotate(1turn);
-            }
-        }
-        `);
-
-        this.button = document.createElement('button');
-        this.button.id = 'he-button'
-
-        shadow.append(this.button);
+        shadow.append(this.$button);
         shadow.adoptedStyleSheets = [sheet];
+        this.internals = this.attachInternals();
     }
 
-    connectedCallback() {
-        this.button.innerHTML = this.innerHTML;
-        this.innerHTML = '';
+    /**
+     * Gets or sets the `disabled` state of the button.
+     * @type {boolean}
+     */
+    set disabled(val) {
+        if (val) {
+            this.setAttribute('disabled', true);
+            this.internals.states.add('disabled');
+        } else {
+            this.removeAttribute('disabled');
+            this.internals.states.delete('disabled');
+        }
+
+    }
+
+    get disabled() {
+        return this.getAttribute('disabled') != null;
+    }
+
+    /**
+     * Gets or sets the `loading` state of the button.
+     * While loading, a spinner is shown on top of the button.
+     * @type {boolean}
+     */
+    set loading(val) {
+        if (val) {
+            this.setAttribute('loading', true);
+            this.internals.states.add('loading');
+        } else {
+            this.removeAttribute('loading');
+            this.internals.states.delete('loading');
+        }
+    }
+
+    get loading() {
+        return this.getAttribute('loading') != null;
     }
 
     /**
@@ -155,65 +110,48 @@ export class HeliumButton extends HTMLElement {
             case 'submit':
                 this.addEventListener('click', () => this._submitForm())
                 break;
-            case 'input-invalid':
+            case 'he-input-invalid':
                 if (newValue) {
-                    this.disable();
+                    this.disabled = true;
                 } else {
-                    this.enable();
+                    this.disabled = false;
                 }
                 break;
             default:
                 if (newValue === null || newValue === 'false') {
-                    this.button.removeAttribute(name);
+                    this.$button.removeAttribute(name);
                 } else {
-                    this.button.setAttribute(name, newValue);
+                    this.$button.setAttribute(name, newValue);
                 }
                 break;
         }
     }
 
-    /**
-     * Shows or hides the loading animation.
-     * @param {bool} showLoading 
-     */
-    loading(showLoading) {
-        if (showLoading == null || showLoading) {
-            this.setAttribute('loading', true);
-        } else {
-            this.removeAttribute('loading');
-        }
+    connectedCallback() {
+        this.$button.innerHTML = this.innerHTML;
+        this.innerHTML = '';
     }
 
-    /**
-     * Disables the button.
-     */
-    disable() {
-        this.setAttribute('disabled', true);
-    }
-
-    /**
-     * Enables the button.
-     */
-    enable() {
-        this.removeAttribute('disabled');
+    _closeDialog() {
+        document.querySelectorAll(this.getAttribute('close-dialog'))
+            .forEach(($diag) => $diag.close());
     }
 
     _submitForm() {
         const id = this.getAttribute('submit');
-        const form = document.querySelector(id);
-        console.assert(form == null, `No form found with ID ${id}`)
-        form.submit();
+        const $form = document.querySelector(id);
+        console.assert($form == null, `No form found with ID ${id}`);
+        console.assert($form.nodeName === 'FORM', 'The element is not a form!')
+        $form.submit();
     }
 
     _showDialog() {
-        const diag = document.querySelector(this.getAttribute('show-dialog'));
-        diag.showModal();
-    }
-
-    _closeDialog() {
-        const diag = document.querySelector(this.getAttribute('close-dialog'));
-        diag.close();
+        document.querySelectorAll(this.getAttribute('show-dialog'))
+            .forEach(($diag) => $diag.showModal());
     }
 }
 
-customElements.define("he-button", HeliumButton);
+if (!customElements.get('he-button')) {
+    customElements.define("he-button", HeliumButton);
+}
+

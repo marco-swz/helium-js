@@ -1,0 +1,109 @@
+:host {
+    --he-button-cursor-loading: default;
+    --he-button-cursor-hover: pointer;
+    --he-button-cursor-disabled: not-allowed;
+
+    display: inline-block;
+    text-wrap: nowrap;
+    border-radius: 2px;
+    color: black;
+    height: 35px;
+    vertical-align: middle;
+    text-align: center;
+    border: 0.1rem solid rgba(0, 0, 0, 0.2235294118);
+    font-size: 14px;
+    background-color: white;
+    outline-style: none;
+    box-shadow: none !important;
+    width: auto;
+    position: relative;
+}
+
+#he-button {
+    border-radius: inherit;
+    color: inherit;
+    padding: inherit;
+    vertical-align: inherit;
+    text-align: inherit;
+    font-size: inherit;
+    background-color: inherit;
+    outline-style: inherit;
+    box-shadow: inherit;
+    text-shadow: inherit;
+    cursor: inherit;
+
+    height: 100%;
+    width: 100%;
+    border: none;
+    padding: 0px 10px;
+}
+
+:host([disabled]) {
+    background-color: #d9d9d9;
+    color: #666666;
+    cursor: var(--he-button-cursor-disabled);
+    text-shadow: none;
+}
+
+:host(:not([loading]):not([disabled]):hover), 
+:host(:not([loading]):not([disabled]):active), 
+:host(:not([loading]):not([disabled]):focus) {
+    cursor: var(--he-button-cursor-hover);
+    text-shadow: 0px 0px 0.3px var(--he-button-clr-border-hover);
+    border-color: var(--he-button-clr-border-hover, grey);
+    color: var(--he-button-clr-border-hover, black);
+}
+
+:host(:not([loading]):not([disabled]):hover) {
+    background-color: color-mix(in srgb,var(--he-button-clr-bg, white),black 2%)
+}
+
+:host([loading]) {
+    background-color: #d9d9d9;
+    color: #6666668c;
+    cursor: var(--he-button-cursor-loading);
+    text-shadow: none;
+}
+
+:host([loading])::after {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    border: 4px solid transparent;
+    border-top-color: var(--he-button-clr-spinner, black);
+    border-radius: 50%;
+    animation: button-loading-spinner 1s ease infinite;
+}
+
+:host([ok])::after {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    border: 4px solid transparent;
+    border-bottom-color: var(--he-button-clr-spinner, black);
+    border-right-color: var(--he-button-clr-spinner, black);
+    transform: rotate(45deg);
+}
+
+@keyframes button-loading-spinner {
+    from {
+        transform: rotate(0turn);
+    }
+
+    to {
+        transform: rotate(1turn);
+    }
+}
+

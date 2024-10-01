@@ -2,44 +2,63 @@ import './button.js';
 import './input.js';
 import './dialog.js';
 import './select.js';
-import './utils-B1ZZEmwz.js';
 
 const sheet = new CSSStyleSheet();sheet.replaceSync("#he-form {\r\n    display: grid;\r\n    grid-template-columns: max-content 1fr;\r\n    gap: 0.5rem;\r\n    margin: 0.5rem;\r\n    margin-bottom: 0.5rem;\r\n}\r\n\r\n#footer-diag-edit he-button:first-child {\r\n    margin-right: 0.5rem;\r\n}\r\n\r\n#he-form he-select, #he-form he-input {\r\n    width: 100%;\r\n}\r\n\r\n#he-form label {\r\n    display: flex;\r\n    align-items: center;\r\n}\r\n");
 
+/**
+ * A preformatted dialog containing a form.
+ *
+ * @element he-form-dialog
+ *
+ * @attr {on|off} open - If set, the dialog is open (will open if not)
+ * @attr title-text - The text in the title of the dialog
+ *
+ * @listens HeliumFormDialog#he-dialog-show - Shows the dialog
+ * @listens HeliumFormDialog#he-dialog-close - Closes the dialog
+ *
+ * @extends HTMLElement
+ */
 class HeliumFormDialog extends HTMLElement {
     static observedAttributes = [
         "open",
-        "he-title",
-        "close-icon",
+        "title-text",
     ];
-    /** @type {HeliumDialog} */
-    dialog;
+    /** 
+     * The underlying dialog element.
+     * @type {HeliumDialog} 
+     */
+    $dialog;
+    /** 
+     * The form containing all inputs.
+     * @type {HTMLFormElement} 
+     */
+    $form
 
     constructor() {
         super();
-        let shadow = this.attachShadow({ mode: "open" });
+        let $shadow = this.attachShadow({ mode: "open" });
 
-        shadow.adoptedStyleSheets = [sheet];
+        $shadow.adoptedStyleSheets = [sheet];
 
-        this.dialog = document.createElement('he-dialog');
+        this.$dialog = document.createElement('he-dialog');
 
         this.form = document.createElement('form');
         this.form.id = 'he-form';
         this.form.slot = 'body';
-        this.dialog.append(this.form);
+        this.$dialog.append(this.form);
 
-        let footer = document.createElement('div');
-        footer.id = 'footer-diag-edit';
-        footer.slot = 'footer';
-        this.dialog.append(footer);
+        let $footer = document.createElement('div');
+        $footer.id = 'footer-diag-edit';
+        $footer.slot = 'footer';
+        this.$dialog.append($footer);
 
-        let btnSave = document.createElement('he-button');
-        btnSave.innerHTML = 'Speichern';
-        btnSave.id = 'btn-save';
-        btnSave.onclick = () => this.submit.bind(this)();
-        footer.append(btnSave);
+        let $btnSave = document.createElement('he-button');
+        $btnSave.innerHTML = 'Speichern';
+        $btnSave.id = 'btn-save';
+        $btnSave.onclick = () => this.submit.bind(this)();
+        $footer.append($btnSave);
 
-        shadow.append(this.dialog);
+        $shadow.append(this.$dialog);
     }
 
     connectedCallback() {
@@ -51,26 +70,33 @@ class HeliumFormDialog extends HTMLElement {
         });
     }
 
-    getValues(validate = true) {
+    /**
+     * Returns a key/value map of all form inputs.
+     * @returns {Object.<string, string>}
+     */
+    getValues() {
         let values = {};
-        for (const input of this.body.querySelectorAll('input, select')) {
-            if (this._formInputBlurCallback({ currentTarget: input })) {
-                values[input.name] = input.value;
+        for (const $input of this.body.querySelectorAll('input, select')) {
+            if (this._formInputBlurCallback({ currentTarget: $input })) {
+                values[$input.name] = $input.value;
             }
         }
         return values;
     }
 
     /**
-     * 
-     * @param {?string} enpoint 
-     * @param {?Object<string, string>} fetchArgs 
-     * @param {?function(RequestInit): RequestInit} callbackBefore
-     * @param {?function(Response): any} callbackAfter
+     * Submits the form asynchronisly to the specified endpoint.
+     * Additional functionality before and after the submit can be 
+     * implemented using callback functions.
+     * The submission is not executed if any input is invalid.
+     * @param {?string} enpoint - The address of the endpoint for submission
+     * @param {?Object<string, string>} fetchArgs - The arguments passed to the internal `fetch()` call
+     * @param {?function(RequestInit): RequestInit} callbackBefore - The callback function executed before the submission
+     * @param {?function(Response): any} callbackAfter - The callback function executed after receiving the response
      * @returns void
      */
     submit(endpoint, fetchArgs, callbackBefore, callbackAfter) {
-        let values = {};
+        // TODO(marco): Replace with `this.getValues()`
         for (const input of this.form.querySelectorAll('input, select')) {
             if (!this._formInputBlurCallback({ currentTarget: input })) {
                 return;
@@ -97,11 +123,11 @@ class HeliumFormDialog extends HTMLElement {
 
         callbackAfter = callbackAfter ?? this.getAttribute('after-submit');
 
-        this.dialog.querySelector('#btn-save').loading();
+        this.$dialog.querySelector('#btn-save').loading();
 
         fetch(endpoint, fetchArgs)
             .then(resp => {
-                this.dialog.querySelector('#btn-save').loading(false);
+                this.$dialog.querySelector('#btn-save').loading(false);
 
                 if (callbackAfter) {
                     eval(callbackAfter + '(resp)');
@@ -155,6 +181,7 @@ class HeliumFormDialog extends HTMLElement {
      *   pattern: ?string,
      *   required: ?boolean,
      *   placeholder: ?string,
+     *   hidden: ?boolean,
      *   value: ?string,
      *   options: ?Object<string, string>
      * }>} data
@@ -164,16 +191,19 @@ class HeliumFormDialog extends HTMLElement {
         this.form.innerHTML = '';
 
         data.forEach((entry, i) => {
+            let id = `edit-${i}`;
             let labelText = entry.label;
+
             if (entry.required) {
                 labelText += '*';
             }
 
-            let id = `edit-${i}`;
-            let label = document.createElement('label');
-            label.for = id;
-            label.innerHTML = labelText;
-            this.form.append(label);
+            if (!entry.hidden) {
+                let label = document.createElement('label');
+                label.for = id;
+                label.innerHTML = labelText;
+                this.form.append(label);
+            }
 
             if (entry.options && Object.keys(entry.options).length > 0) {
                 /** @type {HeliumSelect} */
@@ -184,6 +214,10 @@ class HeliumFormDialog extends HTMLElement {
                     let option = document.createElement('option');
                     option.innerHTML = '‎';
                     select.append(option);
+                }
+
+                if (entry.hidden) {
+                    input.style.visibility = 'collapse';
                 }
 
                 for (const [value, text] of Object.entries(entry.options)) {
@@ -205,6 +239,9 @@ class HeliumFormDialog extends HTMLElement {
                 }
                 if (entry.placeholder != null) {
                     input.placeholder = entry.placeholder;
+                }
+                if (entry.hidden) {
+                    input.type = 'hidden';
                 }
                 this.form.append(input);
             }
@@ -234,7 +271,7 @@ class HeliumFormDialog extends HTMLElement {
      * @param {string} newValue The new attribute value
      */
     attributeChangedCallback(name, oldValue, newValue) {
-        this.dialog.attributeChangedCallback(name, oldValue, newValue);
+        this.$dialog.attributeChangedCallback(name, oldValue, newValue);
     }
 
     /**
@@ -246,7 +283,7 @@ class HeliumFormDialog extends HTMLElement {
         if (reset) {
             this.reset();
         }
-        this.dialog.show(empty);
+        this.$dialog.show(empty);
         return this;
     }
 
@@ -255,7 +292,7 @@ class HeliumFormDialog extends HTMLElement {
      * @returns Self
      */
     showModal() {
-        this.dialog.showModal();
+        this.$dialog.showModal();
         return this;
     }
 
@@ -264,7 +301,7 @@ class HeliumFormDialog extends HTMLElement {
      * @return Self
      */
     close() {
-        this.dialog.close();
+        this.$dialog.close();
         return this;
     }
 }
