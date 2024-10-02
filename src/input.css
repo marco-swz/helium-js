@@ -56,7 +56,7 @@
 #inp-main {
     outline: none;
     background-color: inherit;
-    width: inherit;
+    width: 100%;
     font-size:inherit;
     border-radius: inherit;
     border: none;

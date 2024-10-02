@@ -1,5 +1,22 @@
 import sheet from "./toast.css";
 
+/**
+ * A toast element for quick notification.
+ *
+ * @element he-toast
+ *
+ * @attr {'bottom-left'|'bottom-right'|'top-left'|'top-right'|'top'} position - The position of the toast on the screen
+ * @attr [timeout-ms = 5000] - The visible duration of the toast
+ *
+ * @cssprop [--he-toast-clr-success = seagreen] - The accent color for success notifications
+ * @cssprop [--he-toast-clr-warn = orange] - The accent color for warning notifications
+ * @cssprop [--he-toast-clr-error = indianred] - The accent color for error notifications
+ * @cssprop [--he-toast-radius = 3px] - The border radius of the toast
+ *
+ * @extends HTMLElement
+ *
+ * @todo Support for mobile devices and small screens
+ */
 export class HeliumToast extends HTMLElement {
     static observedAttributes = [
         'position',
@@ -20,30 +37,82 @@ export class HeliumToast extends HTMLElement {
         shadow.adoptedStyleSheets = [sheet];
     }
 
+    /**
+     * Callback for attribute changes of the web component.
+     * @param {string} name The attribute name
+     * @param {string} _oldValue The previous attribute value
+     * @param {string} newValue The new attribute value
+     */
+    attributeChangedCallback(name, _oldValue, newValue) {
+        switch (name) {
+            default:
+                break;
+        }
+    }
+
     connectedCallback() {
     }
 
     /**
+     * Starts the hide animation and deletes the toast.
+     * @param {HTMLDivElement} $toast - The toast (not a `he-toast` element, which is only the container for toasts)
+     * @returns void
+     */
+    hideToast($toast) {
+        const animation = $toast.animate(
+            [
+                { opacity: '1' },
+                { opacity: '0' },
+            ], {
+                duration: 200,
+            }
+        )
+        animation.onfinish = () => $toast.remove();
+    }
+
+
+    /**
+     * Shows a toast with the given message and of given type.
      * @param {string} content
      * @param {null|'info'|'warn'|'error'} type 
-     * @returns {HTMLDivElement}
      */
+    showToast(message, type) {
+        const $toast = this._renderToast(message, type);
+
+        // NOTE(marco): For now disabled
+        //$toast.animate(
+        //    [
+        //        { opacity: '0' },
+        //        { opacity: '1' },
+        //    ], {
+        //        duration: 200,
+        //    }
+        //)
+
+        const position = this.getAttribute('position') ?? '';
+        if (position.includes('top')) {
+            this.$contToasts.prepend($toast);
+        } else {
+            this.$contToasts.append($toast);
+        }
+    }
+
     _renderToast(content,type) {
-        const duration = this.getAttribute('timeout-ms') ?? 4000;
+        const duration = this.getAttribute('timeout-ms') ?? 5000;
 
         const $toast = document.createElement('div');
         $toast.id = 'toast';
+        $toast.setAttribute('type', type);
 
         const $bar = document.createElement('div');
         $bar.id = 'bar';
         $bar.style.width = '0%';
-        $bar.setAttribute('type', type);
         const animation = $bar.animate(
             [
                 { width: '100%' },
                 { width: '0%' },
             ], {
-                duration: duration,
+                duration: Number(duration),
             }
         )
         animation.onfinish = () => this.hideToast($toast);
@@ -67,50 +136,6 @@ export class HeliumToast extends HTMLElement {
 
         return $toast;
     }
-
-    showToast(message, type) {
-        const $toast = this._renderToast(message, type);
-        //$toast.animate(
-        //    [
-        //        { opacity: '0' },
-        //        { opacity: '1' },
-        //    ], {
-        //        duration: 200,
-        //    }
-        //)
-
-        const position = this.getAttribute('position') ?? '';
-        if (position.includes('top')) {
-            this.$contToasts.prepend($toast);
-        } else {
-            this.$contToasts.append($toast);
-        }
-    }
-
-    hideToast($toast) {
-        const animation = $toast.animate(
-            [
-                { opacity: '1' },
-                { opacity: '0' },
-            ], {
-                duration: 200,
-            }
-        )
-        animation.onfinish = () => $toast.remove();
-    }
-
-    /**
-     * Callback for attribute changes of the web component.
-     * @param {string} name The attribute name
-     * @param {string} _oldValue The previous attribute value
-     * @param {string} newValue The new attribute value
-     */
-    attributeChangedCallback(name, _oldValue, newValue) {
-        switch (name) {
-            default:
-                break;
-        }
-    }
 }
 
 function showToastTemp(evt, type) {
@@ -119,6 +144,7 @@ function showToastTemp(evt, type) {
     if ($toast === null) {
         $toast = document.createElement('he-toast');
         $toast.id = 'he-toast-temp';
+        $toast.setAttribute('timeout-ms', 5000);
         $toast.setAttribute('position', 'top-right');
         document.body.append($toast);
     }
@@ -126,7 +152,7 @@ function showToastTemp(evt, type) {
     $toast.showToast(evt.detail.value, type);
 }
 
-document.addEventListener("DOMContentLoaded", function() {
+if (!customElements.get('he-toast')) {
     customElements.define("he-toast", HeliumToast);
 
     document.addEventListener("he-toast", function(e) {
@@ -144,5 +170,4 @@ document.addEventListener("DOMContentLoaded", function() {
     document.addEventListener("he-toast-success", function(e) {
         showToastTemp(e, 'success');
     })
-
-});
+}

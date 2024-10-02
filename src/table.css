@@ -1,3 +1,17 @@
+:host {
+    overflow: auto;
+    width: fit-content;
+}
+
+:host::-webkit-scrollbar {
+    width: 10px !important;
+}
+
+:host::-webkit-scrollbar-thumb {
+    background-color: darkgrey !important;
+    border-radius: 10px !important;
+}
+
 table {
     border-spacing: 0;
     border-collapse: separate;
@@ -7,15 +21,14 @@ table {
 thead {
     position: sticky;
     top: 1px;
-    z-index: 100;
+    z-index: 2;
 }
 
 thead th {
     background-color: var(--he-table-clr-bg-header, white);
     color: var(--he-table-clr-fg-header, black);
     font-weight: 500;
-    padding: 7px 15px;
-    padding-top: 15px;
+    padding: 7px 12px;
     text-align: center;
     vertical-align: middle;
     text-wrap: nowrap;
@@ -77,7 +90,7 @@ thead .span-colname {
     position: absolute;
     left: 0.3rem;
     pointer-events: none;
-    transition: 0.2s ease all;
+    transition: 0.1s ease all;
     top: 0px;
     font-weight: 600;
 }
@@ -88,7 +101,6 @@ thead .inp-filter {
     font-size: 0.9rem;
     font-weight: 500;
     background-color: transparent;
-    border-radius: 2px;
     outline: none;
     border: 0;
     color: black;
@@ -97,8 +109,6 @@ thead .inp-filter {
     -moz-appearance: none;
     appearance: none;
     text-indent: 1px;
-    text-overflow: '';
-    border-radius: var(--he-table-filter-radius, 2px);
 }
 
 tbody tr:last-child td:first-child {
@@ -109,6 +119,7 @@ tbody tr:last-child td:last-child {
 }
 thead tr:first-child th:first-child {
     border-top-left-radius: var(--he-table-radius, 4px);
+    padding-top: 14px;
 }
 thead tr:first-child th:last-child {
     border-top-right-radius: var(--he-table-radius, 4px);
@@ -117,15 +128,17 @@ thead tr:first-child th:last-child {
 thead .inp-filter:focus,
 .cont-filter input:not(:placeholder-shown),
 .cont-filter select:has(option:checked:not([value=""])) {
-    background-color: whitesmoke;
-    transform: translateY(9px);
+    transform: translateY(7px);
     font-weight: 600;
+    border-bottom: 0.1rem solid darkgrey;
+    padding: 4px 5px;
+    padding-bottom: 1px;
 }
 
 thead .inp-filter:focus + .span-colname, 
 .cont-filter input:not(:placeholder-shown) + .span-colname,
 .cont-filter select:has(option:checked:not([value=""])) + .span-colname {
-    transform: translateY(-3px);
+    transform: translateY(-5px);
     font-size: 0.7rem;
     opacity: 1;
 }

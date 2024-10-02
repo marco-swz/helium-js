@@ -183,7 +183,7 @@ export class HeliumTable extends HTMLElement {
             } else {
                 let $inpFilter = document.createElement('input');
                 $inpFilter.id = 'filter-' + colName;
-                $inpFilter.type = 'search';
+                $inpFilter.type = 'text';
                 $inpFilter.name = colName;
                 $inpFilter.autocomplete = 'off';
                 $inpFilter.placeholder = ' ';
@@ -367,6 +367,7 @@ export class HeliumTable extends HTMLElement {
     replaceBody(data) {
         this.$body.innerHTML = '';
         this.offset = 0;
+        this._updateExternElements(0);
 
         this.$checkAll.checked = false;
         this.$checkAll.indeterminate = false;

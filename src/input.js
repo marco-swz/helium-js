@@ -7,6 +7,8 @@ import sheet from "./input.css";
  *   - Report validity to other elements
  *   - Loading indicator
  *
+ * @element he-input
+ *
  * @attr pattern - A `RegExp` pattern to check, if the input is valid
  * @attr {on|off} required - If set, the input will count empty values as invalid
  * @attr report-validity - The selector of another HTML element. 

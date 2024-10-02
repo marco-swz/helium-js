@@ -4,7 +4,7 @@
     aspect-ratio: 1;
     border-radius: var(--he-check-radius, 0.2rem);
     cursor: pointer;
-    background-color: #eee;
+    background-color: whitesmoke;
     border: 0.1rem solid grey;
 }
 
@@ -27,7 +27,7 @@
 }
 
 :host(:hover) .checkmark {
-    background-color: var(--he-check-clr-hover, lightgrey);
+    background-color: var(--he-check-clr-hover, white);
 }
 
 :host(:state(checked)) .checkmark {
