@@ -1,4 +1,4 @@
-import { HeliumFormDialog } from './form_dialog.js';
+import { HeliumFormDialog, HeliumFormDialogResponseEvent, HeliumFormDialogSubmitEvent } from './form_dialog.js';
 import { HeliumCheck } from './check.js';
 import { HeliumToast } from './toast.js';
 import sheet from './table.css';
@@ -185,7 +185,7 @@ export class HeliumTable extends HTMLElement {
                 $inpFilter.id = 'filter-' + colName;
                 $inpFilter.type = 'text';
                 $inpFilter.name = colName;
-                $inpFilter.autocomplete = 'off';
+                //$inpFilter.autocomplete = 'off';
                 $inpFilter.placeholder = ' ';
                 $inpFilter.classList.add('inp-filter');
                 $inpFilter.value = $column.getAttribute('filter') ?? '';
@@ -234,7 +234,7 @@ export class HeliumTable extends HTMLElement {
             $filter.style.minWidth = $input.offsetWidth + 'px';
         }
 
-        this._requestRows(this._replaceBody);
+        this._requestRows(this.replaceBody);
         this._updateExternElements(0);
     }
 
@@ -291,37 +291,36 @@ export class HeliumTable extends HTMLElement {
 
     /**
      * 
-     * @param {RequestInit} request
-     * @returns request
+     * @param {HeliumFormDialogSubmitEvent} evt
+     * @returns void
      */
-    formEditBeforeSubmitCallback(request) {
-        request.body = {
-            data: [JSON.parse(request.body)],
+    formEditBeforeSubmitCallback(evt) {
+        evt.fetchArgs.body = {
+            data: [JSON.parse(evt.fetchArgs.body)],
         };
 
         if (this.dataOld != null) {
-            request.body.old = [this.dataOld];
+            evt.fetchArgs.body.old = [this.dataOld];
         }
-        request.method = this.editRequestType;
-        request.headers = {
+        evt.fetchArgs.method = this.editRequestType;
+        evt.fetchArgs.headers = {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         }
 
-        request.body = JSON.stringify(request.body);
-        return request;
+        evt.fetchArgs.body = JSON.stringify(evt.fetchArgs.body);
     }
 
     /**
      * 
-     * @param {Response} response
+     * @param {HeliumFormDialogResponseEvent} evt
      * @returns void
      */
-    formEditAfterSubmitCallback(response) {
-        response.json().then(data => {
+    formEditAfterSubmitCallback(evt) {
+        evt.response.json().then(data => {
             switch (this.editRequestType) {
                 case 'POST':
-                    this._requestRows(this._replaceBody);
+                    this._requestRows(this.replaceBody);
                     break;
                 case 'PATCH':
                     data.forEach((entry, i) => {
@@ -332,7 +331,6 @@ export class HeliumTable extends HTMLElement {
             }
             this.$diagEdit.close();
         });
-
     }
 
     /**
@@ -427,7 +425,7 @@ export class HeliumTable extends HTMLElement {
         this.dataOld = data;
         this.idsEdit = [$row.id];
         this.editRequestType = 'PATCH';
-        this.$diagEdit.setAttribute('he-title', 'Bearbeiten');
+        this.$diagEdit.setAttribute('title-text', 'Bearbeiten');
         this.$diagEdit.showModal();
     }
 
@@ -442,14 +440,14 @@ export class HeliumTable extends HTMLElement {
 
         this.$diagEdit.setValues(data);
         this.editRequestType = 'POST';
-        this.$diagEdit.setAttribute('he-title', 'Duplizieren');
+        this.$diagEdit.setAttribute('title-text', 'Duplizieren');
         this.$diagEdit.showModal();
     }
 
     showDialogNew() {
         this.$diagEdit.reset();
         this.editRequestType = 'POST';
-        this.$diagEdit.setAttribute('he-title', 'Erstellen');
+        this.$diagEdit.setAttribute('title-text', 'Erstellen');
         this.$diagEdit.showModal();
     }
 
@@ -501,7 +499,7 @@ export class HeliumTable extends HTMLElement {
         this.offset = 0;
 
         if (this.endpoint != null) {
-            this._requestRows(this._replaceBody);
+            this._requestRows(this.replaceBody);
             return;
         }
 
@@ -625,7 +623,7 @@ export class HeliumTable extends HTMLElement {
      */
     _sortClickCallback(e, isDesc) {
         if (this.endpoint) {
-            this._requestRows(this._replaceBody);
+            this._requestRows(this.replaceBody);
             return;
         }
 
@@ -699,17 +697,20 @@ export class HeliumTable extends HTMLElement {
                 }
             }
 
-            if (column.getAttribute('no-edit') === 'true') {
-                continue;
+            let required = column.getAttribute('required') === 'true';
+            let hidden = column.getAttribute('type') === 'hidden';
+            if (column.getAttribute('no-edit')) {
+                hidden = true;
+                required = false;
             }
 
             data.push({
                 name: column.getAttribute('column'),
-                required: column.getAttribute('required') === 'true',
+                required: required,
                 label: column.querySelector('span').innerHTML,
                 placeholder: column.getAttribute('default'),
                 pattern: column.getAttribute('pattern'),
-                hidden: column.getAttribute('type') === 'hidden',
+                hidden: hidden,
                 options: optionValues,
             })
         }
@@ -719,8 +720,8 @@ export class HeliumTable extends HTMLElement {
         $dialog.renderRows(data);
 
         $dialog.setAttribute('endpoint', this.endpoint);
-        $dialog.setAttribute('before-submit', `document.querySelector('#${this.id}').formEditBeforeSubmitCallback`);
-        $dialog.setAttribute('after-submit', `document.querySelector('#${this.id}').formEditAfterSubmitCallback`);
+        $dialog.onsubmit = (evt) => this.formEditBeforeSubmitCallback.bind(this)(evt);
+        $dialog.onresponse = (evt) => this.formEditAfterSubmitCallback.bind(this)(evt);
         return $dialog;
     }
 

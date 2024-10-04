@@ -18,6 +18,7 @@ import sheet from "./input.css";
  * @attr {on|off} disabled - Toggles the `disabled` state of the input. A disabled input will not be submitted in forms.
  * @attr {on|off} readonly - Toggles the `readonly` state of the input. Contrary to `disabled`, the value will still be submitted in forms.
  * @attr {on|off} [autocomplete=off] - Shows suggestion from previous inputs (browser native appearance)
+ * @attr {'change'} validate-on - The validation is triggered by the provided event
  *
  * @cssprop [--he-input-clr-border-hover=grey] - The border color when hovering
  * @cssprop [--he-input-clr-spinner=black] - The color of the spinner while in `loading` state
@@ -34,7 +35,8 @@ export class HeliumInput extends HTMLElement {
         'type',
         'disabled',
         'readonly',
-        'autocomplete'
+        'autocomplete',
+        'placeholder',
     ];
 
     /** @type {HTMLInputElement} */
@@ -101,11 +103,51 @@ export class HeliumInput extends HTMLElement {
      * @type {boolean}
      */
     set name(val) {
-        this.setAttribute('name', val);
+        if (val) {
+            this.setAttribute('name', val);
+        } else {
+            this.removeAttribute('name');
+        }
     }
 
     get name() {
         return this.getAttribute('name');
+    }
+
+    set placeholder(val) {
+        if (val) {
+            this.setAttribute('placeholder', val);
+        } else {
+            this.removeAttribute('placeholder');
+        }
+    }
+
+    get placeholder() {
+        return this.getAttribute('placeholder');
+    }
+
+    set required(val) {
+        if (val) {
+            this.setAttribute('required', true);
+        } else {
+            this.removeAttribute('required');
+        }
+    }
+
+    get required() {
+        return this.$input.required;
+    }
+
+    set type(val) {
+        if (val) {
+            this.setAttribute('type', val);
+        } else {
+            this.removeAttribute('type');
+        }
+    }
+
+    get type() {
+        return this.getAttribute('type');
     }
 
     /**
@@ -120,11 +162,15 @@ export class HeliumInput extends HTMLElement {
     }
 
     get value() {
-        return this.$input.value;
+        return this.$input.value === ''
+            ? this.placeholder
+            : this.$input.value;
     }
 
     connectedCallback() {
-        this.$input.onchange = () => this.inputChangedCallback.bind(this)();
+        if (this.getAttribute('validate-on') === 'change') {
+            this.$input.onchange = () => this.inputChangedCallback.bind(this)();
+        }
 
         this.value = this.getAttribute('value');
         if (!this.value) {
@@ -133,10 +179,31 @@ export class HeliumInput extends HTMLElement {
     }
 
     /**
-     * Sets the focus to the input.
+     * Callback for attribute changes of the web component.
+     * @param {string} name The attribute name
+     * @param {string} _oldValue The previous attribute value
+     * @param {string} newValue The new attribute value
      */
-    focus() {
-        this.$input.focus();
+    attributeChangedCallback(name, _oldValue, newValue) {
+        switch (name) {
+            case 'type':
+                if (newValue === 'hidden') {
+                    this.style.display = 'none';
+                } else {
+                    this.style.display = '';
+                }
+            case 'placeholder':
+                if (this.value === '') {
+                    this.internals.setFormValue(newValue);
+                }
+            default:
+                if (newValue) {
+                    this.$input.setAttribute(name, newValue);
+                } else {
+                    this.$input.removeAttribute(name);
+                }
+                break;
+        }
     }
 
     /**
@@ -182,34 +249,17 @@ export class HeliumInput extends HTMLElement {
     }
 
     /**
+     * Sets the focus to the input.
+     */
+    focus() {
+        this.$input.focus();
+    }
+
+    /**
      * The native callback function for resetting the input a part of a form.
      */
     formResetCallback() {
         this.$input.value = "";
-    }
-
-    /**
-     * Callback for attribute changes of the web component.
-     * @param {string} name The attribute name
-     * @param {string} _oldValue The previous attribute value
-     * @param {string} newValue The new attribute value
-     */
-    attributeChangedCallback(name, _oldValue, newValue) {
-        switch (name) {
-            case 'type':
-                if (newValue === 'hidden') {
-                    this.style.display = 'none';
-                } else {
-                    this.style.display = '';
-                }
-            default:
-                if (newValue) {
-                    this.$input.setAttribute(name, newValue);
-                } else {
-                    this.$input.removeAttribute(name);
-                }
-                break;
-        }
     }
 
     /**

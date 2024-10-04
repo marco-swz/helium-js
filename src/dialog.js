@@ -70,13 +70,10 @@ export class HeliumDialog extends HTMLElement {
             </dialog>
         `;
 
-        let $body = $shadow.querySelector('#he-diag-body');
-        $body.append(...this.children);
-
         let $icon = $shadow.querySelector('#he-icon-close');
         $icon.onclick = () => $shadow.querySelector('#he-diag-outer').close();
 
-        this.dialog = $shadow.querySelector('#he-diag-outer');
+        this.$dialog = $shadow.querySelector('#he-diag-outer');
         this.$title = $shadow.querySelector('#he-title');
     }
 

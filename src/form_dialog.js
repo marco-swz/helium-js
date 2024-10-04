@@ -4,6 +4,26 @@ import { HeliumDialog } from './dialog.js';
 import { HeliumSelect } from './select.js';
 import sheet from './form_dialog.css';
 
+export class HeliumFormDialogSubmitEvent extends Event {
+    /** @type {RequestInit} */
+    fetchArgs;
+
+    constructor(fetchArgs) {
+        super('he-form-dialog-submit', { detail: { fetchArgs: fetchArgs } });
+        this.fetchArgs = fetchArgs;
+    }
+}
+
+export class HeliumFormDialogResponseEvent extends Event {
+    /** @type {Response} */
+    response;
+
+    constructor(response) {
+        super('he-form-dialog-response', { detail: { response: response } });
+        this.response = response;
+    }
+}
+
 /**
  * A preformatted dialog containing a form.
  *
@@ -32,6 +52,11 @@ export class HeliumFormDialog extends HTMLElement {
      * @type {HTMLFormElement} 
      */
     $form
+    /**
+     * Callback function triggered when the form is submitted.
+     * @type {?()}
+     */
+    onsubmit;
 
     constructor() {
         super();
@@ -41,10 +66,10 @@ export class HeliumFormDialog extends HTMLElement {
 
         this.$dialog = document.createElement('he-dialog');
 
-        this.form = document.createElement('form');
-        this.form.id = 'he-form';
-        this.form.slot = 'body';
-        this.$dialog.append(this.form);
+        this.$form = document.createElement('form');
+        this.$form.id = 'he-form';
+        this.$form.slot = 'body';
+        this.$dialog.append(this.$form);
 
         let $footer = document.createElement('div');
         $footer.id = 'footer-diag-edit';
@@ -75,10 +100,8 @@ export class HeliumFormDialog extends HTMLElement {
      */
     getValues() {
         let values = {};
-        for (const $input of this.body.querySelectorAll('input, select')) {
-            if (this._formInputBlurCallback({ currentTarget: $input })) {
-                values[$input.name] = $input.value;
-            }
+        for (const $input of this.$form.querySelectorAll('.input')) {
+            values[$input.name] = $input.value;
         }
         return values;
     }
@@ -90,18 +113,14 @@ export class HeliumFormDialog extends HTMLElement {
      * The submission is not executed if any input is invalid.
      * @param {?string} enpoint - The address of the endpoint for submission
      * @param {?Object<string, string>} fetchArgs - The arguments passed to the internal `fetch()` call
-     * @param {?function(RequestInit): RequestInit} callbackBefore - The callback function executed before the submission
-     * @param {?function(Response): any} callbackAfter - The callback function executed after receiving the response
      * @returns void
      */
-    submit(endpoint, fetchArgs, callbackBefore, callbackAfter) {
-        // TODO(marco): Replace with `this.getValues()`
-        for (const input of this.form.querySelectorAll('input, select')) {
-            if (!this._formInputBlurCallback({ currentTarget: input })) {
-                return;
-            }
-            values[input.name] = input.value;
+    submit(endpoint, fetchArgs) {
+        if (!this.checkValidity()) {
+            return;
         }
+
+        const values = this.getValues();
 
         endpoint = endpoint
             ?? this.getAttribute('endpoint')
@@ -115,58 +134,30 @@ export class HeliumFormDialog extends HTMLElement {
             ?? this.getAttribute('headers');
         fetchArgs.body = JSON.stringify(values);
 
-        callbackBefore = callbackBefore ?? this.getAttribute('before-submit');
-        if (callbackBefore) {
-            fetchArgs = eval(callbackBefore + '(fetchArgs)');
+        let evt = new HeliumFormDialogSubmitEvent(fetchArgs);
+        this.dispatchEvent(evt);
+
+        if (this.onsubmit != null) {
+            this.onsubmit(evt);
         }
 
-        callbackAfter = callbackAfter ?? this.getAttribute('after-submit');
-
-        this.$dialog.querySelector('#btn-save').loading();
+        this.$dialog.querySelector('#btn-save').loading = true;;
 
         fetch(endpoint, fetchArgs)
             .then(resp => {
-                this.$dialog.querySelector('#btn-save').loading(false);
+                this.$dialog.querySelector('#btn-save').loading = false;
 
-                if (callbackAfter) {
-                    eval(callbackAfter + '(resp)');
+                const evt = new HeliumFormDialogResponseEvent(resp);
+                this.dispatchEvent(evt);
+
+                if (this.onresponse != null) {
+                    this.onresponse(evt);
                 }
-
-                const event = new CustomEvent("he-form-dialog-submit", {
-                    detail: {
-                        source: this.id,
-                        data: resp,
-                    }
-                });
-
-                this.dispatchEvent(event);
             });
     }
 
-    /**
-     * 
-     * @param {HeliumInput} input
-     * @returns boolean
-     */
-    _validateInput(input) {
-        return input.checkValidity()
-
-        const pattern = input.pattern
-
-        if (input.required && input.value === '') {
-            return false;
-        }
-
-        if (pattern == null) {
-            return true;
-        }
-
-        const regex = new RegExp(pattern);
-        return regex.test(input.value);
-    }
-
     reset() {
-        this.form.reset();
+        this.$form.reset();
     }
 
     /**
@@ -176,7 +167,7 @@ export class HeliumFormDialog extends HTMLElement {
      */
     setValues(data) {
         for (const [name, val] of Object.entries(data)) {
-            const input = this.form.querySelector(`[name="${name}"]`);
+            const input = this.$form.querySelector(`[name="${name}"]`);
             if (input) {
                 input.value = val;
             }
@@ -200,7 +191,7 @@ export class HeliumFormDialog extends HTMLElement {
      * @returns void
      */
     renderRows(data) {
-        this.form.innerHTML = '';
+        this.$form.innerHTML = '';
 
         data.forEach((entry, i) => {
             let id = `edit-${i}`;
@@ -214,66 +205,74 @@ export class HeliumFormDialog extends HTMLElement {
                 let label = document.createElement('label');
                 label.for = id;
                 label.innerHTML = labelText;
-                this.form.append(label);
+                this.$form.append(label);
             }
 
             if (entry.options && Object.keys(entry.options).length > 0) {
                 /** @type {HeliumSelect} */
-                let select = document.createElement('he-select');
-                select.id = id;
-                select.name = entry.name;
+                let $select = document.createElement('he-select');
+                $select.id = id;
+                $select.name = entry.name;
+                $select.classList.add('input');
                 if (!entry.required) {
-                    let option = document.createElement('option');
-                    option.innerHTML = '‎';
-                    select.append(option);
+                    let $option = document.createElement('option');
+                    $option.innerHTML = '‎';
+                    $select.append($option);
                 }
 
                 if (entry.hidden) {
-                    input.style.visibility = 'collapse';
+                    $select.style.display = 'none';
                 }
 
                 for (const [value, text] of Object.entries(entry.options)) {
                     const opt = document.createElement('option');
                     opt.value = value;
                     opt.innerHTML = text;
-                    select.append(opt);
+                    $select.append(opt);
                 }
-                this.form.append(select);
+                this.$form.append($select);
             } else {
-                let input = document.createElement('he-input');
-                input.required = entry.required;
-                input.id = id;
-                input.name = entry.name;
-                input.type = 'text';
-                input.onblur = (e) => this._formInputBlurCallback.bind(this)(e);
+                let $input = document.createElement('he-input');
+                $input.required = entry.required;
+                $input.id = id;
+                $input.name = entry.name;
+                $input.type = 'text';
+                $input.classList.add('input');
+                // TODO(marco): Immediate validation is not quite nice
+                //input.onblur = (e) => this._formInputBlurCallback.bind(this)(e);
                 if (entry.pattern) {
-                    input.pattern = entry.pattern;
+                    $input.pattern = entry.pattern;
                 }
                 if (entry.placeholder != null) {
-                    input.placeholder = entry.placeholder;
+                    $input.placeholder = entry.placeholder;
                 }
                 if (entry.hidden) {
-                    input.type = 'hidden';
+                    $input.type = 'hidden';
                 }
-                this.form.append(input);
+                this.$form.append($input);
             }
         });
     }
 
     /**
-     * @param {InputEvent} e
-     * @returns boolean
+     * @param {?HTMLElement} $elem
+     * @returns {boolean}
      */
-    _formInputBlurCallback(e) {
-        const input = e.currentTarget;
-        const isValid = this._validateInput(input);
-        if (isValid) {
-            input.removeAttribute('invalid');
+    checkValidity($elem) {
+        if ($elem == null) {
+            $elem = this.$form.querySelectorAll('.input');
         } else {
-            input.setAttribute('invalid', true);
+            $elem = [$elem];
         }
 
-        return isValid;
+        let allValid = true;
+        for (const $e of $elem) {
+            if (!$e.checkValidity()) {
+                allValid = false;
+            }
+        }
+
+        return allValid;
     }
 
     /**
