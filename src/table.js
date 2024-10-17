@@ -64,6 +64,10 @@ import sheet from './table.css';
  * @listens HeliumFormDialog#he-dialog-close - Closes the dialog
  *
  * @extends HTMLElement
+ *
+ * @todo Univeral datetime conversion
+ * @todo Language abstraction
+ * #todo Remove multiple `oncheck` calls when unselecting all rows
  */
 export class HeliumTable extends HTMLElement {
     static observedAttributes = [
@@ -95,12 +99,36 @@ export class HeliumTable extends HTMLElement {
     pagination;
     /** @type {number} */
     offset = 0;
+    /** @type {Object.<string, Object.<string, string>>} */
+    remap = {};
+    /** @type {Object.<string, Array<string>>} */
+    options = {};
 
     constructor() {
         super();
         let shadow = this.attachShadow({ mode: "open" });
 
         shadow.adoptedStyleSheets = [sheet];
+    }
+
+    set loading(val) {
+        if (val) {
+            this.$body.parentElement.setAttribute('loading', true);
+        } else {
+            this.$body.parentElement.removeAttribute('loading');
+        }
+    }
+
+    get loading() {
+        return this.$body.parentElement.getAttribute('loading') != null;
+    }
+
+    set oncheck(val) {
+        this.setAttribute('oncheck', val);
+    }
+
+    get oncheck() {
+        return this.getAttribute('oncheck');
     }
 
     /**
@@ -165,9 +193,22 @@ export class HeliumTable extends HTMLElement {
                 $column.style.display = 'none';
             }
 
-            const options = this._getColumnOptions($column);
+            try {
+                this.remap[colName] = JSON.parse($column.getAttribute('remap'));
+            } catch (error) {
+                throw new Error('The provided remap is not valid JSON!');
+            }
 
-            if (options && options.length > 0) {
+            //const options = this._getColumnOptions($column);
+            const options = $column.getAttribute('options');
+
+            if (options) {
+                try {
+                    this.options[colName] = JSON.parse(options);
+                } catch (error) {
+                    throw new Error('The provided options are not valid JSON!');
+                }
+
                 let $selFilter = document.createElement('select');
                 $selFilter.id = 'filter-' + colName;
                 $selFilter.name = colName;
@@ -176,8 +217,13 @@ export class HeliumTable extends HTMLElement {
                 let $optionEmpty = document.createElement('option');
                 $optionEmpty.value = '';
                 $selFilter.append($optionEmpty);
-                for (const option of options) {
-                    $selFilter.append(option.cloneNode(true));
+
+                for (const val of this.options[colName]) {
+                    const text = this._renderText($column, val);
+                    let $option = document.createElement('option');
+                    $option.innerHTML = text;
+                    $option.value = val;
+                    $selFilter.append($option);
                 }
                 $contFilter.prepend($selFilter);
             } else {
@@ -185,7 +231,7 @@ export class HeliumTable extends HTMLElement {
                 $inpFilter.id = 'filter-' + colName;
                 $inpFilter.type = 'text';
                 $inpFilter.name = colName;
-                //$inpFilter.autocomplete = 'off';
+                $inpFilter.autocomplete = 'off';
                 $inpFilter.placeholder = ' ';
                 $inpFilter.classList.add('inp-filter');
                 $inpFilter.value = $column.getAttribute('filter') ?? '';
@@ -235,7 +281,7 @@ export class HeliumTable extends HTMLElement {
         }
 
         this._requestRows(this.replaceBody);
-        this._updateExternElements(0);
+        this._updateExternElements([]);
     }
 
     deleteChecked(confirm = true) {
@@ -350,12 +396,8 @@ export class HeliumTable extends HTMLElement {
         return data;
     }
 
-    loading(enable = true) {
-        if (enable) {
-            this.$body.parentElement.setAttribute('loading', true);
-        } else {
-            this.$body.parentElement.removeAttribute('loading');
-        }
+    refresh() {
+        this._requestRows(this.replaceBody);
     }
 
     /**
@@ -365,7 +407,7 @@ export class HeliumTable extends HTMLElement {
     replaceBody(data) {
         this.$body.innerHTML = '';
         this.offset = 0;
-        this._updateExternElements(0);
+        this._updateExternElements([]);
 
         this.$checkAll.checked = false;
         this.$checkAll.indeterminate = false;
@@ -398,8 +440,8 @@ export class HeliumTable extends HTMLElement {
 
         let columns = this._getColumns();
         for (let i = 0; i < columns.length; ++i) {
-            const colName = columns[i].getAttribute('column');
-            const colType = columns[i].getAttribute('type') ?? 'text';
+            const $column = columns[i];
+            const colName = $column.getAttribute('column');
             const val = newData[colName];
             if (val == null) {
                 continue;
@@ -408,7 +450,7 @@ export class HeliumTable extends HTMLElement {
             // `+1` because of checkbox
             let $cell = $row.children[i + 1];
             $cell.setAttribute('data', val);
-            $cell.innerHTML = this._renderCellText(colType, val);
+            $cell.innerHTML = this._renderText($column, val);
         }
     }
 
@@ -486,11 +528,11 @@ export class HeliumTable extends HTMLElement {
             for (const check of $checks) {
                 check.checked = true;
             }
-            this._updateExternElements($checks.length);
+            this._updateExternElements($checks);
         } else {
             for (const check of $checks) {
                 check.checked = false;
-                this._updateExternElements(0);
+                this._updateExternElements([]);
             }
         }
     }
@@ -529,18 +571,6 @@ export class HeliumTable extends HTMLElement {
                 $row.style.visibility = null;
             }
         }
-    }
-
-    /**
-     * @param {HTMLElement} column
-     * @returns {?HTMLCollection<HTMLOptionElement>}
-     */
-    _getColumnOptions(column) {
-        let selector = column.getAttribute('options');
-
-        /** @type {HTMLDataListElement} */
-        let list = document.querySelector('datalist' + selector);
-        return list == null ? null : list.children;
     }
 
     /**
@@ -665,53 +695,26 @@ export class HeliumTable extends HTMLElement {
         return $row;
     }
 
-    /**
-      * Returns the *text* representation of a value depending on the data type.
-      * @param {string} type 
-      * @param {string} val 
-      * @returns string
-      * @todo Maybe remove
-      */
-    _renderCellText(type, val) {
-        switch (type) {
-            case 'date':
-                return val.split('-').reverse().join('.');
-            case 'datetime':
-                val = val.replace('T', ' ');
-                const [date, time] = val.split(' ');
-                return date.split('-').reverse().join('.') + ' ' + time;
-            default:
-                return val;
-        }
-    }
-
     _renderDialogEdit() {
         let data = [];
-        for (let column of this._getColumns()) {
-            const options = this._getColumnOptions(column);
-            let optionValues = null;
-            if (options && options.length > 0) {
-                optionValues = [];
-                for (const $option of options) {
-                    optionValues[$option.value] = $option.innerHTML;
-                }
-            }
-
-            let required = column.getAttribute('required') === 'true';
-            let hidden = column.getAttribute('type') === 'hidden';
-            if (column.getAttribute('no-edit')) {
+        for (let $column of this._getColumns()) {
+            let required = $column.getAttribute('required') === 'true';
+            let hidden = $column.getAttribute('type') === 'hidden';
+            if ($column.getAttribute('no-edit')) {
                 hidden = true;
                 required = false;
             }
+            const colName = $column.getAttribute('column');
+            const options = this.options[colName];
 
             data.push({
-                name: column.getAttribute('column'),
+                name: $column.getAttribute('column'),
                 required: required,
-                label: column.querySelector('span').innerHTML,
-                placeholder: column.getAttribute('default'),
-                pattern: column.getAttribute('pattern'),
+                label: $column.querySelector('span').innerHTML,
+                placeholder: $column.getAttribute('default'),
+                pattern: $column.getAttribute('pattern'),
                 hidden: hidden,
-                options: optionValues,
+                options: options,
             })
         }
 
@@ -724,7 +727,6 @@ export class HeliumTable extends HTMLElement {
         $dialog.onresponse = (evt) => this.formEditAfterSubmitCallback.bind(this)(evt);
         return $dialog;
     }
-
 
     /**
      * @param {Object.<string, string>} data 
@@ -743,12 +745,14 @@ export class HeliumTable extends HTMLElement {
         $row.append($cellCheck);
         $row.onclick = (e) => this._rowClickCallback.bind(this)(e);
 
-        for (let column of this._getColumns()) {
-            let colName = column.getAttribute('column');
-            let colType = column.getAttribute('type');
+        for (let $column of this._getColumns()) {
+            let colName = $column.getAttribute('column');
+            let colType = $column.getAttribute('type');
             let $cell = document.createElement('td');
             let val = data[colName] ?? '';
-            $cell.innerHTML = this._renderCellText(colType, val);
+            let text = val;
+
+            $cell.innerHTML = this._renderText($column, text);
             $cell.setAttribute('data', val);
             $cell.title = val;
 
@@ -773,7 +777,7 @@ export class HeliumTable extends HTMLElement {
             return;
         }
 
-        this.loading();
+        this.loading = true;
 
         let formData = new FormData(this.$form);
 
@@ -789,9 +793,40 @@ export class HeliumTable extends HTMLElement {
             .then(data => {
                 callback.bind(this)(data);
             })
-            .catch(errorMsg => { console.log(errorMsg); })
-            .finally(() => this.loading(false));
+            .catch(errorMsg => { console.error(errorMsg); })
+            .finally(() => this.loading = false);
     }
+
+    /**
+      * Returns the *text* representation of a value depending on the data type.
+      * @param {HTMLTableCellElement} $column 
+      * @param {string} val 
+      * @returns string
+      */
+    _renderText($column, val) {
+        let text = val;
+        switch ($column.getAttribute('type')) {
+            case 'date':
+                text = val.split('-').reverse().join('.');
+                break;
+            case 'datetime':
+                val = val.replace('T', ' ');
+                const [date, time] = val.split(' ');
+                text = date.split('-').reverse().join('.') + ' ' + time;
+                break;
+        }
+
+        const colRemap = this.remap[$column.getAttribute('column')];
+        if (colRemap) {
+            const valRemap = colRemap[val];
+            if (valRemap) {
+                text = valRemap;
+            }
+        }
+
+        return text;
+    }
+
 
     /**
      * 
@@ -800,7 +835,7 @@ export class HeliumTable extends HTMLElement {
      */
     _rowClickCallback(e) {
         const row = e.currentTarget;
-        const checked = this.$body.querySelectorAll('.check-row:state(checked)');
+        let checked = this.$body.querySelectorAll('.check-row:state(checked)');
         let numChecked = checked.length;
 
         if (!e.target.classList.contains('check-row')) {
@@ -823,15 +858,28 @@ export class HeliumTable extends HTMLElement {
             this.$checkAll.checked = true;
         }
 
-        this._updateExternElements(numChecked);
+        checked = this.$body.querySelectorAll('.check-row:state(checked)');
+        this._updateExternElements(checked);
     }
 
-    _updateExternElements(numChecked) {
+    _updateExternElements(checked) {
+        const evt = new CustomEvent('check', {
+            detail: {
+                numRows: checked.length,
+            }
+        })
+        this.dispatchEvent(evt);
+
+        const oncheck = eval(this.oncheck);
+        if (typeof oncheck === 'function') {
+            oncheck.call(this, evt);
+        }
+
         for (const elem of document.querySelectorAll(`[he-table-checked="#${this.id}"]`)) {
             elem.classList.remove('.he-table-checked-none');
             elem.classList.remove('.he-table-checked-one');
             elem.classList.remove('.he-table-checked-multiple');
-            switch (numChecked) {
+            switch (checked.length) {
                 case 0:
                     elem.setAttribute('he-table-state', 'none');
                     break;

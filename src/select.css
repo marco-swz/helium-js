@@ -3,13 +3,14 @@
     width: fit-content;
     font-size: 14px;
     min-width: 60px;
+    display: inline-block;
 }
 
 #inp {
     position: relative;
     background-color: var(--he-select-clr-bg, whitesmoke);
     border: 1px solid lightgrey;
-    width: inherit;
+    width: 100%;
     height: inherit;
     min-width: inherit;
     padding: 0.3rem 0.4rem;
@@ -47,6 +48,7 @@
     border: 1px solid grey;
     border-radius: var(--he-select-border-radius, 3px);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    width: min-content;
 }
 
 #cont-options {

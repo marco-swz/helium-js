@@ -14,6 +14,7 @@ export default {
         'src/tabs.js',
         'src/toast.js',
         'src/helium.js',
+        'src/combo_button.js',
     ],
     output: [
         {

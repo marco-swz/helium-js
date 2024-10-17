@@ -76,7 +76,7 @@ export class HeliumToast extends HTMLElement {
      * @param {string} content
      * @param {null|'info'|'warn'|'error'} type 
      */
-    showToast(message, type) {
+    _showToast(message, type) {
         const $toast = this._renderToast(message, type);
 
         // NOTE(marco): For now disabled
@@ -136,38 +136,39 @@ export class HeliumToast extends HTMLElement {
 
         return $toast;
     }
-}
 
-function showToastTemp(evt, type) {
-    /** @type {HeliumToast} */
-    let $toast = document.querySelector('#he-toast-temp');
-    if ($toast === null) {
-        $toast = document.createElement('he-toast');
-        $toast.id = 'he-toast-temp';
-        $toast.setAttribute('timeout-ms', 5000);
-        $toast.setAttribute('position', 'top-right');
-        document.body.append($toast);
+    static showToast(text, type) {
+        /** @type {HeliumToast} */
+        let $toast = document.querySelector('#he-toast-temp');
+        if ($toast === null) {
+            $toast = document.createElement('he-toast');
+            $toast.id = 'he-toast-temp';
+            $toast.setAttribute('timeout-ms', 5000);
+            $toast.setAttribute('position', 'top-right');
+            document.body.append($toast);
+        }
+
+        $toast._showToast(text, type);
     }
-
-    $toast.showToast(evt.detail.value, type);
 }
 
 if (!customElements.get('he-toast')) {
+    window.HeliumToast = HeliumToast;
     customElements.define("he-toast", HeliumToast);
 
     document.addEventListener("he-toast", function(e) {
-        showToastTemp(e);
+        HeliumToast.showToast(e.detail.value);
     })
 
     document.addEventListener("he-toast-error", function(e) {
-        showToastTemp(e, 'error');
+        HeliumToast.showToast(e.detail.value, 'error');
     })
 
     document.addEventListener("he-toast-warn", function(e) {
-        showToastTemp(e, 'warn');
+        HeliumToast.showToast(e.detail.value, 'warn');
     })
 
     document.addEventListener("he-toast-success", function(e) {
-        showToastTemp(e, 'success');
+        HeliumToast.showToast(e.detail.value, 'success');
     })
 }

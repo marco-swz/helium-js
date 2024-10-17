@@ -15,9 +15,11 @@ import sheet from './button.css';
  *
  * @extends HTMLElement
  * @todo Add all css variables to doc
+ * @todo Disable all click events when disabled or loading
  */
 export class HeliumButton extends HTMLElement {
     static observedAttributes = [
+        'theme',
         'popovertarget',
         'popovertargetaction',
         'form',
@@ -29,6 +31,7 @@ export class HeliumButton extends HTMLElement {
         'close-dialog',
         'submit',
         'he-input-invalid',
+        'disabled',
     ];
     /** @type {HTMLInputElement} */
     $button;
@@ -56,10 +59,8 @@ export class HeliumButton extends HTMLElement {
     set disabled(val) {
         if (val) {
             this.setAttribute('disabled', true);
-            this.internals.states.add('disabled');
         } else {
             this.removeAttribute('disabled');
-            this.internals.states.delete('disabled');
         }
 
     }
@@ -85,6 +86,22 @@ export class HeliumButton extends HTMLElement {
 
     get loading() {
         return this.getAttribute('loading') != null;
+    }
+
+    /**
+     * Gets or sets the theme of the button.
+     * @type {'primary'|'secondary'}
+     */
+    set theme(val) {
+        if (val) {
+            this.setAttribute('theme', val);
+        } else {
+            this.removeAttribute('theme');
+        }
+    }
+
+    get theme() {
+        return this.getAttribute('theme');
     }
 
     /**
@@ -115,6 +132,18 @@ export class HeliumButton extends HTMLElement {
                     this.disabled = true;
                 } else {
                     this.disabled = false;
+                }
+                break;
+            case 'theme':
+                break;
+
+            case 'disabled':
+                if (newValue) {
+                    this.internals.states.add('disabled');
+                    this.$button.setAttribute('disabled', true);
+                } else {
+                    this.internals.states.delete('disabled');
+                    this.$button.removeAttribute('disabled');
                 }
                 break;
             default:

@@ -18,7 +18,6 @@ const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\r\n    display: inl
  * @attr {on|off} disabled - Toggles the `disabled` state of the input. A disabled input will not be submitted in forms.
  * @attr {on|off} readonly - Toggles the `readonly` state of the input. Contrary to `disabled`, the value will still be submitted in forms.
  * @attr {on|off} [autocomplete=off] - Shows suggestion from previous inputs (browser native appearance)
- * @attr {'change'} validate-on - The validation is triggered by the provided event
  *
  * @cssprop [--he-input-clr-border-hover=grey] - The border color when hovering
  * @cssprop [--he-input-clr-spinner=black] - The color of the spinner while in `loading` state
@@ -163,15 +162,12 @@ class HeliumInput extends HTMLElement {
 
     get value() {
         return this.$input.value === ''
-            ? this.placeholder
+            ? this.placeholder ?? ''
             : this.$input.value;
     }
 
     connectedCallback() {
-        if (this.getAttribute('validate-on') === 'change') {
-            this.$input.onchange = () => this.inputChangedCallback.bind(this)();
-        }
-
+        this.$input.onchange = () => this.inputChangedCallback.bind(this)();
         this.value = this.getAttribute('value');
         if (!this.value) {
             this.value = this.innerHTML;
@@ -197,7 +193,7 @@ class HeliumInput extends HTMLElement {
                     this.internals.setFormValue(newValue);
                 }
             default:
-                if (newValue) {
+                if (newValue != null) {
                     this.$input.setAttribute(name, newValue);
                 } else {
                     this.$input.removeAttribute(name);

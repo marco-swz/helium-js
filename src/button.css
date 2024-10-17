@@ -5,72 +5,74 @@
     --he-button-clr-bg: white;
     --he-button-border-width: 0.1rem;
     --he-button-border-color: rgba(0, 0, 0, 0.2235294118);
+    --he-button-border-color-hover: rgba(0, 0, 0, 0.2235294118);
+    --he-button-clr-hover: black;
+    --he-button-font-size: 14px;
+    --he-button-height: 35px;
+    --he-button-width: auto;
+    --he-button-clr: black;
+    --he-clr-bg-primary: hsl(200, 50%, 50%);
+    --he-clr-primary: hsl(0, 0%, 100%);
+    --he-clr-bg-primary-hover: hsl(200, 50%, 60%);
+    --he-clr-primary-hover:var(--he-clr-primary);
 
     display: inline-block;
     text-wrap: nowrap;
     border-radius: 2px;
-    color: black;
-    height: 35px;
-    vertical-align: middle;
-    text-align: center;
-    border-width: var(--he-button-border-width);
-    border-style: solid;;
-    border-color: var(--he-button-border-color);
-    font-size: 14px;
-    background-color: var(--he-button-clr-bg);
     outline-style: none;
     box-shadow: none !important;
-    width: auto;
-    position: relative;
 }
 
 #he-button {
+    position: relative;
     border-radius: inherit;
     color: inherit;
     padding: inherit;
-    vertical-align: inherit;
-    text-align: inherit;
-    font-size: inherit;
-    background-color: inherit;
+    vertical-align: middle;
+    text-align: center;
+    font-size: var(-he-button-font-size);
+    background-color: var(--he-button-clr-bg);
     outline-style: inherit;
     box-shadow: inherit;
     text-shadow: inherit;
     cursor: inherit;
-
-    height: 100%;
-    width: 100%;
-    border: none;
+    color: var(--he-button-clr);
+    height: var(--he-button-height);
+    width: var(--he-button-width);
+    border-width: var(--he-button-border-width);
+    border-style: solid;
+    border-color: var(--he-button-border-color);
     padding: 0px 10px;
 }
 
-:host([disabled]) {
+:host([disabled]) #he-button {
     background-color: #d9d9d9;
     color: #666666;
     cursor: var(--he-button-cursor-disabled);
     text-shadow: none;
 }
 
-:host(:not([loading]):not([disabled]):hover), 
-:host(:not([loading]):not([disabled]):active), 
-:host(:not([loading]):not([disabled]):focus) {
+:host(:not([loading]):not([disabled]):hover) #he-button,
+:host(:not([loading]):not([disabled]):active) #he-button,
+:host(:not([loading]):not([disabled]):focus) #he-button {
     cursor: var(--he-button-cursor-hover);
     text-shadow: 0px 0px 0.3px var(--he-button-clr-border-hover);
-    border-color: var(--he-button-clr-border-hover, grey);
-    color: var(--he-button-clr-border-hover, black);
+    border-color: var(--he-button-border-color-hover);
+    color: var(--he-button-clr-hover);
 }
 
-:host(:not([loading]):not([disabled]):hover) {
-    background-color: color-mix(in srgb,var(--he-button-clr-bg),black 2%)
+:host(:not([loading]):not([disabled]):hover) #he-button {
+    background-color: color-mix(in srgb, var(--he-button-clr-bg), black 2%)
 }
 
-:host([loading]) {
+:host([loading]) #he-button {
     background-color: #d9d9d9;
     color: #6666668c;
     cursor: var(--he-button-cursor-loading);
     text-shadow: none;
 }
 
-:host([loading])::after {
+:host([loading]) #he-button::after {
     content: "";
     position: absolute;
     width: 16px;
@@ -86,7 +88,7 @@
     animation: button-loading-spinner 1s ease infinite;
 }
 
-:host([ok])::after {
+:host([ok]) #he-button::after {
     content: "";
     position: absolute;
     width: 16px;
@@ -102,6 +104,20 @@
     transform: rotate(45deg);
 }
 
+:host([theme=primary]) #he-button {
+    border-color: transparent;
+    background-color: var(--he-clr-bg-primary);
+    color: var(--he-clr-primary);
+}
+
+:host([theme=primary]:not([loading]):not([disabled]):hover) #he-button,
+:host([theme=primary]:not([loading]):not([disabled]):active) #he-button,
+:host([theme=primary]:not([loading]):not([disabled]):focus) #he-button {
+    background-color: var(--he-clr-bg-primary-hover);
+    color: var(--he-clr-primary-hover);
+    border-color: transparent;
+}
+
 @keyframes button-loading-spinner {
     from {
         transform: rotate(0turn);
@@ -111,4 +127,3 @@
         transform: rotate(1turn);
     }
 }
-
