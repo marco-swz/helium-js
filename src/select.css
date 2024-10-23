@@ -27,19 +27,16 @@
 }
 
 #inp::after {
-    content: "";
+    content: "▼";
     position: absolute;
-    width: 4px;
-    height: 4px;
+    font-size: 10px;
+    width: fit-content;
+    height: fit-content;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    margin: auto 10px auto auto;
-    border: 2px solid transparent;
-    border-bottom-color: var(--he-select-clr-arrow, black);
-    border-right-color: var(--he-select-clr-arrow, black);
-    transform: rotate(45deg) translateY(-2.5px);
+    margin: auto 4px auto auto;
 }
 
 #popover {

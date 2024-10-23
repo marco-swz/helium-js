@@ -45,7 +45,7 @@ export class HeliumComboButton extends HTMLElement {
         this.$contButtons.append($slotButton);
 
         const $btnMenu = document.createElement('button');
-        $btnMenu.innerHTML = 'v';
+        $btnMenu.innerHTML = '▼';
         $btnMenu.id = 'btn-menu'
         $btnMenu.setAttribute('popovertarget', 'popover');
         this.$contButtons.append($btnMenu);

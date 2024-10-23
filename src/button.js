@@ -8,6 +8,7 @@ import sheet from './button.css';
  * This behavior is activated by he `report-validtity` attribute of the `HeliumInput`.
  * @attr show-dialog - Calls `.showModal()` on the specified element(s) if the button is pressed.
  * @attr close-dialog - Calls `.close()` on the specified element(s) if the button is pressed.
+ * @attr {string} onload - The content `onload` is evaluated when attached to the DOM
  *
  * @cssprop [--he-button-cursor-loading = default] - The cursor style when in `loading` state
  * @cssprop [--he-button-cursor-hover = pointer] - The cursor style when hovering
@@ -20,6 +21,7 @@ import sheet from './button.css';
 export class HeliumButton extends HTMLElement {
     static observedAttributes = [
         'theme',
+        'variant',
         'popovertarget',
         'popovertargetaction',
         'form',
@@ -136,7 +138,18 @@ export class HeliumButton extends HTMLElement {
                 break;
             case 'theme':
                 break;
+            case 'variant': 
+                if (newValue === 'primary') {
 
+
+                } else if (newValue === 'outline') {
+
+                } else if (newValue === 'ghost') {
+
+                } else {
+
+                }
+                break;
             case 'disabled':
                 if (newValue) {
                     this.internals.states.add('disabled');
@@ -159,6 +172,8 @@ export class HeliumButton extends HTMLElement {
     connectedCallback() {
         this.$button.innerHTML = this.innerHTML;
         this.innerHTML = '';
+
+        this.onload && this.onload();
     }
 
     _closeDialog() {

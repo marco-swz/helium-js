@@ -7,6 +7,7 @@
     --he-combo-button-sep-width: 0.05rem;
     --he-combo-button-sep-color: lightgrey;
     --he-combo-button-height: 35px;
+    --he-combo-button-popover-border-color: 240 5.9% 90%;
 
     display: inline-block;
     height: var(--he-combo-button-height);
@@ -15,7 +16,7 @@
 #popover {
     inset: unset;
     outline: none;
-    border: 1px solid grey;
+    border: 1px solid hsl(var(--he-combo-button-popover-border-color));
     border-radius: var(--he-select-border-radius, 3px);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     width: min-content;
@@ -26,8 +27,6 @@
 
         &::slotted(he-button) {
             --he-button-width: 100%;
-            --he-button-border-color: transparent;
-            --he-button-border-color-hover: transparent;
         }
     }
 }
@@ -38,13 +37,9 @@
     border-style: solid;
     border-width: var(--he-combo-button-border-width);
     width: fit-content;
-    height: fit-content;
+    height: calc(var(--he-combo-button-height) - 2px);
     border-color: var(--he-combo-button-border-color);
-
-    & #slot-button::slotted(he-button) {
-        --he-button-border-radius: 0;
-        --he-button-border-width: 0;
-    }
+    overflow: hidden;
 
     & button {
         border-radius: 0;
@@ -53,7 +48,14 @@
         background-color: var(--he-combo-button-clr-bg);
         color: var(--he-combo-button-clr);
         border-left-color: var(--he-combo-button-sep-color);
-        border-left-width: var(--he-combo-Button-sep-width);
-        border-left-style: solid;;
+        border-left-width: var(--he-combo-button-sep-width);
+        border-left-style: solid;
+        cursor: pointer;
+        font-size: 10px;
+        padding: 5px;
+
+        &:hover {
+            background-color: hsl(240 4.8% 95.9%);
+        }
     }
 }

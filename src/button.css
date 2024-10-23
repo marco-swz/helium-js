@@ -2,19 +2,20 @@
     --he-button-cursor-loading: default;
     --he-button-cursor-hover: pointer;
     --he-button-cursor-disabled: not-allowed;
-    --he-button-clr-bg: white;
     --he-button-border-width: 0.1rem;
-    --he-button-border-color: rgba(0, 0, 0, 0.2235294118);
-    --he-button-border-color-hover: rgba(0, 0, 0, 0.2235294118);
-    --he-button-clr-hover: black;
     --he-button-font-size: 14px;
     --he-button-height: 35px;
     --he-button-width: auto;
-    --he-button-clr: black;
-    --he-clr-bg-primary: hsl(200, 50%, 50%);
-    --he-clr-primary: hsl(0, 0%, 100%);
-    --he-clr-bg-primary-hover: hsl(200, 50%, 60%);
-    --he-clr-primary-hover:var(--he-clr-primary);
+
+    --he-button-clr: 0 0% 0%;
+    --he-button-clr-bg: 0 0% 100%;
+    --he-button-clr-bg-hover: 240 4.8% 95.9%;
+    --he-button-border-color: 240 4.9% 83.9%;
+    --he-button-border-color-hover: var(--he-button-border-color);
+
+    --he-theme-clr: var(--he-clr-accent, 0 0% 0%);
+    --he-theme-clr-b1: var(--he-theme-clr) / .75;
+    --he-theme-contrast: 0 0% 100%;
 
     display: inline-block;
     text-wrap: nowrap;
@@ -23,53 +24,94 @@
     box-shadow: none !important;
 }
 
+:host([theme=danger]) {
+    --he-theme-clr: 0 72.2% 50.6%;
+    --he-theme-clr-b1: var(--he-theme-clr) / .75;
+    --he-theme-contrast: 0 0% 100%;
+}
+
+:host([theme=warning]) {
+    --he-theme-clr: 32.1 94.6% 43.7%;
+    --he-theme-clr-b1: var(--he-theme-clr) / .75;
+    --he-theme-contrast: 0 0% 100%;
+}
+
+:host([theme=sucess]) {
+    --he-theme-clr: 142.1 76.2% 36.3%;
+    --he-theme-clr-b1: var(--he-theme-clr) / .75;
+    --he-theme-contrast: 0 0% 100%;
+}
+
+:host([theme][variant]), 
+:host([theme]) {
+    --he-button-clr: var(--he-theme-clr);
+    --he-button-clr-hover: var(--he-theme-contrast);
+    --he-button-clr-bg: var(--he-theme-contrast);
+    --he-button-clr-bg-hover: var(--he-theme-clr);
+    --he-button-border-color: var(--he-theme-clr);
+    --he-button-border-color-hover: var(--he-theme-clr);
+}
+
+:host([variant=primary]) {
+    --he-button-clr: var(--he-theme-contrast);
+    --he-button-clr-hover: var(--he-theme-contrast);
+    --he-button-clr-bg: var(--he-theme-clr);
+    --he-button-clr-bg-hover: var(--he-theme-clr-b1);
+    --he-button-border-color: var(--he-theme-clr);
+    --he-button-border-color-hover: var(--he-theme-clr-b1);
+}
+
+:host([variant=ghost]) {
+    --he-button-border-color: 0 0% 100%;
+    --he-button-border-color-hover: var(--he-button-clr-bg-hover);
+}
+:host([variant=ghost][theme]) {
+    --he-button-clr: var(--he-theme-clr);
+    --he-button-clr-hover: var(--he-theme-contrast);
+    --he-button-clr-bg: var(--he-theme-contrast);
+    --he-button-clr-bg-hover: var(--he-theme-clr);
+    --he-button-border-color: var(--he-theme-contrast);
+    --he-button-border-color-hover: var(--he-theme-clr);
+}
+
 #he-button {
     position: relative;
     border-radius: inherit;
-    color: inherit;
     padding: inherit;
     vertical-align: middle;
     text-align: center;
     font-size: var(-he-button-font-size);
-    background-color: var(--he-button-clr-bg);
+    background-color: hsl(var(--he-button-clr-bg));
     outline-style: inherit;
     box-shadow: inherit;
     text-shadow: inherit;
     cursor: inherit;
-    color: var(--he-button-clr);
+    color: hsl(var(--he-button-clr));
     height: var(--he-button-height);
     width: var(--he-button-width);
     border-width: var(--he-button-border-width);
     border-style: solid;
-    border-color: var(--he-button-border-color);
+    border-color: hsl(var(--he-button-border-color));
     padding: 0px 10px;
 }
 
 :host([disabled]) #he-button {
-    background-color: #d9d9d9;
-    color: #666666;
+    opacity: 0.5;
     cursor: var(--he-button-cursor-disabled);
-    text-shadow: none;
 }
 
 :host(:not([loading]):not([disabled]):hover) #he-button,
 :host(:not([loading]):not([disabled]):active) #he-button,
 :host(:not([loading]):not([disabled]):focus) #he-button {
+    background-color: hsl(var(--he-button-clr-bg-hover));
+    border-color: hsl(var(--he-button-border-color-hover));
     cursor: var(--he-button-cursor-hover);
-    text-shadow: 0px 0px 0.3px var(--he-button-clr-border-hover);
-    border-color: var(--he-button-border-color-hover);
-    color: var(--he-button-clr-hover);
-}
-
-:host(:not([loading]):not([disabled]):hover) #he-button {
-    background-color: color-mix(in srgb, var(--he-button-clr-bg), black 2%)
+    color: hsl(var(--he-button-clr-hover));
 }
 
 :host([loading]) #he-button {
-    background-color: #d9d9d9;
-    color: #6666668c;
+    opacity: 0.5;
     cursor: var(--he-button-cursor-loading);
-    text-shadow: none;
 }
 
 :host([loading]) #he-button::after {
@@ -102,20 +144,6 @@
     border-bottom-color: var(--he-button-clr-spinner, black);
     border-right-color: var(--he-button-clr-spinner, black);
     transform: rotate(45deg);
-}
-
-:host([theme=primary]) #he-button {
-    border-color: transparent;
-    background-color: var(--he-clr-bg-primary);
-    color: var(--he-clr-primary);
-}
-
-:host([theme=primary]:not([loading]):not([disabled]):hover) #he-button,
-:host([theme=primary]:not([loading]):not([disabled]):active) #he-button,
-:host([theme=primary]:not([loading]):not([disabled]):focus) #he-button {
-    background-color: var(--he-clr-bg-primary-hover);
-    color: var(--he-clr-primary-hover);
-    border-color: transparent;
 }
 
 @keyframes button-loading-spinner {

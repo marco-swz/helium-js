@@ -193,6 +193,7 @@ tbody #row-btn-more td:hover {
 tbody #row-btn-more td {
     padding: 0.4rem;
     border: 1px solid darkgrey;
+    display: table-cell;
 }
 
 .cont-sorters {
