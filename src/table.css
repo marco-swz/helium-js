@@ -1,4 +1,5 @@
 :host {
+    --he-table-row-bg: 0 0% 100%;
     overflow: auto;
     width: fit-content;
 }
@@ -147,12 +148,16 @@ tbody {
     min-height: 15px;
 }
 
+tbody tr {
+    background-color: hsl(var(--he-table-row-bg));
+}
+
 tbody tr:nth-child(even) {
-    background-color: whitesmoke;
+    filter: brightness(0.97);
 }
 
 tbody tr:hover {
-    background-color: #dcdcdc;
+    filter:brightness(0.93);
 }
 
 tbody td {
@@ -163,6 +168,10 @@ tbody td {
     padding: 5px 15px;
     vertical-align: middle;
     width: 0;
+}
+
+tbody td > * {
+    filter: unset;
 }
 
 tbody td:first-child {

@@ -73,6 +73,7 @@ import sheet from './table.css';
  * @attr {on|off} no-edit - If set, the input field is hidden when editing a row
  * @attr {?string} default - The default value for a column
  * @attr {'asc'|'desc'} sort - The direction for sorting the table by the given column
+ * @attr {Object.<string, string>} row-color - If a cell of the column has the given value, the background color of the row is set to the provided value. The color has to be in HSL format and is passed to the CSS `hsl()` function.
  *
  * @element he-table
  *
@@ -122,6 +123,8 @@ export class HeliumTable extends HTMLElement {
     options = {};
     /** @type {ElementInternals} */
     internals;
+    /** @type {Object.<string, ?Object.<string, string>>} */
+    rowColors = {};
 
     constructor() {
         super();
@@ -733,6 +736,14 @@ export class HeliumTable extends HTMLElement {
                     $cell.setAttribute('data', val);
                     $cell.innerHTML = this._renderText($column, text);
                     $cell.title = val;
+                    let colors = this.rowColors[colName];
+                    if (colors) {
+                        let color = colors[val];
+                        if (color) {
+                            $row.style.cssText = `--he-table-row-bg: ${color}`;
+                        }
+                    }
+
                     break;
             }
 
@@ -871,6 +882,12 @@ export class HeliumTable extends HTMLElement {
                 this.remap[colName] = JSON.parse($column.getAttribute('remap'));
             } catch (error) {
                 throw new Error('The provided remap is not valid JSON!');
+            }
+
+            try {
+                this.rowColors[colName] = JSON.parse($column.getAttribute('row-color'));
+            } catch (error) {
+                throw new Error('The provided row-color is not valid JSON!');
             }
 
             //const options = this._getColumnOptions($column);
