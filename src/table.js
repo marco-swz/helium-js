@@ -606,7 +606,7 @@ export class HeliumTable extends HTMLElement {
     }
 
     _showDialogEdit($row) {
-        let data = this._getRowData($row, true);
+        let data = this._getRowData($row, false);
 
         this.$diagEdit.setValues(data);
         this.dataOld = data;
@@ -677,7 +677,20 @@ export class HeliumTable extends HTMLElement {
                 hidden = true;
                 required = false;
             }
+
             const options = this.options[colName];
+            let optionMap = {};
+            if (options != null) {
+                const remap = this.remap[colName];
+                for (const val of options) {
+                    const mapped = remap[val];
+                    if (mapped) {
+                        optionMap[val] = mapped;
+                    } else {
+                        optionMap[val] = val;
+                    }
+                }
+            }
 
             data.push({
                 name: $column.getAttribute('column'),
@@ -686,7 +699,7 @@ export class HeliumTable extends HTMLElement {
                 placeholder: $column.getAttribute('default'),
                 pattern: $column.getAttribute('pattern'),
                 hidden: hidden,
-                options: options,
+                options: optionMap,
             })
         }
 

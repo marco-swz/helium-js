@@ -68,13 +68,23 @@ export function hePositionRelative(elem, target, position, offset=0) {
 }
 
 export function heDisableBodyScroll() {
-    const width = window.innerWidth - document.body.offsetWidth;
-    document.body.style.overflow = 'hidden';
-    document.body.style.paddingRight = width + 'px';
+    //const isScrollYVisible = document.body.scrollHeight > document.body.clientHeight;
+    //if (isScrollYVisible) {
+    //    document.body.style.position = 'fixed';
+    //    document.body.style.overflowY = 'scroll';
+    //}
+
+    //const isScrollXVisible = document.body.scrollWidth > document.body.clientWidth;
+    //if (isScrollXVisible) {
+    //    document.body.style.position = 'fixed';
+    //    document.body.style.overflowX = 'scroll';
+    //}
+    //document.body.style.overflowX = 'scroll';
 }
 
 export function heEnableBodyScroll() {
-    document.body.style.overflow = '';
-    document.body.style.paddingRight = '';
+    document.body.style.position = 'static';
+    document.body.style.overflowY = 'auto';
+    document.body.style.overflowX = 'auto';
 }
 

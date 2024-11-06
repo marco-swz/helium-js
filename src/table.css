@@ -261,3 +261,7 @@ table[loading] tbody::after {
         background-position: -135% 0%
     }
 }
+
+he-form-dialog {
+    --he-form-dialog-width: 350px;
+}

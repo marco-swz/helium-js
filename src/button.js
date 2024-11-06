@@ -92,7 +92,7 @@ export class HeliumButton extends HTMLElement {
 
     /**
      * Gets or sets the theme of the button.
-     * @type {'primary'|'secondary'}
+     * @type {'danger'|'warning'|'success'}
      */
     set theme(val) {
         if (val) {
@@ -104,6 +104,22 @@ export class HeliumButton extends HTMLElement {
 
     get theme() {
         return this.getAttribute('theme');
+    }
+
+    /**
+     * Gets or sets the theme of the button.
+     * @type {'primary'|'ghost'}
+     */
+    set variant(val) {
+        if (val) {
+            this.setAttribute('variant', val);
+        } else {
+            this.removeAttribute('variant');
+        }
+    }
+
+    get variant() {
+        return this.getAttribute('variant');
     }
 
     /**

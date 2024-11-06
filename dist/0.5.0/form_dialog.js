@@ -2,9 +2,9 @@ import './button.js';
 import './input.js';
 import './dialog.js';
 import './select.js';
-import './utils-BkymcsnI.js';
+import './utils-BGzlNXdX.js';
 
-const sheet = new CSSStyleSheet();sheet.replaceSync("#he-form {\r\n    display: grid;\r\n    grid-template-columns: max-content 1fr;\r\n    gap: 0.5rem;\r\n    margin: 0.5rem;\r\n    margin-bottom: 0.5rem;\r\n}\r\n\r\n#footer-diag-edit he-button:first-child {\r\n    margin-right: 0.5rem;\r\n}\r\n\r\n#he-form he-select, #he-form he-input {\r\n    width: 100%;\r\n}\r\n\r\n#he-form label {\r\n    display: flex;\r\n    align-items: center;\r\n}\r\n");
+const sheet = new CSSStyleSheet();sheet.replaceSync("\r\n#he-form {\r\n    display: grid;\r\n    grid-template-columns: max-content 1fr;\r\n    gap: 0.5rem;\r\n    padding: 0.5rem;\r\n    margin-bottom: 0.5rem;\r\n    width: var(--he-form-dialog-width, 300px);\r\n    max-height: var(--he-form-dialog-max-height, 500px);\r\n    overflow: auto;\r\n}\r\n\r\n#footer-diag-edit {\r\n    display: flex;\r\n    gap: 0.5rem;\r\n    padding-right: 0.4rem;\r\n    padding-bottom: 0.4rem;\r\n}\r\n\r\n#he-form he-select, #he-form he-input {\r\n    width: 100%;\r\n}\r\n\r\n#he-form label {\r\n    display: flex;\r\n    align-items: center;\r\n}\r\n");
 
 class HeliumFormDialogSubmitEvent extends Event {
     /** @type {RequestInit} */
@@ -78,9 +78,11 @@ class HeliumFormDialog extends HTMLElement {
         $footer.slot = 'footer';
         this.$dialog.append($footer);
 
+        /** @type {HeliumButton} */
         let $btnSave = document.createElement('he-button');
         $btnSave.innerHTML = 'Speichern';
         $btnSave.id = 'btn-save';
+        $btnSave.variant = 'primary';
         $btnSave.onclick = () => this.submit.bind(this)();
         $footer.append($btnSave);
 
@@ -217,7 +219,6 @@ class HeliumFormDialog extends HTMLElement {
                 $select.classList.add('input');
                 if (!entry.required) {
                     let $option = document.createElement('option');
-                    $option.innerHTML = '‎';
                     $select.append($option);
                 }
 
