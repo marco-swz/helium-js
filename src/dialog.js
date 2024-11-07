@@ -77,15 +77,6 @@ export class HeliumDialog extends HTMLElement {
         this.$title = $shadow.querySelector('#he-title');
     }
 
-    connectedCallback() {
-        this.addEventListener("he-dialog-show", function() {
-            this.show();
-        })
-        this.addEventListener("he-dialog-close", function() {
-            this.close();
-        })
-    }
-
     /**
      * Callback for attribute changes of the web component.
      * @param {string} name The attribute name
@@ -125,6 +116,42 @@ export class HeliumDialog extends HTMLElement {
     }
 
     /**
+     * Closes the dialog.
+     * @return Self
+     */
+    close() {
+        this.$dialog.close();
+        return this;
+    }
+
+
+    connectedCallback() {
+        this.addEventListener("he-dialog-show", function() {
+            this.show();
+        })
+        this.addEventListener("he-dialog-close", function() {
+            this.close();
+        })
+    }
+
+    /**
+     * Sets the values of all elements within the `body` slot to the provided value. 
+     * @param {Object.<string, number|string>} values A mapping from `name` to value
+     * @returns {Self}
+     */
+    fill(values) {
+        const $slot = this.$dialog.querySelector('slot[name=body]');
+        for (const [name, val] of Object.entries(values)) {
+            $slot.assignedElements().forEach((elem) =>
+                elem.querySelectorAll(`[name="${name}"]`).forEach(
+                    (e) => e.value = val
+                )
+            );
+        }
+        return this;
+    }
+
+    /**
      * Opens the dialog.
      * @returns Self
      */
@@ -139,15 +166,6 @@ export class HeliumDialog extends HTMLElement {
      */
     showModal() {
         this.$dialog.showModal();
-        return this;
-    }
-
-    /**
-     * Closes the dialog.
-     * @return Self
-     */
-    close() {
-        this.$dialog.close();
         return this;
     }
 
