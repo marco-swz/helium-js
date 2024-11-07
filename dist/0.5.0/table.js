@@ -424,7 +424,7 @@ class HeliumTable extends HTMLElement {
         }
 
         let row = $check.parentElement.parentElement;
-        let data = this._getRowData(row, true);
+        let data = this._getRowData(row, false);
 
         this.$diagEdit.setValues(data);
         this.editRequestType = 'POST';
