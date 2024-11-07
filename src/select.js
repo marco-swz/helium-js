@@ -47,10 +47,26 @@ export class HeliumSelect extends HTMLElement {
         shadow.adoptedStyleSheets = [sheet];
     }
 
-    /** 
+    /**
+     * Disables or enables the select.
+     * @type {boolean}
+     */
+    set disabled(val) {
+        if (val) {
+            this.setAttribute('disabled', true);
+        } else {
+            this.getAttribute('disabled');
+        }
+    }
+
+    get disabled() {
+        return this.getAttribute('disabled') !== null;
+    }
+
+    /**
      * Gets or sets the filter attribute.
      * The filter allows searching the options of the select.
-     * @type {boolean} 
+     * @type {boolean}
      */
     set filter(val) {
         if (val) {
@@ -64,6 +80,9 @@ export class HeliumSelect extends HTMLElement {
         return this.getAttribute('filter') !== null;
     }
 
+    /**
+     * @param {(arg0: InputEvent) => void} val
+     */
     set onchange(val) {
         if (val) {
             this.setAttribute('onchange', val);

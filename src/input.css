@@ -62,6 +62,7 @@
     border: none;
     padding: 0.3rem 0.4rem;
     cursor: inherit;
+    color: inherit;
 }
 
 :host([readonly]:hover), :host([readonly]:focus),
@@ -70,7 +71,8 @@
 }
 
 :host([readonly]), :host([disabled]) {
-    cursor: default
+    cursor: default;
+    color: hsl(from var(--he-input-clr, black) h s calc(l + 50))
 }
 
 @keyframes button-loading-spinner {

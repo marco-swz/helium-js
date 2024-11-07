@@ -2,9 +2,9 @@ import './button.js';
 import './input.js';
 import './dialog.js';
 import './select.js';
-import './utils-BkymcsnI.js';
+import './utils-DVetH1yt.js';
 
-const sheet = new CSSStyleSheet();sheet.replaceSync("#he-form {\r\n    display: grid;\r\n    grid-template-columns: max-content 1fr;\r\n    gap: 0.5rem;\r\n    margin: 0.5rem;\r\n    margin-bottom: 0.5rem;\r\n}\r\n\r\n#footer-diag-edit he-button:first-child {\r\n    margin-right: 0.5rem;\r\n}\r\n\r\n#he-form he-select, #he-form he-input {\r\n    width: 100%;\r\n}\r\n\r\n#he-form label {\r\n    display: flex;\r\n    align-items: center;\r\n}\r\n");
+const sheet = new CSSStyleSheet();sheet.replaceSync("#he-form {\n    display: grid;\n    grid-template-columns: max-content 1fr;\n    gap: 0.5rem;\n    margin: 0.5rem;\n    margin-bottom: 0.5rem;\n}\n\n#footer-diag-edit he-button:first-child {\n    margin-right: 0.5rem;\n}\n\n#he-form he-select, #he-form he-input {\n    width: 100%;\n}\n\n#he-form label {\n    display: flex;\n    align-items: center;\n}\n");
 
 class HeliumFormDialogSubmitEvent extends Event {
     /** @type {RequestInit} */

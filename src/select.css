@@ -6,6 +6,11 @@
     display: inline-block;
 }
 
+:host([disabled]) {
+    pointer-events: none;
+    color: hsl(from var(--he-select-clr, black) h s calc(l + 50))
+}
+
 #inp {
     position: relative;
     background-color: var(--he-select-clr-bg, whitesmoke);
@@ -19,6 +24,7 @@
     text-align: left;
     padding-right: 25px;
     text-wrap: nowrap;
+    color: inherit;
 }
 
 #inp:hover, #inp:focus {
