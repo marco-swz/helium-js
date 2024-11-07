@@ -92,6 +92,23 @@ export class HeliumSelect extends HTMLElement {
     }
 
     /** 
+     * Gets or sets the name of the element for form submissions.
+     * @type {string} 
+     */
+    set name(val) {
+        if (val) {
+            this.setAttribute('name', val)
+        } else {
+            this.removeAttribute('name');
+        }
+    }
+
+    get name() {
+        return this.getAttribute('name');
+    }
+
+
+    /** 
      * Gets or sets the `open` state of the element.
      * If `open` is set, the options are shown to the user.
      * @type {boolean} 
@@ -111,6 +128,7 @@ export class HeliumSelect extends HTMLElement {
     set value(val) {
         if (val) {
             const $option = this.options.querySelector(`[value="${val}"]`);
+            console.assert($option != null, `No select option with value ${val}`);
             this._select($option);
         }
     }
@@ -148,6 +166,15 @@ export class HeliumSelect extends HTMLElement {
         }
     }
 
+    /**
+     * Checks if the value of the select is valid and
+     * reports the validity to external elements.
+     * @returns {boolean}
+     */
+    checkValidity() {
+        return true;
+    }
+
     connectedCallback() {
         this.options = document.createElement('div');
         this.options.id = 'cont-options';
@@ -158,9 +185,6 @@ export class HeliumSelect extends HTMLElement {
             this.options.append(opt);
         }
 
-        // This is an empty whitespace character. 
-        // It keeps the correct height of the input element.
-        this.input.innerHTML = '‎';
         this.$popover.append(this.options);
         this.select(0);
     }
@@ -171,7 +195,7 @@ export class HeliumSelect extends HTMLElement {
      */
     select(optionIndex) {
         const option = this.options.children[optionIndex];
-        console.assert(option != null, 'No option with the given index!');
+        console.assert(option != null, `No option with the given index ${optionIndex}!`);
         this._select(option);
     }
 
@@ -255,8 +279,13 @@ export class HeliumSelect extends HTMLElement {
         this.open = false;
         const target = e.currentTarget;
         this._select(target);
-        const onchange = this.getAttribute('onchange');
-        eval(onchange);
+
+        const evt = new CustomEvent('change', {});
+        this.dispatchEvent(evt);
+        const onchange = eval(this.getAttribute('onchange'));
+        if (typeof onchange === 'function') {
+            onchange.call(this, evt);
+        }
     }
 
 }
