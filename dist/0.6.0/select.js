@@ -11,7 +11,7 @@ class HeliumSelect extends HTMLElement {
     /** @type {HTMLDivElement} */
     $popover;
     /** @type {HeliumInput} */
-    filter;
+    $filter;
     /** @type {HTMLElement} */
     options;
     /** @type {ElementInternals} */
@@ -29,16 +29,16 @@ class HeliumSelect extends HTMLElement {
         this.input.id = 'inp';
         this.input.setAttribute('popovertarget', 'popover');
 
-        this.filter = document.createElement('he-input');
-        this.filter.id = 'filter';
-        this.filter.style.display = 'none';
-        this.filter.onkeyup = () => this._changedFilterCallback.bind(this)();
+        this.$filter = document.createElement('he-input');
+        this.$filter.id = 'filter';
+        this.$filter.style.display = 'none';
+        this.$filter.onkeyup = () => this._changedFilterCallback.bind(this)();
 
         //this.popover = document.createElement('he-popover');
         this.$popover = document.createElement('div');
         this.$popover.id = 'popover';
         this.$popover.popover = '';
-        this.$popover.append(this.filter);
+        this.$popover.append(this.$filter);
 
         this.$popover.addEventListener("beforetoggle", (e) => this._beforetoggledPopoverCallback.bind(this)(e));
         this.$popover.addEventListener("toggle", (e) => this._toggledPopoverCallback.bind(this)(e));
@@ -158,9 +158,9 @@ class HeliumSelect extends HTMLElement {
                 break;
             case 'filter':
                 if (newValue == null || newValue === 'false') {
-                    this.filter.style.display = "none";
+                    this.$filter.style.display = "none";
                 } else {
-                    this.filter.style.display = "";
+                    this.$filter.style.display = "";
                 }
         }
     }
@@ -217,7 +217,7 @@ class HeliumSelect extends HTMLElement {
         window.clearTimeout(this._filterTimeout);
 
         this._filterTimeout = setTimeout(() => {
-            const filterVal = this.filter.value.toLowerCase();
+            const filterVal = this.$filter.value.toLowerCase();
 
             for (const option of this.options.children) {
                 if (filterVal.length === 0 || (option.value !== '' && option.innerText.toLowerCase().includes(filterVal))) {
@@ -260,10 +260,10 @@ class HeliumSelect extends HTMLElement {
                 this.$popover.style.width = this.input.offsetWidth - 7 + 'px';
             }
             this.$popover.style.visibility = '';
-            this.filter.focus();
+            this.$filter.focus();
         } else {
             this.internals.states.delete('open');
-            this.filter.value = '';
+            this.$filter.value = '';
 
             for (const option of this.options.children) {
                 option.style.display = '';
