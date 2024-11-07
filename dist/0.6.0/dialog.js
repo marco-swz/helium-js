@@ -179,6 +179,16 @@ class HeliumDialog extends HTMLElement {
         $slot.innerHTML = content;
         return this;
     }
+
+    /**
+     * Changes the title of the dialog.
+     * @param {string} content The new title
+     * @returns {Self}
+     */
+    setTitle(newTitle) {
+        this.setAttribute('title-text', newTitle);
+        return this;
+    }
 }
 
 function showDialogTemp(evt, type) {
