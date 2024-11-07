@@ -7,15 +7,15 @@
     --he-button-height: 35px;
     --he-button-width: auto;
 
-    --he-button-clr: 0 0% 0%;
-    --he-button-clr-bg: 0 0% 100%;
-    --he-button-clr-bg-hover: 240 4.8% 95.9%;
-    --he-button-border-color: 240 4.9% 83.9%;
+    --he-button-clr: black;
+    --he-button-clr-bg: white;
+    --he-button-clr-bg-hover: hsl(240 4.8% 95.9%);
+    --he-button-border-color: hsl(240 4.9% 83.9%);
     --he-button-border-color-hover: var(--he-button-border-color);
 
-    --he-theme-clr: var(--he-clr-accent, 0 0% 0%);
-    --he-theme-clr-b1: var(--he-theme-clr) / .75;
-    --he-theme-contrast: 0 0% 100%;
+    --he-theme-clr: var(--he-clr-accent, black);
+    --he-theme-clr-b1: hsl(from var(--he-theme-clr) h s calc(l + 10));
+    --he-theme-contrast: white;
 
     display: inline-block;
     text-wrap: nowrap;
@@ -25,21 +25,21 @@
 }
 
 :host([theme=danger]) {
-    --he-theme-clr: 0 72.2% 50.6%;
-    --he-theme-clr-b1: var(--he-theme-clr) / .75;
-    --he-theme-contrast: 0 0% 100%;
+    --he-theme-clr: hsl(0 72.2% 50.6%);
+    --he-theme-clr-b1: hsl(from var(--he-theme-clr) h s calc(l + 10));
+    --he-theme-contrast: white;
 }
 
 :host([theme=warning]) {
-    --he-theme-clr: 32.1 94.6% 43.7%;
-    --he-theme-clr-b1: var(--he-theme-clr) / .75;
-    --he-theme-contrast: 0 0% 100%;
+    --he-theme-clr: hsl(32.1 94.6% 43.7%);
+    --he-theme-clr-b1: hsl(from var(--he-theme-clr) h s calc(l + 10));
+    --he-theme-contrast: white;
 }
 
 :host([theme=success]) {
-    --he-theme-clr: 142.1 76.2% 36.3%;
-    --he-theme-clr-b1: var(--he-theme-clr) / .75;
-    --he-theme-contrast: 0 0% 100%;
+    --he-theme-clr: hsl(142.1 76.2% 36.3%);
+    --he-theme-clr-b1: hsl(from var(--he-theme-clr) h s calc(l + 10));
+    --he-theme-contrast: white;
 }
 
 :host([theme][variant]), 
@@ -62,7 +62,7 @@
 }
 
 :host([variant=ghost]) {
-    --he-button-border-color: 0 0% 100%;
+    --he-button-border-color: white;
     --he-button-border-color-hover: var(--he-button-clr-bg-hover);
 }
 :host([variant=ghost][theme]) {
@@ -81,17 +81,17 @@
     vertical-align: middle;
     text-align: center;
     font-size: var(-he-button-font-size);
-    background-color: hsl(var(--he-button-clr-bg));
+    background-color: var(--he-button-clr-bg);
     outline-style: inherit;
     box-shadow: inherit;
     text-shadow: inherit;
     cursor: inherit;
-    color: hsl(var(--he-button-clr));
+    color: var(--he-button-clr);
     height: var(--he-button-height);
     width: var(--he-button-width);
     border-width: var(--he-button-border-width);
     border-style: solid;
-    border-color: hsl(var(--he-button-border-color));
+    border-color: var(--he-button-border-color);
     padding: 0px 10px;
 }
 
@@ -103,10 +103,10 @@
 :host(:not([loading]):not([disabled]):hover) #he-button,
 :host(:not([loading]):not([disabled]):active) #he-button,
 :host(:not([loading]):not([disabled]):focus) #he-button {
-    background-color: hsl(var(--he-button-clr-bg-hover));
-    border-color: hsl(var(--he-button-border-color-hover));
+    background-color: var(--he-button-clr-bg-hover);
+    border-color: var(--he-button-border-color-hover);
     cursor: var(--he-button-cursor-hover);
-    color: hsl(var(--he-button-clr-hover));
+    color: var(--he-button-clr-hover);
 }
 
 :host([loading]) #he-button {

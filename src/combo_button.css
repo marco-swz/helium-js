@@ -7,7 +7,7 @@
     --he-combo-button-sep-width: 0.05rem;
     --he-combo-button-sep-color: lightgrey;
     --he-combo-button-height: 35px;
-    --he-combo-button-popover-border-color: 240 5.9% 90%;
+    --he-combo-button-popover-border-color: hsl(240 5.9% 90%);
 
     display: inline-block;
     height: var(--he-combo-button-height);
@@ -16,7 +16,7 @@
 #popover {
     inset: unset;
     outline: none;
-    border: 1px solid hsl(var(--he-combo-button-popover-border-color));
+    border: 1px solid var(--he-combo-button-popover-border-color);
     border-radius: var(--he-select-border-radius, 3px);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     width: min-content;

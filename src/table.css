@@ -1,5 +1,5 @@
 :host {
-    --he-table-row-bg: 0 0% 100%;
+    --he-table-row-bg: white;
     overflow: auto;
     width: fit-content;
 }
@@ -149,7 +149,7 @@ tbody {
 }
 
 tbody tr {
-    background-color: hsl(var(--he-table-row-bg));
+    background-color: var(--he-table-row-bg);
 }
 
 tbody tr:nth-child(even) {
