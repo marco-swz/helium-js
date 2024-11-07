@@ -1,6 +1,6 @@
-import { h as heSpaceBelow, a as hePositionRelative, b as heEnableBodyScroll } from './utils-BGzlNXdX.js';
+import { h as heSpaceBelow, a as hePositionRelative, b as heDisableBodyScroll, c as heEnableBodyScroll } from './utils-DVetH1yt.js';
 
-const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\r\n    height: 1.6rem;\r\n    width: fit-content;\r\n    font-size: 14px;\r\n    min-width: 60px;\r\n    display: inline-block;\r\n}\r\n\r\n#inp {\r\n    position: relative;\r\n    background-color: var(--he-select-clr-bg, whitesmoke);\r\n    border: 1px solid lightgrey;\r\n    width: 100%;\r\n    height: inherit;\r\n    min-width: inherit;\r\n    padding: 0.3rem 0.4rem;\r\n    border-radius: 3px;\r\n    outline: none;\r\n    text-align: left;\r\n    padding-right: 25px;\r\n    text-wrap: nowrap;\r\n}\r\n\r\n#inp:hover, #inp:focus {\r\n    cursor: pointer;\r\n    border-color: var(--he-select-clr-border-hover, grey);\r\n}\r\n\r\n#inp::after {\r\n    content: \"▼\";\r\n    position: absolute;\r\n    font-size: 10px;\r\n    width: fit-content;\r\n    height: fit-content;\r\n    top: 0;\r\n    left: 0;\r\n    right: 0;\r\n    bottom: 0;\r\n    margin: auto 4px auto auto;\r\n}\r\n\r\n#popover {\r\n    inset: unset;\r\n    outline: none;\r\n    border: 1px solid grey;\r\n    border-radius: var(--he-select-border-radius, 3px);\r\n    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);\r\n    width: min-content;\r\n}\r\n\r\n#cont-options {\r\n    display: flex;\r\n    flex-direction: column;\r\n    background-color: var(--he-select-clr-bg, white);\r\n    max-height: 300px;\r\n    overflow: auto;\r\n    overscroll-behavior: contain;\r\n}\r\n\r\n#cont-options option {\r\n    padding: 5px 4px;\r\n    border-radius: 3px;\r\n}\r\n\r\n#cont-options option[selected] {\r\n    background-color: var(--he-select-clr-bg-hover, whitesmoke);\r\n}\r\n\r\n#cont-options option:hover:not(:disabled) {\r\n    background-color: var(--he-select-clr-bg-hover, whitesmoke);\r\n    cursor: pointer;\r\n}\r\n\r\n#filter {\r\n    --he-input-border-radius: 2px;\r\n    width: 100%;\r\n}\r\n\r\n");
+const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\n    height: fit-content;\n    width: fit-content;\n    font-size: 14px;\n    min-width: 60px;\n    display: inline-block;\n}\n\n:host([disabled]) {\n    pointer-events: none;\n    color: hsl(from var(--he-select-clr, black) h s calc(l + 50))\n}\n\n#inp {\n    position: relative;\n    background-color: var(--he-select-clr-bg, whitesmoke);\n    border: 1px solid lightgrey;\n    width: 100%;\n    height: inherit;\n    min-width: inherit;\n    padding: 0.3rem 0.4rem;\n    border-radius: 3px;\n    outline: none;\n    text-align: left;\n    padding-right: 25px;\n    text-wrap: nowrap;\n    color: inherit;\n}\n\n#inp:hover, #inp:focus {\n    cursor: pointer;\n    border-color: var(--he-select-clr-border-hover, grey);\n}\n\n#inp::after {\n    content: \"▼\";\n    position: absolute;\n    font-size: 10px;\n    width: fit-content;\n    height: fit-content;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    margin: auto 4px auto auto;\n}\n\n#popover {\n    inset: unset;\n    outline: none;\n    border: 1px solid grey;\n    border-radius: var(--he-select-border-radius, 3px);\n    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);\n    width: min-content;\n}\n\n#cont-options {\n    display: flex;\n    flex-direction: column;\n    background-color: var(--he-select-clr-bg, white);\n    max-height: 300px;\n    overflow: auto;\n    overscroll-behavior: contain;\n}\n\n#cont-options option {\n    padding: 5px 4px;\n    border-radius: 3px;\n}\n\n#cont-options option[selected] {\n    background-color: var(--he-select-clr-bg-hover, whitesmoke);\n}\n\n#cont-options option:hover:not(:disabled) {\n    background-color: var(--he-select-clr-bg-hover, whitesmoke);\n    cursor: pointer;\n}\n\n#filter {\n    --he-input-border-radius: 2px;\n    width: 100%;\n}\n\n");
 
 class HeliumSelect extends HTMLElement {
     static formAssociated = true;
@@ -48,10 +48,26 @@ class HeliumSelect extends HTMLElement {
         shadow.adoptedStyleSheets = [sheet];
     }
 
-    /** 
+    /**
+     * Disables or enables the select.
+     * @type {boolean}
+     */
+    set disabled(val) {
+        if (val) {
+            this.setAttribute('disabled', true);
+        } else {
+            this.getAttribute('disabled');
+        }
+    }
+
+    get disabled() {
+        return this.getAttribute('disabled') !== null;
+    }
+
+    /**
      * Gets or sets the filter attribute.
      * The filter allows searching the options of the select.
-     * @type {boolean} 
+     * @type {boolean}
      */
     set filter(val) {
         if (val) {
@@ -66,22 +82,8 @@ class HeliumSelect extends HTMLElement {
     }
 
     /**
-     * Gets or sets the name of input.
-     * The name will be used for form submissions.
-     * @type {boolean}
+     * @param {(arg0: InputEvent) => void} val
      */
-    set name(val) {
-        if (val) {
-            this.setAttribute('name', val);
-        } else {
-            this.removeAttribute('name');
-        }
-    }
-
-    get name() {
-        return this.getAttribute('name');
-    }
-
     set onchange(val) {
         if (val) {
             this.setAttribute('onchange', val);
@@ -110,7 +112,6 @@ class HeliumSelect extends HTMLElement {
     set value(val) {
         if (val) {
             const $option = this.options.querySelector(`[value="${val}"]`);
-            console.assert($option != null, `No select option with value ${val}`);
             this._select($option);
         }
     }
@@ -146,15 +147,6 @@ class HeliumSelect extends HTMLElement {
         }
     }
 
-    /**
-     * Checks if the value of the input is valid and
-     * reports the validity to external elements.
-     * @returns {boolean}
-     */
-    checkValidity() {
-        return true;
-    }
-
     connectedCallback() {
         this.options = document.createElement('div');
         this.options.id = 'cont-options';
@@ -167,7 +159,7 @@ class HeliumSelect extends HTMLElement {
 
         // This is an empty whitespace character. 
         // It keeps the correct height of the input element.
-        //this.input.innerHTML = '‎';
+        this.input.innerHTML = '‎';
         this.$popover.append(this.options);
         this.select(0);
     }
@@ -243,6 +235,7 @@ class HeliumSelect extends HTMLElement {
             if (this.$popover.offsetWidth < this.input.offsetWidth - compensation) {
                 this.$popover.style.width = this.input.offsetWidth - 7 + 'px';
             }
+            heDisableBodyScroll();
             this.$popover.style.visibility = '';
             this.filter.focus();
         } else {
@@ -261,14 +254,8 @@ class HeliumSelect extends HTMLElement {
         this.open = false;
         const target = e.currentTarget;
         this._select(target);
-
-        const evt = new CustomEvent('change', {});
-
-        this.dispatchEvent(evt);
-        const onchange = eval(this.getAttribute('onchange'));
-        if (typeof onchange === 'function') {
-            onchange.call(this, evt);
-        }
+        const onchange = this.getAttribute('onchange');
+        eval(onchange);
     }
 
 }

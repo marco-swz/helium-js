@@ -19,6 +19,7 @@ import sheet from "./input.css";
  * @attr {on|off} readonly - Toggles the `readonly` state of the input. Contrary to `disabled`, the value will still be submitted in forms.
  * @attr {on|off} [autocomplete=off] - Shows suggestion from previous inputs (browser native appearance)
  *
+ * @cssprop [--he-input-clr-black] - The color of the text
  * @cssprop [--he-input-clr-border-hover=grey] - The border color when hovering
  * @cssprop [--he-input-clr-spinner=black] - The color of the spinner while in `loading` state
  * @cssprop [--he-input-clr-ok=black] - The color of the indicator while in `ok` state

@@ -1,9 +1,14 @@
 :host {
-    height: 1.6rem;
+    height: fit-content;
     width: fit-content;
     font-size: 14px;
     min-width: 60px;
     display: inline-block;
+}
+
+:host([disabled]) {
+    pointer-events: none;
+    color: hsl(from var(--he-select-clr, black) h s calc(l + 50))
 }
 
 #inp {
@@ -19,6 +24,7 @@
     text-align: left;
     padding-right: 25px;
     text-wrap: nowrap;
+    color: inherit;
 }
 
 #inp:hover, #inp:focus {

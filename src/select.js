@@ -47,10 +47,26 @@ export class HeliumSelect extends HTMLElement {
         shadow.adoptedStyleSheets = [sheet];
     }
 
-    /** 
+    /**
+     * Disables or enables the select.
+     * @type {boolean}
+     */
+    set disabled(val) {
+        if (val) {
+            this.setAttribute('disabled', true);
+        } else {
+            this.getAttribute('disabled');
+        }
+    }
+
+    get disabled() {
+        return this.getAttribute('disabled') !== null;
+    }
+
+    /**
      * Gets or sets the filter attribute.
      * The filter allows searching the options of the select.
-     * @type {boolean} 
+     * @type {boolean}
      */
     set filter(val) {
         if (val) {
@@ -65,22 +81,8 @@ export class HeliumSelect extends HTMLElement {
     }
 
     /**
-     * Gets or sets the name of input.
-     * The name will be used for form submissions.
-     * @type {boolean}
+     * @param {(arg0: InputEvent) => void} val
      */
-    set name(val) {
-        if (val) {
-            this.setAttribute('name', val);
-        } else {
-            this.removeAttribute('name');
-        }
-    }
-
-    get name() {
-        return this.getAttribute('name');
-    }
-
     set onchange(val) {
         if (val) {
             this.setAttribute('onchange', val);
@@ -109,7 +111,6 @@ export class HeliumSelect extends HTMLElement {
     set value(val) {
         if (val) {
             const $option = this.options.querySelector(`[value="${val}"]`);
-            console.assert($option != null, `No select option with value ${val}`);
             this._select($option);
         }
     }
@@ -147,15 +148,6 @@ export class HeliumSelect extends HTMLElement {
         }
     }
 
-    /**
-     * Checks if the value of the input is valid and
-     * reports the validity to external elements.
-     * @returns {boolean}
-     */
-    checkValidity() {
-        return true;
-    }
-
     connectedCallback() {
         this.options = document.createElement('div');
         this.options.id = 'cont-options';
@@ -168,7 +160,7 @@ export class HeliumSelect extends HTMLElement {
 
         // This is an empty whitespace character. 
         // It keeps the correct height of the input element.
-        //this.input.innerHTML = '‎';
+        this.input.innerHTML = '‎';
         this.$popover.append(this.options);
         this.select(0);
     }
@@ -263,14 +255,8 @@ export class HeliumSelect extends HTMLElement {
         this.open = false;
         const target = e.currentTarget;
         this._select(target);
-
-        const evt = new CustomEvent('change', {});
-
-        this.dispatchEvent(evt);
-        const onchange = eval(this.getAttribute('onchange'));
-        if (typeof onchange === 'function') {
-            onchange.call(this, evt);
-        }
+        const onchange = this.getAttribute('onchange');
+        eval(onchange);
     }
 
 }
