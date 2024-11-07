@@ -76,9 +76,11 @@ export class HeliumFormDialog extends HTMLElement {
         $footer.slot = 'footer';
         this.$dialog.append($footer);
 
+        /** @type {HeliumButton} */
         let $btnSave = document.createElement('he-button');
         $btnSave.innerHTML = 'Speichern';
         $btnSave.id = 'btn-save';
+        $btnSave.variant = 'primary';
         $btnSave.onclick = () => this.submit.bind(this)();
         $footer.append($btnSave)
 
@@ -216,7 +218,6 @@ export class HeliumFormDialog extends HTMLElement {
                 $select.classList.add('input');
                 if (!entry.required) {
                     let $option = document.createElement('option');
-                    $option.innerHTML = '‎';
                     $select.append($option);
                 }
 

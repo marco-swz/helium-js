@@ -36,7 +36,7 @@
     --he-theme-contrast: 0 0% 100%;
 }
 
-:host([theme=sucess]) {
+:host([theme=success]) {
     --he-theme-clr: 142.1 76.2% 36.3%;
     --he-theme-clr-b1: var(--he-theme-clr) / .75;
     --he-theme-contrast: 0 0% 100%;
