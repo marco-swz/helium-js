@@ -1,6 +1,6 @@
 import { h as heSpaceBelow, a as hePositionRelative, b as heEnableBodyScroll } from './utils-BGzlNXdX.js';
 
-const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\n    height: fit-content;\n    width: fit-content;\n    font-size: 14px;\n    min-width: 60px;\n    display: inline-block;\n}\n\n:host([disabled]) {\n    pointer-events: none;\n    color: hsl(from var(--he-select-clr, black) h s calc(l + 50))\n}\n\n#inp {\n    position: relative;\n    background-color: var(--he-select-clr-bg, whitesmoke);\n    border: 1px solid lightgrey;\n    width: 100%;\n    height: inherit;\n    min-width: inherit;\n    padding: 0.3rem 0.4rem;\n    border-radius: 3px;\n    outline: none;\n    text-align: left;\n    padding-right: 25px;\n    text-wrap: nowrap;\n    color: inherit;\n}\n\n#inp:hover, #inp:focus {\n    cursor: pointer;\n    border-color: var(--he-select-clr-border-hover, grey);\n}\n\n#inp::after {\n    content: \"▼\";\n    position: absolute;\n    font-size: 10px;\n    width: fit-content;\n    height: fit-content;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    margin: auto 4px auto auto;\n}\n\n#popover {\n    inset: unset;\n    outline: none;\n    border: 1px solid grey;\n    border-radius: var(--he-select-border-radius, 3px);\n    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);\n    width: min-content;\n}\n\n#cont-options {\n    display: flex;\n    flex-direction: column;\n    background-color: var(--he-select-clr-bg, white);\n    max-height: 300px;\n    overflow: auto;\n    overscroll-behavior: contain;\n}\n\n#cont-options option {\n    padding: 5px 4px;\n    border-radius: 3px;\n}\n\n#cont-options option[selected] {\n    background-color: var(--he-select-clr-bg-hover, whitesmoke);\n}\n\n#cont-options option:hover:not(:disabled) {\n    background-color: var(--he-select-clr-bg-hover, whitesmoke);\n    cursor: pointer;\n}\n\n#filter {\n    --he-input-border-radius: 2px;\n    width: 100%;\n}\n\n");
+const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\n    height: 1.8rem;\n    width: fit-content;\n    font-size: 14px;\n    min-width: 60px;\n    display: inline-block;\n}\n\n:host([disabled]) {\n    pointer-events: none;\n    color: hsl(from var(--he-select-clr, black) h s calc(l + 50))\n}\n\n#inp {\n    position: relative;\n    background-color: var(--he-select-clr-bg, whitesmoke);\n    border: 1px solid lightgrey;\n    width: 100%;\n    height: inherit;\n    min-width: inherit;\n    padding: 0.3rem 0.4rem;\n    border-radius: 3px;\n    outline: none;\n    text-align: left;\n    padding-right: 25px;\n    text-wrap: nowrap;\n    color: inherit;\n}\n\n#inp:hover, #inp:focus {\n    cursor: pointer;\n    border-color: var(--he-select-clr-border-hover, grey);\n}\n\n#inp::after {\n    content: \"▼\";\n    position: absolute;\n    font-size: 10px;\n    width: fit-content;\n    height: fit-content;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    margin: auto 4px auto auto;\n}\n\n#popover {\n    inset: unset;\n    outline: none;\n    border: 1px solid grey;\n    border-radius: var(--he-select-border-radius, 3px);\n    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);\n    width: min-content;\n}\n\n#cont-options {\n    display: flex;\n    flex-direction: column;\n    background-color: var(--he-select-clr-bg, white);\n    max-height: 300px;\n    overflow: auto;\n    overscroll-behavior: contain;\n}\n\n#cont-options option {\n    padding: 5px 4px;\n    border-radius: 3px;\n}\n\n#cont-options option[selected] {\n    background-color: var(--he-select-clr-bg-hover, whitesmoke);\n}\n\n#cont-options option:hover:not(:disabled) {\n    background-color: var(--he-select-clr-bg-hover, whitesmoke);\n    cursor: pointer;\n}\n\n#filter {\n    --he-input-border-radius: 2px;\n    width: 100%;\n}\n\n");
 
 class HeliumSelect extends HTMLElement {
     static formAssociated = true;
@@ -93,6 +93,23 @@ class HeliumSelect extends HTMLElement {
     }
 
     /** 
+     * Gets or sets the name of the element for form submissions.
+     * @type {string} 
+     */
+    set name(val) {
+        if (val) {
+            this.setAttribute('name', val);
+        } else {
+            this.removeAttribute('name');
+        }
+    }
+
+    get name() {
+        return this.getAttribute('name');
+    }
+
+
+    /** 
      * Gets or sets the `open` state of the element.
      * If `open` is set, the options are shown to the user.
      * @type {boolean} 
@@ -112,6 +129,7 @@ class HeliumSelect extends HTMLElement {
     set value(val) {
         if (val) {
             const $option = this.options.querySelector(`[value="${val}"]`);
+            console.assert($option != null, `No select option with value ${val}`);
             this._select($option);
         }
     }
@@ -147,6 +165,15 @@ class HeliumSelect extends HTMLElement {
         }
     }
 
+    /**
+     * Checks if the value of the select is valid and
+     * reports the validity to external elements.
+     * @returns {boolean}
+     */
+    checkValidity() {
+        return true;
+    }
+
     connectedCallback() {
         this.options = document.createElement('div');
         this.options.id = 'cont-options';
@@ -157,9 +184,6 @@ class HeliumSelect extends HTMLElement {
             this.options.append(opt);
         }
 
-        // This is an empty whitespace character. 
-        // It keeps the correct height of the input element.
-        this.input.innerHTML = '‎';
         this.$popover.append(this.options);
         this.select(0);
     }
@@ -170,7 +194,7 @@ class HeliumSelect extends HTMLElement {
      */
     select(optionIndex) {
         const option = this.options.children[optionIndex];
-        console.assert(option != null, 'No option with the given index!');
+        console.assert(option != null, `No option with the given index ${optionIndex}!`);
         this._select(option);
     }
 
@@ -253,8 +277,13 @@ class HeliumSelect extends HTMLElement {
         this.open = false;
         const target = e.currentTarget;
         this._select(target);
-        const onchange = this.getAttribute('onchange');
-        eval(onchange);
+
+        const evt = new CustomEvent('change', {});
+        this.dispatchEvent(evt);
+        const onchange = eval(this.getAttribute('onchange'));
+        if (typeof onchange === 'function') {
+            onchange.call(this, evt);
+        }
     }
 
 }
