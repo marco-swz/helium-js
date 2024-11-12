@@ -302,11 +302,15 @@ export class HeliumInput extends HTMLElement {
         return validity.valid;
     }
 
+    /**
+     * Removes all options from the `innerHTML` of the input.
+     * @returns {Self}
+     */
     clearOptions() {
-        // TODO
         for (const $option of this.$slot.assignedElements()) {
             $option.remove();
         }
+        return this;
     }
 
     connectedCallback() {
@@ -319,9 +323,11 @@ export class HeliumInput extends HTMLElement {
 
     /**
      * Sets the focus to the input.
+     * @returns {Self}
      */
     focus() {
         this.$input.focus();
+        return this;
     }
 
     /**
