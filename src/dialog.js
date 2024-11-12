@@ -152,6 +152,20 @@ export class HeliumDialog extends HTMLElement {
     }
 
     /**
+     * Calls `.reset()` on the body slot, if it is a `form` element.
+     * @returns {self}
+     */
+    reset() {
+        const $slot = this.$dialog.querySelector('slot[name=body]');
+        $slot.assignedElements().forEach(($elem) => {
+            if ($elem.nodeName === "FORM") {
+                $elem.reset();
+            }
+        })
+        return this;
+    }
+
+    /**
      * Opens the dialog.
      * @returns Self
      */
