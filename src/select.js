@@ -6,13 +6,16 @@ export class HeliumSelect extends HTMLElement {
     static observedAttributes = [
         'open',
         'filter',
+        'disabled',
     ];
     /** @type {HTMLDivElement} */
     $popover;
     /** @type {HeliumInput} */
     $filter;
     /** @type {HTMLElement} */
-    options;
+    $options;
+    /** @type {HTMLElement} */
+    $input;
     /** @type {ElementInternals} */
     internals;
     /** @type {number | TimerHandler} */
@@ -24,16 +27,15 @@ export class HeliumSelect extends HTMLElement {
         let shadow = this.attachShadow({ mode: "open" });
         this.internals = this.attachInternals();
 
-        this.input = document.createElement('button');
-        this.input.id = 'inp';
-        this.input.setAttribute('popovertarget', 'popover');
+        this.$input = document.createElement('button');
+        this.$input.id = 'inp';
+        this.$input.setAttribute('popovertarget', 'popover');
 
         this.$filter = document.createElement('he-input');
         this.$filter.id = 'filter';
         this.$filter.style.display = 'none';
         this.$filter.onkeyup = () => this._changedFilterCallback.bind(this)();
 
-        //this.popover = document.createElement('he-popover');
         this.$popover = document.createElement('div');
         this.$popover.id = 'popover';
         this.$popover.popover = '';
@@ -43,7 +45,7 @@ export class HeliumSelect extends HTMLElement {
         this.$popover.addEventListener("toggle", (e) => this._toggledPopoverCallback.bind(this)(e));
 
         shadow.append(this.$popover);
-        shadow.append(this.input);
+        shadow.append(this.$input);
         shadow.adoptedStyleSheets = [sheet];
     }
 
@@ -127,7 +129,7 @@ export class HeliumSelect extends HTMLElement {
 
     set value(val) {
         if (val) {
-            const $option = this.options.querySelector(`[value="${val}"]`);
+            const $option = this.$options.querySelector(`[value="${val}"]`);
             console.assert($option != null, `No select option with value ${val}`);
             this._select($option);
         }
@@ -161,6 +163,14 @@ export class HeliumSelect extends HTMLElement {
                 } else {
                     this.$filter.style.display = "";
                 }
+                break;
+            case 'disabled':
+                if (newValue) {
+                    this.internals.setFormValue(null);
+                } else {
+                    this.internals.setFormValue(this.value);
+                }
+                break;
             default:
                 break;
         }
@@ -176,17 +186,24 @@ export class HeliumSelect extends HTMLElement {
     }
 
     connectedCallback() {
-        this.options = document.createElement('div');
-        this.options.id = 'cont-options';
-        this.options.slot = 'content';
+        this.$options = document.createElement('div');
+        this.$options.id = 'cont-options';
+        this.$options.slot = 'content';
 
         for (const opt of this.querySelectorAll('option')) {
             opt.onclick = (e) => this._clickedOptionCallback.bind(this)(e);
-            this.options.append(opt);
+            this.$options.append(opt);
         }
 
-        this.$popover.append(this.options);
+        this.$popover.append(this.$options);
         this.select(0);
+    }
+
+    /**
+     * The native callback function for resetting the input a part of a form.
+     */
+    formResetCallback() {
+        this.select(0)
     }
 
     /** 
@@ -194,7 +211,7 @@ export class HeliumSelect extends HTMLElement {
      * @returns void
      */
     select(optionIndex) {
-        const option = this.options.children[optionIndex];
+        const option = this.$options.children[optionIndex];
         console.assert(option != null, `No option with the given index ${optionIndex}!`);
         this._select(option);
     }
@@ -218,9 +235,12 @@ export class HeliumSelect extends HTMLElement {
         window.clearTimeout(this._filterTimeout);
 
         this._filterTimeout = setTimeout(() => {
-            const filterVal = this.$filter.value.toLowerCase();
+            let filterVal = this.$filter.value;
+            if (filterVal) {
+                filterVal.toLowerCase();
+            }
 
-            for (const option of this.options.children) {
+            for (const option of this.$options.children) {
                 if (filterVal.length === 0 || (option.value !== '' && option.innerText.toLowerCase().includes(filterVal))) {
                     option.style.display = '';
                 } else {
@@ -236,13 +256,16 @@ export class HeliumSelect extends HTMLElement {
      * @returns void
      */
     _select(option) {
-        this.input.innerHTML = option.innerHTML;
+        this.$input.innerHTML = option.innerHTML;
         if (this.selection != null) {
             this.selection.removeAttribute('selected');
         }
         this.selection = option;
         this.selection.setAttribute('selected', '');
-        this.internals.setFormValue(this.selection.value);
+
+        if (!this.disabled) {
+            this.internals.setFormValue(this.selection.value);
+        }
     }
 
     _toggledPopoverCallback(e) {
@@ -254,11 +277,11 @@ export class HeliumSelect extends HTMLElement {
                 positionDefault = 'top-left';
             }
             const position = this.getAttribute('position') ?? positionDefault;
-            hePositionRelative(this.$popover, this.input, position, 3);
+            hePositionRelative(this.$popover, this.$input, position, 3);
             // Manually compensate for the margins with the number
             const compensation = 7;
-            if (this.$popover.offsetWidth < this.input.offsetWidth - compensation) {
-                this.$popover.style.width = this.input.offsetWidth - 7 + 'px';
+            if (this.$popover.offsetWidth < this.$input.offsetWidth - compensation) {
+                this.$popover.style.width = this.$input.offsetWidth - 7 + 'px';
             }
             heDisableBodyScroll();
             this.$popover.style.visibility = '';
@@ -267,7 +290,7 @@ export class HeliumSelect extends HTMLElement {
             this.internals.states.delete('open');
             this.$filter.value = '';
 
-            for (const option of this.options.children) {
+            for (const option of this.$options.children) {
                 option.style.display = '';
             }
 
