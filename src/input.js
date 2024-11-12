@@ -1,4 +1,5 @@
 import sheet from "./input.css";
+import { HeliumPopover } from "./popover.js";
 
 /**
  * A input element with additional features.
@@ -37,12 +38,19 @@ export class HeliumInput extends HTMLElement {
         'readonly',
         'autocomplete',
         'placeholder',
+        'value',
     ];
 
     /** @type {HTMLInputElement} */
     $input;
+    /** @type {HeliumPopover} */
+    $popover;
+    /** @type {HTMLSlotElement} */
+    $slot;
     /** @type {ElementInternals} */
     internals;
+    /** @type {HTMLSlotElement} */
+    $options;
 
     constructor() {
         super();
@@ -53,7 +61,24 @@ export class HeliumInput extends HTMLElement {
         this.$input.autocomplete = 'off';
         this.$input.id = 'inp-main';
 
+        this.$options = document.createElement('div');
+        this.$options.id = 'cont-options';
+
+        this.$slot = document.createElement('slot');
+        this.$slot.name = 'option';
+        this.$options.append(this.$slot);
+
+        const $content = document.createElement('div');
+        $content.slot = 'content';
+        $content.append(this.$options);
+
+        this.$popover = document.createElement('he-popover');
+        this.$popover.append($content);
+        this.$popover.dismiss = "manual";
+        this.$popover.anchorElement = this;
+
         shadow.append(this.$input);
+        shadow.append(this.$popover);
         shadow.adoptedStyleSheets = [sheet];
         this.internals = this.attachInternals();
     }
@@ -114,6 +139,18 @@ export class HeliumInput extends HTMLElement {
         return this.getAttribute('name');
     }
 
+    /**
+     * @param {(arg0: InputEvent) => void} val
+     */
+    set onselect(val) {
+        if (val) {
+            this.setAttribute('onselect', val);
+        } else {
+            this.removeAttribute('onselect');
+        }
+    }
+
+
     set placeholder(val) {
         if (val) {
             this.setAttribute('placeholder', val);
@@ -152,27 +189,16 @@ export class HeliumInput extends HTMLElement {
 
     /**
      * Gets or sets the value of input.
-     * @type {boolean}
+     * @type {string|number}
      */
     set value(val) {
-        this.$input.value = val;
-        if (!this.disabled) {
-            this.internals.setFormValue(val);
-        }
+        this.setAttribute('value', val);
     }
 
     get value() {
         return this.$input.value === ''
             ? this.placeholder ?? ''
             : this.$input.value;
-    }
-
-    connectedCallback() {
-        this.$input.onchange = () => this.inputChangedCallback.bind(this)();
-        this.value = this.getAttribute('value');
-        if (!this.value) {
-            this.value = this.innerHTML;
-        }
     }
 
     /**
@@ -189,10 +215,41 @@ export class HeliumInput extends HTMLElement {
                 } else {
                     this.style.display = '';
                 }
-            case 'placeholder':
-                if (this.value === '') {
-                    this.internals.setFormValue(newValue);
+
+                if (newValue) {
+                    this.$input.setAttribute(name, newValue);
+                } else {
+                    this.$input.removeAttribute(name);
                 }
+                break;
+            case 'placeholder':
+                if (newValue) {
+                    this.$input.setAttribute(name, newValue);
+                    if (this.value === '' && !this.disabled) {
+                        this.internals.setFormValue(newValue);
+                    }
+                } else {
+                    this.$input.removeAttribute(name);
+                }
+                break;
+            case 'value': 
+                if (!this.disabled) {
+                    this.internals.setFormValue(newValue ?? '');
+                }
+
+                if (newValue != null) {
+                    this.$input.value = newValue;
+                } else {
+                    this.$input.removeAttribute(name);
+                }
+                break;
+            case 'disabled':
+                if (newValue) {
+                    this.internals.setFormValue(null);
+                } else {
+                    this.internals.setFormValue(this.value);
+                }
+                break;
             default:
                 if (newValue != null) {
                     this.$input.setAttribute(name, newValue);
@@ -245,6 +302,21 @@ export class HeliumInput extends HTMLElement {
         return validity.valid;
     }
 
+    clearOptions() {
+        // TODO
+        for (const $option of this.$slot.assignedElements()) {
+            $option.remove();
+        }
+    }
+
+    connectedCallback() {
+        this.$input.onchange = () => this._inputChangedCallback.bind(this)();
+        this.onfocus = () => this._inputFocusCallback.bind(this)();
+        this.addEventListener('focusout', (e) => setTimeout(() => this._inputBlurCallback.bind(this)(e), 200));
+        this.$slot.onslotchange = () => this._slotChangedCallback.bind(this)();
+    }
+
+
     /**
      * Sets the focus to the input.
      */
@@ -256,16 +328,65 @@ export class HeliumInput extends HTMLElement {
      * The native callback function for resetting the input a part of a form.
      */
     formResetCallback() {
-        this.$input.value = "";
+        this.value = "";
     }
 
     /**
      * Callback for input changes.
      */
-    inputChangedCallback() {
-        if (!this.disabled && this.checkValidity()) {
+    _inputChangedCallback() {
+        if (this.disabled) {
+            return;
+        }
+
+        if (this.checkValidity()) {
             this.internals.setFormValue(this.$input.value);
         }
+    }
+
+    _inputFocusCallback() {
+        this._updatePopover();
+    }
+
+    _inputBlurCallback(e) {
+        if (document.activeElement !== this || document.activeElement !== document.body) {
+            this.$popover.open = false;
+        }
+    }
+
+    _optionClickedCallback(e) {
+        const $option = e.target;
+        const val = $option.innerHTML;
+
+        this.value = val;
+        this.$popover.open = false;
+        
+        const evt = new CustomEvent('select', {
+            detail: { target: $option },
+        });
+        this.dispatchEvent(evt);
+        const onselect = eval(this.getAttribute('onselect'));
+        if (typeof onselect === 'function') {
+            onselect.call(this, evt);
+        }
+    }
+
+    _slotChangedCallback() {
+        for (const $option of this.$slot.assignedElements()) {
+            $option.onclick = (e) => this._optionClickedCallback.bind(this)(e);
+        }
+        this._updatePopover();
+    }
+
+    _updatePopover() {
+        if (document.activeElement !== this) {
+            return;
+        }
+
+        const options = this.$slot.assignedElements();
+        if (options.length > 0) {
+            this.$popover.open = true;
+        } 
     }
 }
 

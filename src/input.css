@@ -75,6 +75,22 @@
     color: hsl(from var(--he-input-clr, black) h s calc(l + 50))
 }
 
+#cont-options {
+    max-height: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+::slotted(*) {
+    cursor: pointer;
+    padding: 0px 10px;
+}
+
+::slotted(*:hover) {
+    background-color: hsl(from white h s calc(l - 10));
+}
+
 @keyframes button-loading-spinner {
     from {
         transform: rotate(0turn);
