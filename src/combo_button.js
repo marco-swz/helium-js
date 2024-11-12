@@ -42,6 +42,7 @@ export class HeliumComboButton extends HTMLElement {
         $slotButton.innerHTML = this.getAttribute('text');
         $slotButton.id = 'slot-button'
         $slotButton.name = 'button';
+        $slotButton.addEventListener('click', () => this.open = false);
         this.$contButtons.append($slotButton);
 
         const $btnMenu = document.createElement('button');
