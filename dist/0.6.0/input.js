@@ -469,10 +469,12 @@ class HeliumInput extends HTMLElement {
                 }
                 break;
             case 'disabled':
-                if (newValue) {
+                if (newValue != null) {
                     this.internals.setFormValue(null);
+                    this.$input.disabled = true;
                 } else {
                     this.internals.setFormValue(this.value);
+                    this.$input.disabled = false;
                 }
                 break;
             default:
