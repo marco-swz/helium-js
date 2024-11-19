@@ -1,3 +1,5 @@
+import sheet from './tabs.css';
+
 export class HeliumTabs extends HTMLElement {
     static observedAttributes = [
         "tab",
@@ -10,35 +12,6 @@ export class HeliumTabs extends HTMLElement {
     constructor() {
         super();
         let shadow = this.attachShadow({ mode: "open" });
-        let sheet = new CSSStyleSheet();
-
-        sheet.replaceSync(scss`
-            #he-tabs-nav {
-                display: flex;
-            }
-
-            #he-tabs-nav label {
-                padding: 0.5rem 1rem;
-                cursor: pointer;
-                color: gray;
-                border: 1px solid lightgray;
-                border-bottom: 0;
-                border-top-right-radius: 3px;
-                border-top-left-radius: 3px;
-                background-color: whitesmoke;
-            }
-
-            #he-tabs-nav label:has(:checked) {
-                color: black;
-                background-color: white;
-                border-bottom: 1px solid white;
-                margin-bottom: -1px;
-            }
-
-            #he-tabs-nav label:hover {
-                background-color: #0082b40d;
-            }
-        `);
 
         shadow.adoptedStyleSheets = [sheet];
         shadow.innerHTML = `
@@ -83,7 +56,7 @@ export class HeliumTabs extends HTMLElement {
         let tabNr = 0;
 
         for (const elem of slot.assignedElements()) {
-            const tabTitle = elem.getAttribute('title') ?? `Tab ${tabNr}`;
+            const tabTitle = elem.getAttribute('title-text') ?? `Tab ${tabNr}`;
 
             const checkId = 'he-tabs-check' + tabNr;
             /** @type {HTMLLabelElement} */

@@ -1,0 +1,25 @@
+#he-tabs-nav {
+    display: flex;
+}
+
+#he-tabs-nav label {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    color: gray;
+    border: 1px solid lightgray;
+    border-bottom: 0;
+    border-top-right-radius: 3px;
+    border-top-left-radius: 3px;
+    background-color: whitesmoke;
+}
+
+#he-tabs-nav label:has(:checked) {
+    color: black;
+    background-color: white;
+    border-bottom: 1px solid white;
+    margin-bottom: -1px;
+}
+
+#he-tabs-nav label:hover {
+    background-color: #0082b40d;
+}
