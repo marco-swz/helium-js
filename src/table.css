@@ -1,6 +1,8 @@
 :host {
     --he-table-row-bg: white;
+    --he-table-col-max-width: 300px;
     overflow: auto;
+    display: block;
     width: fit-content;
 }
 
@@ -120,10 +122,13 @@ tbody tr:last-child td:last-child {
 }
 thead tr:first-child th:first-child {
     border-top-left-radius: var(--he-table-radius, 4px);
-    padding-top: 14px;
 }
 thead tr:first-child th:last-child {
     border-top-right-radius: var(--he-table-radius, 4px);
+}
+
+thead th[type="check"] {
+    padding-top: 14px;
 }
 
 thead .inp-filter:focus,
@@ -164,7 +169,7 @@ tbody td {
     text-wrap: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 400px;
+    max-width: var(--he-table-col-max-width);
     padding: 5px 15px;
     vertical-align: middle;
     width: 0;

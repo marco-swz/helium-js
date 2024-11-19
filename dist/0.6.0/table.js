@@ -7,7 +7,7 @@ import './utils-BGzlNXdX.js';
 import './dialog.js';
 import './select.js';
 
-const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\r\n    --he-table-row-bg: white;\r\n    overflow: auto;\r\n    width: fit-content;\r\n}\r\n\r\n:host::-webkit-scrollbar {\r\n    width: 10px !important;\r\n}\r\n\r\n:host::-webkit-scrollbar-thumb {\r\n    background-color: darkgrey !important;\r\n    border-radius: 10px !important;\r\n}\r\n\r\ntable {\r\n    border-spacing: 0;\r\n    border-collapse: separate;\r\n    border-radius: var(--he-table-radius, 4px);\r\n}\r\n\r\nthead {\r\n    position: sticky;\r\n    top: 1px;\r\n    z-index: 2;\r\n}\r\n\r\nthead th {\r\n    background-color: var(--he-table-clr-bg-header, white);\r\n    color: var(--he-table-clr-fg-header, black);\r\n    font-weight: 500;\r\n    padding: 7px 12px;\r\n    text-align: center;\r\n    vertical-align: middle;\r\n    text-wrap: nowrap;\r\n    width: 0;\r\n    border-bottom: 1px solid grey;\r\n}\r\n\r\nthead th:hover .label-sorter {\r\n    opacity: 0.5;\r\n}\r\n\r\nthead th div {\r\n    display: flex;\r\n    align-items: center;\r\n    gap: 0.7rem;\r\n    justify-content: space-between;\r\n}\r\n\r\nthead td {\r\n    background-color: #0082b4;\r\n    padding: 0px 4px 8px 4px;\r\n    width: 0;\r\n\r\n}\r\n\r\nthead td:first-child {\r\n    display: flex;;\r\n    align-items: center;;\r\n    padding: 3px 15px;\r\n    border-radius: 0;\r\n    width: fit-content;\r\n}\r\n\r\nthead td:last-child {\r\n    border-radius: 0;\r\n    padding-right: 15px;\r\n}\r\n\r\nthead select {\r\n    padding: 0px 3px;\r\n}\r\n\r\nthead a {\r\n    color: rgba(255, 255, 255, 0.5411764706);\r\n    padding-left: 5px;\r\n\r\n}\r\n\r\nthead a:hover {\r\n    color: white;\r\n}\r\n\r\nthead .cont-filter {\r\n    position: relative;    \r\n    width: 100%;\r\n}\r\n\r\nthead .span-colname {\r\n    position: absolute;\r\n    left: 0.3rem;\r\n    pointer-events: none;\r\n    transition: 0.1s ease all;\r\n    top: 0px;\r\n    font-weight: 600;\r\n}\r\n\r\nthead .inp-filter {\r\n    margin: 0;\r\n    padding: 1px 5px;\r\n    font-size: 0.9rem;\r\n    font-weight: 500;\r\n    background-color: transparent;\r\n    outline: none;\r\n    border: 0;\r\n    color: black;\r\n    width: 100%;\r\n    -webkit-appearance: none;\r\n    -moz-appearance: none;\r\n    appearance: none;\r\n    text-indent: 1px;\r\n}\r\n\r\ntbody tr:last-child td:first-child {\r\n    border-bottom-left-radius: var(--he-table-radius, 4px);\r\n}\r\ntbody tr:last-child td:last-child {\r\n    border-bottom-right-radius: var(--he-table-radius, 4px);\r\n}\r\nthead tr:first-child th:first-child {\r\n    border-top-left-radius: var(--he-table-radius, 4px);\r\n    padding-top: 14px;\r\n}\r\nthead tr:first-child th:last-child {\r\n    border-top-right-radius: var(--he-table-radius, 4px);\r\n}\r\n\r\nthead .inp-filter:focus,\r\n.cont-filter input:not(:placeholder-shown),\r\n.cont-filter select:has(option:checked:not([value=\"\"])) {\r\n    transform: translateY(7px);\r\n    font-weight: 600;\r\n    border-bottom: 0.1rem solid darkgrey;\r\n    padding: 4px 5px;\r\n    padding-bottom: 1px;\r\n}\r\n\r\nthead .inp-filter:focus + .span-colname, \r\n.cont-filter input:not(:placeholder-shown) + .span-colname,\r\n.cont-filter select:has(option:checked:not([value=\"\"])) + .span-colname {\r\n    transform: translateY(-5px);\r\n    font-size: 0.7rem;\r\n    opacity: 1;\r\n}\r\n\r\ntbody {\r\n    min-height: 15px;\r\n}\r\n\r\ntbody tr {\r\n    background-color: var(--he-table-row-bg);\r\n}\r\n\r\ntbody tr:nth-child(even) {\r\n    filter: brightness(0.97);\r\n}\r\n\r\ntbody tr:hover {\r\n    filter:brightness(0.93);\r\n}\r\n\r\ntbody td {\r\n    text-wrap: nowrap;\r\n    overflow: hidden;\r\n    text-overflow: ellipsis;\r\n    max-width: 400px;\r\n    padding: 5px 15px;\r\n    vertical-align: middle;\r\n    width: 0;\r\n}\r\n\r\ntbody td > * {\r\n    filter: unset;\r\n}\r\n\r\ntbody td:first-child {\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: center;\r\n    width: unset;\r\n}\r\n\r\ntbody td xmp {\r\n    margin: 0;\r\n    overflow: hidden;\r\n    text-overflow: ellipsis;\r\n}\r\n\r\ntbody #row-btn-more {\r\n    background-color: var(--he-table-clr-bg-more, white);\r\n    color: var(--he-table-clr-fg-more, black);\r\n    cursor: pointer;\r\n    text-align: center;\r\n}\r\n\r\ntbody #row-btn-more td:hover {\r\n    border-color: grey;\r\n    background-color: whitesmoke;\r\n}\r\n\r\ntbody #row-btn-more td {\r\n    padding: 0.4rem;\r\n    border: 1px solid darkgrey;\r\n    display: table-cell;\r\n}\r\n\r\n.cont-sorters {\r\n    display: inline-flex;\r\n    flex-direction: column;\r\n    font-size: 0.7rem;\r\n    gap: 0;\r\n    cursor: pointer;\r\n}\r\n\r\n.label-sorter {\r\n    opacity: 0;\r\n}\r\n\r\nthead th div .label-sorter:hover {\r\n    opacity: 1;\r\n}\r\n\r\nthead th div .label-sorter:has(input:checked) {\r\n    opacity: 1;\r\n}\r\n\r\n.label-sorter input {\r\n    display: none;\r\n}\r\n\r\ntable[loading] {\r\n    pointer-events: none;\r\n    cursor: no-drop;\r\n}\r\n\r\ntable[loading] tbody {\r\n    position: relative;\r\n}\r\n\r\ntable[loading] tbody::after {\r\n    content: \"\";\r\n    position: absolute;\r\n    height: 100%;\r\n    width: 100%;\r\n    top: 0;\r\n    left: 0;\r\n    right: 0;\r\n    bottom: 0;\r\n    margin: auto;\r\n    background: linear-gradient(-90deg, #dbd8d8 0%, #fcfcfc 50%, #dbd8d8 100%);\r\n    background-size: 400% 400%;\r\n    animation: pulse 1.2s ease-in-out infinite;\r\n}\r\n\r\n@keyframes pulse {\r\n    0% {\r\n        background-position: 0% 0%\r\n    }\r\n    100% {\r\n        background-position: -135% 0%\r\n    }\r\n}\r\n\r\nhe-form-dialog {\r\n    --he-form-dialog-width: 350px;\r\n}\r\n");
+const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\n    --he-table-row-bg: white;\n    --he-table-col-max-width: 300px;\n    overflow: auto;\n    display: block;\n    width: fit-content;\n}\n\n:host::-webkit-scrollbar {\n    width: 10px !important;\n}\n\n:host::-webkit-scrollbar-thumb {\n    background-color: darkgrey !important;\n    border-radius: 10px !important;\n}\n\ntable {\n    border-spacing: 0;\n    border-collapse: separate;\n    border-radius: var(--he-table-radius, 4px);\n}\n\nthead {\n    position: sticky;\n    top: 1px;\n    z-index: 2;\n}\n\nthead th {\n    background-color: var(--he-table-clr-bg-header, white);\n    color: var(--he-table-clr-fg-header, black);\n    font-weight: 500;\n    padding: 7px 12px;\n    text-align: center;\n    vertical-align: middle;\n    text-wrap: nowrap;\n    width: 0;\n    border-bottom: 1px solid grey;\n}\n\nthead th:hover .label-sorter {\n    opacity: 0.5;\n}\n\nthead th div {\n    display: flex;\n    align-items: center;\n    gap: 0.7rem;\n    justify-content: space-between;\n}\n\nthead td {\n    background-color: #0082b4;\n    padding: 0px 4px 8px 4px;\n    width: 0;\n\n}\n\nthead td:first-child {\n    display: flex;;\n    align-items: center;;\n    padding: 3px 15px;\n    border-radius: 0;\n    width: fit-content;\n}\n\nthead td:last-child {\n    border-radius: 0;\n    padding-right: 15px;\n}\n\nthead select {\n    padding: 0px 3px;\n}\n\nthead a {\n    color: rgba(255, 255, 255, 0.5411764706);\n    padding-left: 5px;\n\n}\n\nthead a:hover {\n    color: white;\n}\n\nthead .cont-filter {\n    position: relative;    \n    width: 100%;\n}\n\nthead .span-colname {\n    position: absolute;\n    left: 0.3rem;\n    pointer-events: none;\n    transition: 0.1s ease all;\n    top: 0px;\n    font-weight: 600;\n}\n\nthead .inp-filter {\n    margin: 0;\n    padding: 1px 5px;\n    font-size: 0.9rem;\n    font-weight: 500;\n    background-color: transparent;\n    outline: none;\n    border: 0;\n    color: black;\n    width: 100%;\n    -webkit-appearance: none;\n    -moz-appearance: none;\n    appearance: none;\n    text-indent: 1px;\n}\n\ntbody tr:last-child td:first-child {\n    border-bottom-left-radius: var(--he-table-radius, 4px);\n}\ntbody tr:last-child td:last-child {\n    border-bottom-right-radius: var(--he-table-radius, 4px);\n}\nthead tr:first-child th:first-child {\n    border-top-left-radius: var(--he-table-radius, 4px);\n}\nthead tr:first-child th:last-child {\n    border-top-right-radius: var(--he-table-radius, 4px);\n}\n\nthead th[type=\"check\"] {\n    padding-top: 14px;\n}\n\nthead .inp-filter:focus,\n.cont-filter input:not(:placeholder-shown),\n.cont-filter select:has(option:checked:not([value=\"\"])) {\n    transform: translateY(7px);\n    font-weight: 600;\n    border-bottom: 0.1rem solid darkgrey;\n    padding: 4px 5px;\n    padding-bottom: 1px;\n}\n\nthead .inp-filter:focus + .span-colname, \n.cont-filter input:not(:placeholder-shown) + .span-colname,\n.cont-filter select:has(option:checked:not([value=\"\"])) + .span-colname {\n    transform: translateY(-5px);\n    font-size: 0.7rem;\n    opacity: 1;\n}\n\ntbody {\n    min-height: 15px;\n}\n\ntbody tr {\n    background-color: var(--he-table-row-bg);\n}\n\ntbody tr:nth-child(even) {\n    filter: brightness(0.97);\n}\n\ntbody tr:hover {\n    filter:brightness(0.93);\n}\n\ntbody td {\n    text-wrap: nowrap;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    max-width: var(--he-table-col-max-width);\n    padding: 5px 15px;\n    vertical-align: middle;\n    width: 0;\n}\n\ntbody td > * {\n    filter: unset;\n}\n\ntbody td:first-child {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    width: unset;\n}\n\ntbody td xmp {\n    margin: 0;\n    overflow: hidden;\n    text-overflow: ellipsis;\n}\n\ntbody #row-btn-more {\n    background-color: var(--he-table-clr-bg-more, white);\n    color: var(--he-table-clr-fg-more, black);\n    cursor: pointer;\n    text-align: center;\n}\n\ntbody #row-btn-more td:hover {\n    border-color: grey;\n    background-color: whitesmoke;\n}\n\ntbody #row-btn-more td {\n    padding: 0.4rem;\n    border: 1px solid darkgrey;\n    display: table-cell;\n}\n\n.cont-sorters {\n    display: inline-flex;\n    flex-direction: column;\n    font-size: 0.7rem;\n    gap: 0;\n    cursor: pointer;\n}\n\n.label-sorter {\n    opacity: 0;\n}\n\nthead th div .label-sorter:hover {\n    opacity: 1;\n}\n\nthead th div .label-sorter:has(input:checked) {\n    opacity: 1;\n}\n\n.label-sorter input {\n    display: none;\n}\n\ntable[loading] {\n    pointer-events: none;\n    cursor: no-drop;\n}\n\ntable[loading] tbody {\n    position: relative;\n}\n\ntable[loading] tbody::after {\n    content: \"\";\n    position: absolute;\n    height: 100%;\n    width: 100%;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    margin: auto;\n    background: linear-gradient(-90deg, #dbd8d8 0%, #fcfcfc 50%, #dbd8d8 100%);\n    background-size: 400% 400%;\n    animation: pulse 1.2s ease-in-out infinite;\n}\n\n@keyframes pulse {\n    0% {\n        background-position: 0% 0%\n    }\n    100% {\n        background-position: -135% 0%\n    }\n}\n\nhe-form-dialog {\n    --he-form-dialog-width: 350px;\n}\n");
 
 /**
  * A table supporting CRUD operations and with many additional features.
@@ -65,6 +65,8 @@ const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\r\n    --he-table-r
  * @attr {?string} endpoint - The endpoint for table operations. 
  * @attr {?string} pagination - The amount rows for each pagination step
  * @attr {on|off} submit-all - If set, all rows of the table are passed on to forms, instead of checked one.
+ * @attr {on|off} no-sorter - If set, hides the sorting button for all columns.
+ * @attr {on|off} no-filter - If set, disables the filters for all rows.
  *
  * # Column Attributes
  * The `th` element for each column can have additional attributes, which are specific to the single column.
@@ -266,6 +268,24 @@ class HeliumTable extends HTMLElement {
     }
 
     /**
+     * Filters a column based on the provided value.
+     * @param {string} colName The name of the column to filter (NOT the display name)
+     * @param {string} filterValue The filter value
+     * @param {boolean} [partial=false] Does not filter partial matches if set to `true`
+     * @returns {Self}
+     */
+    filterColumn(colName, filterValue, partial = false) {
+        let columns = this._getColumns();
+        for (let i = 0; i < columns.length; ++i) {
+            if (columns[i].getAttribute('column') === colName) {
+                this._filterColumn(i, filterValue, !partial);
+                return this;
+            }
+        }
+        throw new Error(`No column found with name ${colName}`);
+    }
+
+    /**
      * 
      * @param {HeliumFormDialogSubmitEvent} evt
      * @returns void
@@ -333,6 +353,49 @@ class HeliumTable extends HTMLElement {
      */
     getTableData(returnDisplayValues = false) {
         return this._getTableData(returnDisplayValues);
+    }
+
+    /**
+     * 
+     * @param {string|Array<string>} keyColumn
+     * @param {Array<Object.<string, string>>} data 
+     * @returns {Self}
+     */
+    mergeData(keyColumn, data) {
+        if (!Array.isArray(keyColumn)) {
+            keyColumn = [keyColumn];
+        }
+
+        let rowMap = {};
+        for (const $row of this.$body.rows) {
+            const rowData = this._getRowData($row);
+            const key = keyColumn.map((x) => rowData[x]).join('-');
+            rowMap[key] = $row;
+        }
+
+        for (const entry of data) {
+            const key = keyColumn.map((x) => entry[x]).join('-');
+            let $row = rowMap[key];
+
+            if ($row == null) {
+                $row = this._renderRow(entry);
+                this.$body.append($row);
+                continue;
+            }
+
+            for (const $col of this._getColumns(true)) {
+                const colName = $col.getAttribute('column');
+                const newVal = data[colName];
+                if (newVal == null) {
+                    continue;
+                }
+
+                $cell = $row.cells[$col.cellIndex];
+                $cell.setAttribute('data', newVal);
+                $cell.innerHTML = this._renderText($cell, newVal);
+            }
+        }
+
     }
 
     refresh() {
@@ -405,6 +468,49 @@ class HeliumTable extends HTMLElement {
 
     reportValidity() {
         return this.internals.reportValidity();
+    }
+
+    /**
+     * Changes values of a table row selected by the `where` argument.
+     * @param {Object.<string, string>} where A mapping of column name to value, to filter which row is modified.
+     * @param {Object.<string, string>} to A mappig from column name to new value.
+     * @returns {Self}
+     */
+    setRowData(where, to) {
+        /** @type {Object.<string, HTMLTableCellElement>} */
+        let colMap = {};
+        for (const $col of this._getColumns(true)) {
+            colMap[colName] = $col;
+        }
+
+        for (const $row of this.$body.rows) {
+            let isMatch = true;
+            for (const [colName, filterVal] of Object.entries(where)) {
+                const $col = colMap[colName];
+                if (idx == null) {
+                    throw new Error(`No column with name '${colName}'!`);
+                }
+
+                const val = $row.cells[$col.cellIndex].getAttribute('data');
+                if (filterVal !== val) {
+                    isMatch = false;
+                    break;
+                }
+            }
+
+            if (!isMatch) {
+                continue;
+            }
+
+            for (const [colName, newVal] of Object.entries(to)) {
+                const $col = colMap[colName];
+                const $cell = $row.cells[$col.cellIndex];
+                $cell.setAttribute('data', newVal);
+                $cell.innerHTML = this._renderText($col, newVal);
+            }
+        }
+
+        return this;
     }
 
     showDialogEdit() {
@@ -492,16 +598,25 @@ class HeliumTable extends HTMLElement {
         }
 
         const $filter = e.currentTarget;
-        const filterValue = $filter.value.toLowerCase();
         const colIdx = Array.prototype.indexOf.call(
             $filter.parentElement.parentElement.parentElement.parentElement.children,
             $filter.parentElement.parentElement.parentElement
         );
+
+        this._filterColumn(colIdx, $filter.value);
+    }
+
+    _filterColumn(colIdx, filterValue, strict = false) {
+        filterValue = filterValue.toLowerCase();
         for (const $row of this.$body.children) {
             const data = $row.children[colIdx].getAttribute('data');
             let hideMask = $row.getAttribute('mask') ?? 0;
 
-            if (data.toLowerCase().includes(filterValue)) {
+            const isMatch = strict
+                ? data === filterValue
+                : data.toLowerCase().includes(filterValue);
+
+            if (isMatch) {
                 // Clear bit for column filter
                 hideMask &= ~1 << colIdx;
             } else {
@@ -513,16 +628,20 @@ class HeliumTable extends HTMLElement {
 
             if (hideMask > 0) {
                 $row.style.visibility = 'collapse';
+                $row.querySelector('he-check').checked = false;
             } else {
                 $row.style.visibility = null;
             }
+
+            this._updateExternElements([]);
         }
     }
 
     /**
+     * @param {boolean} [dataOnly=false] Also includes non-data column like check cols if `true`
      * @returns {NodeListOf<HTMLTableCellElement>}
      */
-    _getColumns(dataOnly=false) {
+    _getColumns(dataOnly = false) {
         if (dataOnly) {
             return this.shadowRoot.querySelectorAll('th[column]');
         }
@@ -607,6 +726,10 @@ class HeliumTable extends HTMLElement {
         $contSorters.classList.add('cont-sorters');
         $contSorters.append($labelSortAsc);
         $contSorters.append($labelSortDesc);
+
+        if (this.getAttribute('no-sorter')) {
+            $contSorters.style.display = 'none';
+        }
 
         return $contSorters;
     }
@@ -750,11 +873,12 @@ class HeliumTable extends HTMLElement {
                     break;
                 case 'hidden':
                     $cell.style.display = 'none';
-                    // no break
+                // no break
                 default:
                     $cell.setAttribute('data', val);
                     $cell.innerHTML = this._renderText($column, text);
                     $cell.title = val;
+                    $cell.style.maxWidth = `var(--he-table-max-width-${colName}, --he-table-col-max-width)`;
                     let colors = this.rowColors[colName];
                     if (colors) {
                         let color = colors[val];
@@ -935,6 +1059,10 @@ class HeliumTable extends HTMLElement {
                     $option.value = val;
                     $selFilter.append($option);
                 }
+                if (this.getAttribute('no-filter')) {
+                    $spanName.style.position = 'unset';
+                    $inpFilter.style.display = 'none';
+                }
                 $contFilter.prepend($selFilter);
             } else {
                 let $inpFilter = document.createElement('input');
@@ -946,6 +1074,10 @@ class HeliumTable extends HTMLElement {
                 $inpFilter.classList.add('inp-filter');
                 $inpFilter.value = $column.getAttribute('filter') ?? '';
                 $inpFilter.onchange = (e) => this._filterChangeCallback(e);
+                if (this.getAttribute('no-filter')) {
+                    $spanName.style.position = 'unset';
+                    $inpFilter.style.display = 'none';
+                }
                 $contFilter.prepend($inpFilter);
             }
         }

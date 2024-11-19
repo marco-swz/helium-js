@@ -59,6 +59,8 @@ import sheet from './table.css';
  * @attr {?string} endpoint - The endpoint for table operations. 
  * @attr {?string} pagination - The amount rows for each pagination step
  * @attr {on|off} submit-all - If set, all rows of the table are passed on to forms, instead of checked one.
+ * @attr {on|off} no-sorter - If set, hides the sorting button for all columns.
+ * @attr {on|off} no-filter - If set, disables the filters for all rows.
  *
  * # Column Attributes
  * The `th` element for each column can have additional attributes, which are specific to the single column.
@@ -260,6 +262,24 @@ export class HeliumTable extends HTMLElement {
     }
 
     /**
+     * Filters a column based on the provided value.
+     * @param {string} colName The name of the column to filter (NOT the display name)
+     * @param {string} filterValue The filter value
+     * @param {boolean} [partial=false] Does not filter partial matches if set to `true`
+     * @returns {Self}
+     */
+    filterColumn(colName, filterValue, partial = false) {
+        let columns = this._getColumns();
+        for (let i = 0; i < columns.length; ++i) {
+            if (columns[i].getAttribute('column') === colName) {
+                this._filterColumn(i, filterValue, !partial);
+                return this;
+            }
+        }
+        throw new Error(`No column found with name ${colName}`);
+    }
+
+    /**
      * 
      * @param {HeliumFormDialogSubmitEvent} evt
      * @returns void
@@ -327,6 +347,49 @@ export class HeliumTable extends HTMLElement {
      */
     getTableData(returnDisplayValues = false) {
         return this._getTableData(returnDisplayValues);
+    }
+
+    /**
+     * 
+     * @param {string|Array<string>} keyColumn
+     * @param {Array<Object.<string, string>>} data 
+     * @returns {Self}
+     */
+    mergeData(keyColumn, data) {
+        if (!Array.isArray(keyColumn)) {
+            keyColumn = [keyColumn];
+        }
+
+        let rowMap = {};
+        for (const $row of this.$body.rows) {
+            const rowData = this._getRowData($row);
+            const key = keyColumn.map((x) => rowData[x]).join('-');
+            rowMap[key] = $row;
+        }
+
+        for (const entry of data) {
+            const key = keyColumn.map((x) => entry[x]).join('-');
+            let $row = rowMap[key];
+
+            if ($row == null) {
+                $row = this._renderRow(entry);
+                this.$body.append($row);
+                continue;
+            }
+
+            for (const $col of this._getColumns(true)) {
+                const colName = $col.getAttribute('column');
+                const newVal = data[colName];
+                if (newVal == null) {
+                    continue;
+                }
+
+                $cell = $row.cells[$col.cellIndex];
+                $cell.setAttribute('data', newVal);
+                $cell.innerHTML = this._renderText($cell, newVal);
+            }
+        }
+
     }
 
     refresh() {
@@ -399,6 +462,49 @@ export class HeliumTable extends HTMLElement {
 
     reportValidity() {
         return this.internals.reportValidity();
+    }
+
+    /**
+     * Changes values of a table row selected by the `where` argument.
+     * @param {Object.<string, string>} where A mapping of column name to value, to filter which row is modified.
+     * @param {Object.<string, string>} to A mappig from column name to new value.
+     * @returns {Self}
+     */
+    setRowData(where, to) {
+        /** @type {Object.<string, HTMLTableCellElement>} */
+        let colMap = {};
+        for (const $col of this._getColumns(true)) {
+            colMap[colName] = $col;
+        }
+
+        for (const $row of this.$body.rows) {
+            let isMatch = true;
+            for (const [colName, filterVal] of Object.entries(where)) {
+                const $col = colMap[colName];
+                if (idx == null) {
+                    throw new Error(`No column with name '${colName}'!`);
+                }
+
+                const val = $row.cells[$col.cellIndex].getAttribute('data');
+                if (filterVal !== val) {
+                    isMatch = false;
+                    break;
+                }
+            }
+
+            if (!isMatch) {
+                continue;
+            }
+
+            for (const [colName, newVal] of Object.entries(to)) {
+                const $col = colMap[colName];
+                const $cell = $row.cells[$col.cellIndex];
+                $cell.setAttribute('data', newVal);
+                $cell.innerHTML = this._renderText($col, newVal);
+            }
+        }
+
+        return this;
     }
 
     showDialogEdit() {
@@ -486,16 +592,25 @@ export class HeliumTable extends HTMLElement {
         }
 
         const $filter = e.currentTarget;
-        const filterValue = $filter.value.toLowerCase();
         const colIdx = Array.prototype.indexOf.call(
             $filter.parentElement.parentElement.parentElement.parentElement.children,
             $filter.parentElement.parentElement.parentElement
         );
+
+        this._filterColumn(colIdx, $filter.value);
+    }
+
+    _filterColumn(colIdx, filterValue, strict = false) {
+        filterValue = filterValue.toLowerCase();
         for (const $row of this.$body.children) {
             const data = $row.children[colIdx].getAttribute('data');
             let hideMask = $row.getAttribute('mask') ?? 0;
 
-            if (data.toLowerCase().includes(filterValue)) {
+            const isMatch = strict
+                ? data === filterValue
+                : data.toLowerCase().includes(filterValue);
+
+            if (isMatch) {
                 // Clear bit for column filter
                 hideMask &= ~1 << colIdx;
             } else {
@@ -507,16 +622,20 @@ export class HeliumTable extends HTMLElement {
 
             if (hideMask > 0) {
                 $row.style.visibility = 'collapse';
+                $row.querySelector('he-check').checked = false;
             } else {
                 $row.style.visibility = null;
             }
+
+            this._updateExternElements([]);
         }
     }
 
     /**
+     * @param {boolean} [dataOnly=false] Also includes non-data column like check cols if `true`
      * @returns {NodeListOf<HTMLTableCellElement>}
      */
-    _getColumns(dataOnly=false) {
+    _getColumns(dataOnly = false) {
         if (dataOnly) {
             return this.shadowRoot.querySelectorAll('th[column]');
         }
@@ -601,6 +720,10 @@ export class HeliumTable extends HTMLElement {
         $contSorters.classList.add('cont-sorters')
         $contSorters.append($labelSortAsc);
         $contSorters.append($labelSortDesc);
+
+        if (this.getAttribute('no-sorter')) {
+            $contSorters.style.display = 'none';
+        }
 
         return $contSorters;
     }
@@ -744,11 +867,12 @@ export class HeliumTable extends HTMLElement {
                     break;
                 case 'hidden':
                     $cell.style.display = 'none';
-                    // no break
+                // no break
                 default:
                     $cell.setAttribute('data', val);
                     $cell.innerHTML = this._renderText($column, text);
                     $cell.title = val;
+                    $cell.style.maxWidth = `var(--he-table-max-width-${colName}, --he-table-col-max-width)`;
                     let colors = this.rowColors[colName];
                     if (colors) {
                         let color = colors[val];
@@ -929,6 +1053,10 @@ export class HeliumTable extends HTMLElement {
                     $option.value = val;
                     $selFilter.append($option);
                 }
+                if (this.getAttribute('no-filter')) {
+                    $spanName.style.position = 'unset';
+                    $inpFilter.style.display = 'none';
+                }
                 $contFilter.prepend($selFilter);
             } else {
                 let $inpFilter = document.createElement('input');
@@ -940,6 +1068,10 @@ export class HeliumTable extends HTMLElement {
                 $inpFilter.classList.add('inp-filter');
                 $inpFilter.value = $column.getAttribute('filter') ?? '';
                 $inpFilter.onchange = (e) => this._filterChangeCallback(e);
+                if (this.getAttribute('no-filter')) {
+                    $spanName.style.position = 'unset';
+                    $inpFilter.style.display = 'none';
+                }
                 $contFilter.prepend($inpFilter);
             }
         }
