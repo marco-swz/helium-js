@@ -379,12 +379,12 @@ export class HeliumTable extends HTMLElement {
 
             for (const $col of this._getColumns(true)) {
                 const colName = $col.getAttribute('column');
-                const newVal = data[colName];
+                const newVal = entry[colName];
                 if (newVal == null) {
                     continue;
                 }
 
-                $cell = $row.cells[$col.cellIndex];
+                let $cell = $row.cells[$col.cellIndex];
                 $cell.setAttribute('data', newVal);
                 $cell.innerHTML = this._renderText($cell, newVal);
             }
