@@ -2,7 +2,7 @@
     --he-table-row-bg: white;
     --he-table-col-max-width: 300px;
     overflow: auto;
-    display: block;
+    display: inline-block;
     width: fit-content;
 }
 

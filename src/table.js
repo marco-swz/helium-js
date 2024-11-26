@@ -355,11 +355,12 @@ export class HeliumTable extends HTMLElement {
      * @param {Array<Object.<string, string>>} data 
      * @returns {Self}
      */
-    mergeData(keyColumn, data) {
+    mergeData(keyColumn, data, removeOld=false) {
         if (!Array.isArray(keyColumn)) {
             keyColumn = [keyColumn];
         }
 
+        /** @type {Object.<string, HTMLTableRowElement} */
         let rowMap = {};
         for (const $row of this.$body.rows) {
             const rowData = this._getRowData($row);
@@ -370,6 +371,7 @@ export class HeliumTable extends HTMLElement {
         for (const entry of data) {
             const key = keyColumn.map((x) => entry[x]).join('-');
             let $row = rowMap[key];
+            delete rowMap[key];
 
             if ($row == null) {
                 $row = this._renderRow(entry);
@@ -390,6 +392,11 @@ export class HeliumTable extends HTMLElement {
             }
         }
 
+        if (removeOld) {
+            for (const $row of Object.values(rowMap)) {
+                $row.remove();
+            }
+        }
     }
 
     refresh() {
@@ -568,16 +575,16 @@ export class HeliumTable extends HTMLElement {
      */
     _checkAllCheckCallback() {
         this.$checkAll.indeterminate = false;
-        const $checks = this.$body.querySelectorAll('.check-row');
+        const checks = this.$body.querySelectorAll('.check-row');
 
         if (this.$checkAll.checked) {
-            for (const check of $checks) {
+            for (const check of checks) {
                 check.checked = true;
             }
-            this._updateExternElements($checks);
+            this._updateExternElements(checks);
         } else {
-            for (const check of $checks) {
-                check.checked = false;
+            for (const $check of checks) {
+                $check.checked = false;
                 this._updateExternElements([]);
             }
         }
@@ -601,6 +608,7 @@ export class HeliumTable extends HTMLElement {
     }
 
     _filterColumn(colIdx, filterValue, strict = false) {
+        let checks = [];
         filterValue = filterValue.toLowerCase();
         for (const $row of this.$body.children) {
             const data = $row.children[colIdx].getAttribute('data');
@@ -620,14 +628,20 @@ export class HeliumTable extends HTMLElement {
 
             $row.setAttribute('mask', hideMask);
 
+            const $check = $row.querySelector('he-check');
             if (hideMask > 0) {
                 $row.style.visibility = 'collapse';
-                $row.querySelector('he-check').checked = false;
+                $check.checked = false;
             } else {
                 $row.style.visibility = null;
             }
+            
+            if ($check.checked) {
+                checks.push($check);
+            }
 
-            this._updateExternElements([]);
+            this._updateCheckAll(checks);
+            this._updateExternElements(checks);
         }
     }
 
@@ -651,11 +665,10 @@ export class HeliumTable extends HTMLElement {
         let data = {};
         let columns = this._getColumns(true);
         for (let i = 0; i < columns.length; ++i) {
-            // `i+1` to skip the checkbox column
-            let $cell = row.children[i + 1];
-            let column = columns[i];
+            let $column = columns[i];
+            let $cell = row.children[$column.cellIndex];
 
-            const colName = column.getAttribute('column');
+            const colName = $column.getAttribute('column');
             data[colName] = returnDisplayValues
                 ? $cell.innerText
                 : $cell.getAttribute('data');
@@ -872,7 +885,6 @@ export class HeliumTable extends HTMLElement {
                     $cell.setAttribute('data', val);
                     $cell.innerHTML = this._renderText($column, text);
                     $cell.title = val;
-                    $cell.style.maxWidth = `var(--he-table-max-width-${colName}, --he-table-col-max-width)`;
                     let colors = this.rowColors[colName];
                     if (colors) {
                         let color = colors[val];
@@ -972,6 +984,8 @@ export class HeliumTable extends HTMLElement {
         const columns = this.querySelectorAll('th');
         for (let $column of columns) {
             let colName = $column.getAttribute('column') ?? $column.innerText;
+            //$column.style.maxWidth = `var(--he-table-col-max-width-${colName}, --he-table-col-max-width)`;
+            //$column.style.width = `var(--he-table-col-width-${colName}, unset)`;
 
             const colType = $column.getAttribute('type');
             switch (colType) {
@@ -1119,7 +1133,6 @@ export class HeliumTable extends HTMLElement {
         const $row = e.currentTarget;
         if (this.$checkAll) {
             let checked = this.$body.querySelectorAll('.check-row:state(checked)');
-            let numChecked = checked.length;
 
             if (!e.target.classList.contains('check-row')) {
                 for (let check of checked) {
@@ -1127,21 +1140,10 @@ export class HeliumTable extends HTMLElement {
                 }
 
                 $row.children[0].children[0].checked = true;
-                numChecked = 1;
-            }
-
-            if (numChecked === 0) {
-                this.$checkAll.checked = false;
-                this.$checkAll.indeterminate = false;
-            } else if (numChecked < this.$body.children.length) {
-                this.$checkAll.checked = true;
-                this.$checkAll.indeterminate = true;
-            } else {
-                this.$checkAll.indeterminate = false;
-                this.$checkAll.checked = true;
             }
 
             checked = this.$body.querySelectorAll('.check-row:state(checked)');
+            this._updateCheckAll(checked);
             this._updateExternElements(checked);
         } else {
             const $rowOld = this.$body.querySelector('tr[selected]');
@@ -1153,6 +1155,31 @@ export class HeliumTable extends HTMLElement {
         }
     }
 
+    /**
+     * 
+     * @param {Array<HeliumCheck>} checked 
+     * @returns {void}
+     */
+    _updateCheckAll(checked) {
+        if (this.$checkAll) {
+            if (checked.length === 0) {
+                this.$checkAll.checked = false;
+                this.$checkAll.indeterminate = false;
+            } else if (checked.length < this.$body.children.length) {
+                this.$checkAll.checked = true;
+                this.$checkAll.indeterminate = true;
+            } else {
+                this.$checkAll.indeterminate = false;
+                this.$checkAll.checked = true;
+            }
+        }
+    }
+
+    /**
+     * 
+     * @param {Array<HeliumCheck>} checked 
+     * @returns {void}
+     */
     _updateExternElements(checked) {
         // The form value only needs to be set when the name is set.
         // This avoids parsing all checked rows each click.
