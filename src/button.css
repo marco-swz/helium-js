@@ -93,6 +93,7 @@
     border-style: solid;
     border-color: var(--he-button-border-color);
     padding: 0px 10px;
+    font-weight: 600;
 }
 
 :host([disabled]) #he-button {

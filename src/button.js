@@ -41,6 +41,8 @@ export class HeliumButton extends HTMLElement {
     listenerClick = null;
     /** @type {ElementInternals} */
     internals;
+    /** @type {HTMLSlotElement} */
+    $slot;
 
     constructor() {
         super();
@@ -48,6 +50,10 @@ export class HeliumButton extends HTMLElement {
 
         this.$button = document.createElement('button');
         this.$button.id = 'he-button'
+
+        this.$slot = document.createElement('slot');
+        this.$slot.name = "inner";
+        this.$button.append(this.$slot);
 
         shadow.append(this.$button);
         shadow.adoptedStyleSheets = [sheet];
@@ -186,9 +192,12 @@ export class HeliumButton extends HTMLElement {
     }
 
     connectedCallback() {
-        this.$button.innerHTML = this.innerHTML;
-        this.innerHTML = '';
+        let $inner = document.createElement('span');
+        $inner.slot = 'inner';
+        $inner.innerHTML = this.innerHTML;
 
+
+        this.$button.append($inner);
         this.onload && this.onload();
     }
 
