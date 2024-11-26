@@ -1,4 +1,4 @@
-const sheet = new CSSStyleSheet();sheet.replaceSync("#he-diag-outer {\r\n    outline: none;\r\n    padding: 0;\r\n    border-radius: 3px;\r\n    border: 0;\r\n    box-shadow:0 5px 10px 0 #80808054;\r\n}\r\n\r\n#he-icon-close {\r\n    font-weight: 900;\r\n    width: 30px;\r\n    aspect-ratio: 1;\r\n    height: fit-content;\r\n    text-align: center;\r\n    cursor: pointer;\r\n    border-radius: 50%;\r\n    font-family: cursive;\r\n    display: flex;\r\n    justify-content: center;\r\n    align-items: center;\r\n}\r\n\r\n#he-icon-close:hover {\r\n    background-color: whitesmoke;\r\n}\r\n\r\n#he-diag-inner {\r\n    min-height: 100px;\r\n    min-width: 200px;\r\n    display: flex;\r\n    flex-direction: column;\r\n    justify-content: space-between;\r\n}\r\n\r\n#he-diag-body {\r\n    padding-left: 10px;\r\n    padding-right: 10px;\r\n    padding-top: 10px;\r\n}\r\n\r\n#he-diag-header {\r\n    display: flex;\r\n    justify-content: space-between;\r\n    padding: 3px 15px;\r\n    padding-top: 10px;\r\n}\r\n\r\n#he-diag-footer {\r\n    display: flex;\r\n    justify-content: flex-end;\r\n    padding: 10px;\r\n    gap: 5px;\r\n}\r\n\r\n#he-title {\r\n    display: flex;\r\n    font-weight: 500;\r\n    font-size: 1.5rem;\r\n    align-items: center;\r\n}\r\n\r\n#he-diag-footer input[type=button] {\r\n    border-radius: 3px;\r\n    color: black;\r\n    height: 35px;\r\n    padding: 0px 10px;\r\n    vertical-align: middle;\r\n    text-align: center;\r\n    border: 1px solid rgba(0, 0, 0, 0.2235294118);\r\n    font-size: 14px;\r\n    background-color: white;\r\n    outline-style: none;\r\n    box-shadow: none !important;\r\n    width: auto;\r\n    visibility: collapse;\r\n\r\n    &[disabled] {\r\n        background-color: #d9d9d9;\r\n        color: #666666;\r\n        cursor: no-drop;\r\n        text-shadow: none;\r\n    }\r\n\r\n    &:hover:enabled, &:active:enabled, &:focus:enabled {\r\n        cursor: pointer;\r\n        text-shadow: 0px 0px 0.3px #0082b4;\r\n        border-color: #0082b4;\r\n        color: #0082b4;\r\n    }\r\n\r\n    &:hover:enabled{\r\n        background-color: #0082b40d;\r\n    }\r\n}\r\n");
+const sheet = new CSSStyleSheet();sheet.replaceSync("#he-diag-outer {\n    outline: none;\n    padding: 0;\n    border-radius: 3px;\n    border: 0;\n    box-shadow:0 5px 10px 0 #80808054;\n}\n\n#he-icon-close {\n    font-weight: 900;\n    width: 30px;\n    aspect-ratio: 1;\n    height: fit-content;\n    text-align: center;\n    cursor: pointer;\n    border-radius: 50%;\n    font-family: cursive;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n}\n\n#he-icon-close:hover {\n    background-color: whitesmoke;\n}\n\n#he-diag-inner {\n    min-height: 100px;\n    min-width: 200px;\n    display: flex;\n    flex-direction: column;\n    justify-content: space-between;\n}\n\n#he-diag-body {\n    padding: 10px 15px;\n}\n\n#he-diag-header {\n    display: flex;\n    justify-content: space-between;\n    padding: 10px 15px;\n}\n\n#he-diag-footer {\n    display: flex;\n    justify-content: flex-end;\n    padding: 15px;\n    gap: 5px;\n}\n\n#he-title {\n    display: flex;\n    font-weight: 500;\n    font-size: 1.5rem;\n    align-items: center;\n    color: var(--he-dialog-clr-title);\n}\n\n#he-diag-footer input[type=button] {\n    border-radius: 3px;\n    color: black;\n    height: 35px;\n    padding: 0px 10px;\n    vertical-align: middle;\n    text-align: center;\n    border: 1px solid rgba(0, 0, 0, 0.2235294118);\n    font-size: 14px;\n    background-color: white;\n    outline-style: none;\n    box-shadow: none !important;\n    width: auto;\n    visibility: collapse;\n\n    &[disabled] {\n        background-color: #d9d9d9;\n        color: #666666;\n        cursor: no-drop;\n        text-shadow: none;\n    }\n\n    &:hover:enabled, &:active:enabled, &:focus:enabled {\n        cursor: pointer;\n        text-shadow: 0px 0px 0.3px #0082b4;\n        border-color: #0082b4;\n        color: #0082b4;\n    }\n\n    &:hover:enabled{\n        background-color: #0082b40d;\n    }\n}\n");
 
 /**
  * Will open the targeted dialog.
@@ -205,7 +205,7 @@ class HeliumDialog extends HTMLElement {
     }
 }
 
-function showDialogTemp(evt, type) {
+function heShowDialogTemp(content, type) {
     /** @type {HeliumDialog} */
     let $diag = document.querySelector('#he-dialog-temp');
     if ($diag === null) {
@@ -214,47 +214,52 @@ function showDialogTemp(evt, type) {
         switch (type) {
             case 'error':
                 $diag.style.setProperty('--he-dialog-clr-title', 'indianred');
-                $diag.setAttribute('title', 'Fehler');
+                $diag.setAttribute('title-text', 'Fehler');
                 break;
             case 'warn':
                 $diag.style.setProperty('--he-dialog-clr-title', 'orange');
-                $diag.setAttribute('title', 'Warnung');
+                $diag.setAttribute('title-text', 'Warnung');
                 break;
             case 'success':
                 $diag.style.setProperty('--he-dialog-clr-title', 'seagreen');
-                $diag.setAttribute('title', 'Erfolg');
+                $diag.setAttribute('title-text', 'Erfolg');
                 break;
             default:
                 $diag.style.removeProperty('--he-dialog-clr-title');
-                $diag.removeAttribute('title');
+                $diag.setAttribute('title-text', 'Info');
                 break;
         }
         document.body.append($diag);
     }
 
-    if (evt.detail && evt.detail.value) {
-        $diag.setBody(evt.detail.value);
-    }
+    $diag.innerHTML = `
+        <div slot="body">${content}</div>
+        <he-button slot="footer" onclick="document.querySelector('#he-dialog-temp').close()">
+            Schließen
+        </he-button>
+    `;
     $diag.show();
 }
 
 if (!customElements.get('he-dialog')) {
+    window.heShowDialogTemp = heShowDialogTemp;
+
     customElements.define("he-dialog", HeliumDialog);
 
     document.addEventListener("he-dialog", function(e) {
-        showDialogTemp(e);
+        heShowDialogTemp(e.detail.value);
     });
 
     document.addEventListener("he-dialog-error", function(e) {
-        showDialogTemp(e, 'error');
+        heShowDialogTemp(e.detail.value, 'error');
     });
 
     document.addEventListener("he-dialog-warn", function(e) {
-        showDialogTemp(e, 'warn');
+        heShowDialogTemp(e.detail.value, 'warn');
     });
 
     document.addEventListener("he-dialog-success", function(e) {
-        showDialogTemp(e, 'success');
+        heShowDialogTemp(e.detail.value, 'success');
     });
 }
 

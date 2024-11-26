@@ -205,7 +205,7 @@ export class HeliumDialog extends HTMLElement {
     }
 }
 
-function showDialogTemp(evt, type) {
+function heShowDialogTemp(content, type) {
     /** @type {HeliumDialog} */
     let $diag = document.querySelector('#he-dialog-temp');
     if ($diag === null) {
@@ -214,46 +214,51 @@ function showDialogTemp(evt, type) {
         switch (type) {
             case 'error':
                 $diag.style.setProperty('--he-dialog-clr-title', 'indianred');
-                $diag.setAttribute('title', 'Fehler');
+                $diag.setAttribute('title-text', 'Fehler');
                 break;
             case 'warn':
                 $diag.style.setProperty('--he-dialog-clr-title', 'orange');
-                $diag.setAttribute('title', 'Warnung');
+                $diag.setAttribute('title-text', 'Warnung');
                 break;
             case 'success':
                 $diag.style.setProperty('--he-dialog-clr-title', 'seagreen');
-                $diag.setAttribute('title', 'Erfolg');
+                $diag.setAttribute('title-text', 'Erfolg');
                 break;
             default:
                 $diag.style.removeProperty('--he-dialog-clr-title');
-                $diag.removeAttribute('title');
+                $diag.setAttribute('title-text', 'Info');
                 break;
         }
         document.body.append($diag);
     }
 
-    if (evt.detail && evt.detail.value) {
-        $diag.setBody(evt.detail.value);
-    }
+    $diag.innerHTML = `
+        <div slot="body">${content}</div>
+        <he-button slot="footer" onclick="document.querySelector('#he-dialog-temp').close()">
+            Schließen
+        </he-button>
+    `;
     $diag.show();
 }
 
 if (!customElements.get('he-dialog')) {
+    window.heShowDialogTemp = heShowDialogTemp;
+
     customElements.define("he-dialog", HeliumDialog);
 
     document.addEventListener("he-dialog", function(e) {
-        showDialogTemp(e);
+        heShowDialogTemp(e.detail.value);
     })
 
     document.addEventListener("he-dialog-error", function(e) {
-        showDialogTemp(e, 'error');
+        heShowDialogTemp(e.detail.value, 'error');
     })
 
     document.addEventListener("he-dialog-warn", function(e) {
-        showDialogTemp(e, 'warn');
+        heShowDialogTemp(e.detail.value, 'warn');
     })
 
     document.addEventListener("he-dialog-success", function(e) {
-        showDialogTemp(e, 'success');
+        heShowDialogTemp(e.detail.value, 'success');
     })
 }
