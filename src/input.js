@@ -2,22 +2,46 @@ import sheet from "./input.css";
 import { HeliumPopover } from "./popover.js";
 
 /**
- * A input element with additional features.
+ * An input element with additional features.
  *
  * Features:
  *   - Report validity to other elements
  *   - Loading indicator
+ *   - Full form compatibility
+ *   - Builtin support for suggestions
+ *
+ * ## Suggestions
+ *
+ * Suggestions can be added through the `option` slot.
+ * To decide the value when an option is clicked, first the value is used,
+ * if not present the `innerHTML` is used.
+ * 
+ * ```html
+ * <he-input>
+ *  <option slot="option" value="a">Option A</option>
+ *  <option slot="option" value="b">Option B</option>
+ * </he-input>
+ * ```
+ *
+ * ## Reporting Validity
+ *
+ * The input can report its validity to other elements.
+ * When is is invalid, the ID of this element is added to the `he-input-invalid` attribute on the target element.
+ * When more inputs report to the same element, `he-input-invalid` will hold a space-separated list of IDs of all invalid inputs.
+ * The target is selected using the `report-invalid` attribute on the input.
  *
  * @element he-input
  *
+ * @slot options - Represents a single option shown as suggestion
+ *
  * @attr pattern - A `RegExp` pattern to check, if the input is valid
  * @attr {on|off} required - If set, the input will count empty values as invalid
- * @attr report-validity - The selector of another HTML element. 
+ * @attr report-invalid - The selector of another HTML element. 
  * The attribute `he-input-invalid` will be set on to the ID of this input.
  * If multiple inputs report their validity, `he-input-invalid` will be a space-separated list of IDs.
  * @attr {'text','hidden'} [type=text] - The type of the input
- * @attr {on|off} disabled - Toggles the `disabled` state of the input. A disabled input will not be submitted in forms.
- * @attr {on|off} readonly - Toggles the `readonly` state of the input. Contrary to `disabled`, the value will still be submitted in forms.
+ * @attr {on|off} [disabled=off] - Toggles the `disabled` state of the input. A disabled input will not be submitted in forms.
+ * @attr {on|off} [readonly=off] - Toggles the `readonly` state of the input. Contrary to `disabled`, the value will still be submitted in forms.
  * @attr {on|off} [autocomplete=off] - Shows suggestion from previous inputs (browser native appearance)
  *
  * @cssprop [--he-input-clr-black] - The color of the text
@@ -140,6 +164,23 @@ export class HeliumInput extends HTMLElement {
     }
 
     /**
+     * Gets or sets the `ok` attribute on the input.
+     * @type {boolean}
+     */
+    set ok(val) {
+        if (val) {
+            this.setAttribute('ok', '');
+        } else {
+            this.removeAttribute('ok');
+        }
+    }
+
+    get ok() {
+        return this.getAttribute('ok');
+    }
+
+    /**
+     * The `select` event is triggered when a suggestion is clicked.
      * @param {(arg0: InputEvent) => void} val
      */
     set onselect(val) {
@@ -151,6 +192,11 @@ export class HeliumInput extends HTMLElement {
     }
 
 
+    /**
+     * Gets or sets the placeholder.
+     * The placeholder is set as value when the input is empty.
+     * @type {string}
+     */
     set placeholder(val) {
         if (val) {
             this.setAttribute('placeholder', val);
@@ -163,6 +209,11 @@ export class HeliumInput extends HTMLElement {
         return this.getAttribute('placeholder');
     }
 
+    /**
+     * Gets or sets the required attribute of the input.
+     * The placeholder is set as value when the input is empty.
+     * @type {boolean}
+     */
     set required(val) {
         if (val) {
             this.setAttribute('required', true);
@@ -175,6 +226,10 @@ export class HeliumInput extends HTMLElement {
         return this.$input.required;
     }
 
+    /**
+     * Gets or sets the type of the input.
+     * @type {string}
+     */
     set type(val) {
         if (val) {
             this.setAttribute('type', val);
@@ -202,7 +257,7 @@ export class HeliumInput extends HTMLElement {
     }
 
     /**
-     * Callback for attribute changes of the web component.
+     * Native callback for attribute changes of the web component.
      * @param {string} name The attribute name
      * @param {string} _oldValue The previous attribute value
      * @param {string} newValue The new attribute value
@@ -264,7 +319,7 @@ export class HeliumInput extends HTMLElement {
 
     /**
      * Checks if the value of the input is valid and
-     * reports the validity to external elements.
+     * reports the validity.
      * @returns {boolean}
      */
     checkValidity() {
@@ -315,6 +370,10 @@ export class HeliumInput extends HTMLElement {
         return this;
     }
 
+    /**
+     * This native callback is called when the web component is added to the DOM.
+     * @returns {void}
+     */
     connectedCallback() {
         this.$input.onchange = () => this._inputChangedCallback.bind(this)();
         this.onfocus = () => this._inputFocusCallback.bind(this)();
@@ -337,6 +396,8 @@ export class HeliumInput extends HTMLElement {
      */
     formResetCallback() {
         this.value = "";
+        this.ok = false;
+        this.invalid = false;
     }
 
     /**
@@ -364,7 +425,7 @@ export class HeliumInput extends HTMLElement {
 
     _optionClickedCallback(e) {
         const $option = e.target;
-        const val = $option.innerHTML;
+        const val = $option.value ?? $option.innerHTML;
 
         this.value = val;
         this.$popover.open = false;
