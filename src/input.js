@@ -401,6 +401,15 @@ export class HeliumInput extends HTMLElement {
     }
 
     /**
+     * Resets the input to the default state.
+     * @returns {Self}
+     */
+    reset() {
+        this.formResetCallback();
+        return this;
+    }
+
+    /**
      * Callback for input changes.
      */
     _inputChangedCallback() {
