@@ -37,20 +37,19 @@
     animation: button-loading-spinner 1s ease infinite;
 }
 
+:host([ok]) {
+    border-color: green;
+}
+
 :host([ok])::after {
-    content: "";
+    content: "✔";
     position: absolute;
     width: 10px;
     height: 15px;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    margin: auto 10px auto auto;
-    border: 3px solid transparent;
-    border-bottom-color: var(--he-input-clr-ok, black);
-    border-right-color: var(--he-input-clr-ok, black);
-    transform: rotate(45deg);
+    color: green;
+    top: 1px;
+    right: 8px;
+    font-weight: 700;
 }
 
 #inp-main {
