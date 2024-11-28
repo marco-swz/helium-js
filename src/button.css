@@ -22,6 +22,7 @@
     border-radius: 2px;
     outline-style: none;
     box-shadow: none !important;
+    width: var(--he-button-width);
 }
 
 :host([theme=danger]) {
@@ -88,12 +89,13 @@
     cursor: inherit;
     color: var(--he-button-clr);
     height: var(--he-button-height);
-    width: var(--he-button-width);
     border-width: var(--he-button-border-width);
     border-style: solid;
     border-color: var(--he-button-border-color);
     padding: 0px 10px;
     font-weight: 600;
+    width: inherit;
+    overflow: hidden;
 }
 
 :host([disabled]) #he-button {
