@@ -6,28 +6,58 @@ import sheet from './table.css';
 /**
  * A table supporting CRUD operations and with many additional features.
  *
- * # Features:
- *   - Create, remove, update and duplicate rows
- *   - Synchronize with backend: When a endpoint is defined, all CRUD operations, filtering and sorting is handled via the backend
+ * Features:
+ *   - Builtin dialog to create, remove, update and duplicate rows
+ *   - Synchronize with backend: When an endpoint is defined, all CRUD operations, filtering and sorting are handled via the backend
  *   - Sorting: Sort rows ascending or descending
- *   - Filtering: Filter on or multiple rows
+ *   - Filtering: Filter one or multiple rows
  *   - Pagination: Don't show all rows at once
- *   - Notify other elements: Other elements can "subscribe" to row selections of the table
+ *   - Notify other elements: Events are emitted when rows are selected
+ *   - Form compatibility: Selected rows can be submitted as part of a form
  *
- * # Element notification
- * TODO(marco)
+ * ## Defintion
  *
- * # Backend API
+ * When parsing the HTML of the table, the `innerHTML` is used to define the state.
+ * All `th` elements in the `innerHTML` are used as column definition.
+ * They are moved inside the shadow DOM after initialization and cannot be modified from the outside.
+ * The same happens with `td` elements, except that they are used as the initial table data.
+ * Since `th` and `td` cannot exist outside a table, they need to be wrapped inside a dummy `table` element.
+ *
+ * ```html
+ * <he-table>
+ *   <table>
+ *      <th column="COL1" type>My Column 1</th>
+ *      <th column="COL2">My Column 2</th>
+ *   </table>
+ * </he-table>
+ *
+ * ```
+ *
+ * ## Element notification
+ *
+ * When a row is selected, the `check` event is emitted.
+ * It contains as detail the count of checked rows in the table.
+ *
+ * ```javascript
+ * table.addEventListener('check', 
+ *   (e) => console.log('Number of checked rows:', e.detail.numRows)
+ * );
+ * ```
+ * TODO: Document notification attribute
+ *
+ * ## Backend API
+ *
  * If the attribute `endpoint` is set, all table operations are expected to be handled by the defined endpoint.
  * 
- * ## Retrieving Data
+ * ### Retrieving Data
+ *
  * The table makes a `GET` request to the endpoint
  * and all parameters are passed as query string in the URL.
  * These parameters are:
  *   - All filter values in the form `<columnName>=<filterValue>` 
  *   - `offset`: The current pagination offset
  *   - `count`: The amount of requested rows
- *   - The current sort column and direction in the form `sort=<columnName>-<'asc'|'desc'>` (e.g. `sort=COL1-desc`)
+ *   - The column currently sorted by and direction, in the form `sort=<columnName>-<'asc'|'desc'>` (e.g. `sort=COL1-desc`)
  *
  * Example request:
  * ```
@@ -35,7 +65,7 @@ import sheet from './table.css';
  * ```
  *
  * The table expects as response a JSON list of objects, where
- * each list entry represents a row and each row is object, with 
+ * each list entry represents a row and each row is an object, with 
  * the column names as keys.
  *
  * Example response:
@@ -46,15 +76,83 @@ import sheet from './table.css';
  * ]
  * ```
  * 
- * ## Creating Rows
- * TODO(marco)
+ * ### Creating Rows
  *
- * ## Deleting Rows
+ * When inserting new rows, the table makes a `POST` request to the endpoint.
+ * The request contains a JSON object in the body.
+ * This has the form:
+ *
+ * ```json
+ * {
+ *   data: [
+ *    { "COL1": 1, "COL2": "foo" },
+ *    { "COL1": 2, "COL2": "bar" },
+ *   ]
+ * }
+ * ```
+ *
+ * As response, the table expects a list of boolean values, indicating if the insertion of the
+ * corresponding row was successful or not.
+ *
+ * ```json
+ * [ true, false ]
+ * ```
+ *
+ * ### Editing Rows
+ *
+ * To modify a row, the table sends a `PATCH` request to the endpoint.
+ * The request is a JSON object of the form:
+ *
+ * ```json
+ * {
+ *   data: [
+ *    { "COL1": 1, "COL2": "baz" },
+ *    { "COL1": 100, "COL2": "bar" },
+ *   ],
+ *   old: [
+ *    { "COL1": 1, "COL2": "foo" },
+ *    { "COL1": 2, "COL2": "bar" },
+ *   ]
+ * }
+ * ```
+ *
+ * For each modified value, the entire old and new row is submitted, even the values that are not modified.
+ * The backend can use this information to make the appropriate updates.
+ *
+ * The response is expected to return the updated entries only:
+ *
+ * ```json
+ * [
+ *  { "COL1": 1, "COL2": "baz" },
+ *  { "COL1": 100, "COL2": "bar" },
+ * ]
+ * ```
+ *
+ * ### Deleting Rows
+ *
  * The table makes a `DELETE` request to the specified endpoint.
+ * The request is a JSON object containing a list of all rows to be deleted.
  *
- * TODO(marco)
+ * ```json
+ * {
+ *   data: [
+ *    { "COL1": 1, "COL2": "foo" },
+ *    { "COL1": 2, "COL2": "bar" },
+ *   ]
+ * }
+ * ```
  *
- * # Attributes
+ * As response, the table expects a list of boolean values, indicating if an error occured during deletion or not.
+ *
+ * ```json
+ * [ true, false ]
+ * ```
+ * ## Column Attributes
+ *
+ * The `th` element for each column can have additional attributes, which are specific to the single column.
+ * They are marked with `[th]` in font of the description.
+ *
+ * @element he-table
  *
  * @attr {?string} endpoint - The endpoint for table operations. 
  * @attr {?string} pagination - The amount rows for each pagination step
@@ -62,25 +160,21 @@ import sheet from './table.css';
  * @attr {on|off} no-sorter - If set, hides the sorting button for all columns.
  * @attr {on|off} no-filter - If set, disables the filters for all rows.
  *
- * # Column Attributes
- * The `th` element for each column can have additional attributes, which are specific to the single column.
- * These are the following:
- *
- * @attr {string} column - The internal name of the column. This name needs to be unique for each column
- * @attr {?string} filter - The filter value for a given column
- * @attr {?string} pattern - The regex pattern to determine if the input for a given column is valid
- * @attr {'hidden'|'check'|'edit'|'number'|'date'|'datetime'|'text'|null} type - The type of the column
- * @attr {?string} remap - A mapping of old value to new value, in JSON format
- * @attr {?string} options - A JSON list of allowed values. The selection is enforced via `select` elements
- * @attr {on|off} no-edit - If set, the input field is hidden when editing a row
- * @attr {?string} default - The default value for a column
- * @attr {'asc'|'desc'} sort - The direction for sorting the table by the given column
- * @attr {Object.<string, string>} row-color - If a cell of the column has the given value, the background color of the row is set to the provided value. The color has to be in HSL format and is passed to the CSS `hsl()` function.
- *
- * @element he-table
+ * @attr {string} column - [th] The internal name of the column. This name needs to be unique for each column
+ * @attr {?string} filter - [th] The filter value for a given column
+ * @attr {?string} pattern - [th] The regex pattern to determine if the input for a given column is valid
+ * @attr {'hidden'|'check'|'edit'|'number'|'date'|'datetime'|'text'|null} type - [th] The type of the column
+ * @attr {?string} remap - [th] A mapping of old value to new value, in JSON format
+ * @attr {?string} options - [th] A JSON list of allowed values. The selection is enforced via `select` elements
+ * @attr {on|off} no-edit - [th] If set, the input field is hidden when editing a row
+ * @attr {?string} default - [th] The default value for a column
+ * @attr {'asc'|'desc'} sort - [th] The direction for sorting the table by the given column
+ * @attr {Object.<string, string>} row-color - [th] If a cell of the column has the given value, the background color of the row is set to the provided value. The color has to be in HSL format and is passed to the CSS `hsl()` function.
  *
  * @listens HeliumFormDialog#he-dialog-show - Shows the dialog
  * @listens HeliumFormDialog#he-dialog-close - Closes the dialog
+ *
+ * @fires check - The selection of rows in the table has changed
  *
  * @extends HTMLElement
  *

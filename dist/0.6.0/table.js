@@ -7,33 +7,63 @@ import './utils-BGzlNXdX.js';
 import './dialog.js';
 import './select.js';
 
-const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\n    --he-table-row-bg: white;\n    --he-table-col-max-width: 300px;\n    overflow: auto;\n    display: inline-block;\n    width: fit-content;\n}\n\n:host::-webkit-scrollbar {\n    width: 10px !important;\n}\n\n:host::-webkit-scrollbar-thumb {\n    background-color: darkgrey !important;\n    border-radius: 10px !important;\n}\n\ntable {\n    border-spacing: 0;\n    border-collapse: separate;\n    border-radius: var(--he-table-radius, 4px);\n}\n\nthead {\n    position: sticky;\n    top: 1px;\n    z-index: 2;\n}\n\nthead th {\n    background-color: var(--he-table-clr-bg-header, white);\n    color: var(--he-table-clr-fg-header, black);\n    font-weight: 500;\n    padding: 7px 12px;\n    text-align: center;\n    vertical-align: middle;\n    text-wrap: nowrap;\n    width: 0;\n    border-bottom: 1px solid grey;\n}\n\nthead th:hover .label-sorter {\n    opacity: 0.5;\n}\n\nthead th div {\n    display: flex;\n    align-items: center;\n    gap: 0.7rem;\n    justify-content: space-between;\n}\n\nthead td {\n    background-color: #0082b4;\n    padding: 0px 4px 8px 4px;\n    width: 0;\n\n}\n\nthead td:first-child {\n    display: flex;;\n    align-items: center;;\n    padding: 3px 15px;\n    border-radius: 0;\n    width: fit-content;\n}\n\nthead td:last-child {\n    border-radius: 0;\n    padding-right: 15px;\n}\n\nthead select {\n    padding: 0px 3px;\n}\n\nthead a {\n    color: rgba(255, 255, 255, 0.5411764706);\n    padding-left: 5px;\n\n}\n\nthead a:hover {\n    color: white;\n}\n\nthead .cont-filter {\n    position: relative;    \n    width: 100%;\n}\n\nthead .span-colname {\n    position: absolute;\n    left: 0.3rem;\n    pointer-events: none;\n    transition: 0.1s ease all;\n    top: 0px;\n    font-weight: 600;\n}\n\nthead .inp-filter {\n    margin: 0;\n    padding: 1px 5px;\n    font-size: 0.9rem;\n    font-weight: 500;\n    background-color: transparent;\n    outline: none;\n    border: 0;\n    color: black;\n    width: 100%;\n    -webkit-appearance: none;\n    -moz-appearance: none;\n    appearance: none;\n    text-indent: 1px;\n}\n\ntbody tr:last-child td:first-child {\n    border-bottom-left-radius: var(--he-table-radius, 4px);\n}\ntbody tr:last-child td:last-child {\n    border-bottom-right-radius: var(--he-table-radius, 4px);\n}\nthead tr:first-child th:first-child {\n    border-top-left-radius: var(--he-table-radius, 4px);\n}\nthead tr:first-child th:last-child {\n    border-top-right-radius: var(--he-table-radius, 4px);\n}\n\nthead th[type=\"check\"] {\n    padding-top: 14px;\n}\n\nthead .inp-filter:focus,\n.cont-filter input:not(:placeholder-shown),\n.cont-filter select:has(option:checked:not([value=\"\"])) {\n    transform: translateY(7px);\n    font-weight: 600;\n    border-bottom: 0.1rem solid darkgrey;\n    padding: 4px 5px;\n    padding-bottom: 1px;\n}\n\nthead .inp-filter:focus + .span-colname, \n.cont-filter input:not(:placeholder-shown) + .span-colname,\n.cont-filter select:has(option:checked:not([value=\"\"])) + .span-colname {\n    transform: translateY(-5px);\n    font-size: 0.7rem;\n    opacity: 1;\n}\n\ntbody {\n    min-height: 15px;\n}\n\ntbody tr {\n    background-color: var(--he-table-row-bg);\n}\n\ntbody tr:nth-child(even) {\n    filter: brightness(0.97);\n}\n\ntbody tr:hover {\n    filter:brightness(0.93);\n}\n\ntbody td {\n    text-wrap: nowrap;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    max-width: var(--he-table-col-max-width);\n    padding: 5px 15px;\n    vertical-align: middle;\n    width: 0;\n}\n\ntbody td > * {\n    filter: unset;\n}\n\ntbody td:first-child {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    width: unset;\n}\n\ntbody td xmp {\n    margin: 0;\n    overflow: hidden;\n    text-overflow: ellipsis;\n}\n\ntbody #row-btn-more {\n    background-color: var(--he-table-clr-bg-more, white);\n    color: var(--he-table-clr-fg-more, black);\n    cursor: pointer;\n    text-align: center;\n}\n\ntbody #row-btn-more td:hover {\n    border-color: grey;\n    background-color: whitesmoke;\n}\n\ntbody #row-btn-more td {\n    padding: 0.4rem;\n    border: 1px solid darkgrey;\n    display: table-cell;\n}\n\n.cont-sorters {\n    display: inline-flex;\n    flex-direction: column;\n    font-size: 0.7rem;\n    gap: 0;\n    cursor: pointer;\n}\n\n.label-sorter {\n    opacity: 0;\n}\n\nthead th div .label-sorter:hover {\n    opacity: 1;\n}\n\nthead th div .label-sorter:has(input:checked) {\n    opacity: 1;\n}\n\n.label-sorter input {\n    display: none;\n}\n\ntable[loading] {\n    pointer-events: none;\n    cursor: no-drop;\n}\n\ntable[loading] tbody {\n    position: relative;\n}\n\ntable[loading] tbody::after {\n    content: \"\";\n    position: absolute;\n    height: 100%;\n    width: 100%;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    margin: auto;\n    background: linear-gradient(-90deg, #dbd8d8 0%, #fcfcfc 50%, #dbd8d8 100%);\n    background-size: 400% 400%;\n    animation: pulse 1.2s ease-in-out infinite;\n}\n\n@keyframes pulse {\n    0% {\n        background-position: 0% 0%\n    }\n    100% {\n        background-position: -135% 0%\n    }\n}\n\nhe-form-dialog {\n    --he-form-dialog-width: 350px;\n}\n");
+const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\n    --he-table-row-bg: white;\n    --he-table-col-max-width: 300px;\n    overflow: auto;\n    display: inline-block;\n    width: fit-content;\n}\n\n:host::-webkit-scrollbar {\n    width: 10px !important;\n}\n\n:host::-webkit-scrollbar-thumb {\n    background-color: darkgrey !important;\n    border-radius: 10px !important;\n}\n\ntable {\n    table-layout: inherit;\n    width: inherit;\n    border-spacing: 0;\n    border-collapse: separate;\n    border-radius: var(--he-table-radius, 4px);\n}\n\nthead {\n    position: sticky;\n    top: -1px;\n    z-index: 2;\n}\n\nthead th {\n    background-color: var(--he-table-clr-bg-header, white);\n    color: var(--he-table-clr-fg-header, black);\n    font-weight: 500;\n    padding: 7px 12px;\n    text-align: center;\n    vertical-align: middle;\n    text-wrap: nowrap;\n    width: inherit;\n    border-bottom: 1px solid grey;\n}\n\nthead th:hover .label-sorter {\n    opacity: 0.5;\n}\n\nthead th div {\n    display: flex;\n    align-items: center;\n    gap: 0.7rem;\n    justify-content: space-between;\n}\n\nthead td {\n    background-color: #0082b4;\n    padding: 0px 4px 8px 4px;\n    width: 0;\n\n}\n\nthead td:first-child {\n    display: flex;;\n    align-items: center;;\n    padding: 3px 15px;\n    border-radius: 0;\n    width: fit-content;\n}\n\nthead td:last-child {\n    border-radius: 0;\n    padding-right: 15px;\n}\n\nthead select {\n    padding: 0px 3px;\n}\n\nthead a {\n    color: rgba(255, 255, 255, 0.5411764706);\n    padding-left: 5px;\n\n}\n\nthead a:hover {\n    color: white;\n}\n\nthead .cont-filter {\n    position: relative;    \n    width: 100%;\n}\n\nthead .span-colname {\n    position: absolute;\n    left: 0.3rem;\n    pointer-events: none;\n    transition: 0.1s ease all;\n    top: 0px;\n    font-weight: 600;\n}\n\nthead .inp-filter {\n    margin: 0;\n    padding: 1px 5px;\n    font-size: 0.9rem;\n    font-weight: 500;\n    background-color: transparent;\n    outline: none;\n    border: 0;\n    color: black;\n    width: 100%;\n    -webkit-appearance: none;\n    -moz-appearance: none;\n    appearance: none;\n    text-indent: 1px;\n}\n\ntbody tr:last-child td:first-child {\n    border-bottom-left-radius: var(--he-table-radius, 4px);\n}\ntbody tr:last-child td:last-child {\n    border-bottom-right-radius: var(--he-table-radius, 4px);\n}\nthead tr:first-child th:first-child {\n    border-top-left-radius: var(--he-table-radius, 4px);\n}\nthead tr:first-child th:last-child {\n    border-top-right-radius: var(--he-table-radius, 4px);\n}\n\nthead th[type=\"check\"] {\n    padding-top: 14px;\n}\n\nthead .inp-filter:focus,\n.cont-filter input:not(:placeholder-shown),\n.cont-filter select:has(option:checked:not([value=\"\"])) {\n    transform: translateY(7px);\n    font-weight: 600;\n    border-bottom: 0.1rem solid darkgrey;\n    padding: 4px 5px;\n    padding-bottom: 1px;\n}\n\nthead .inp-filter:focus + .span-colname, \n.cont-filter input:not(:placeholder-shown) + .span-colname,\n.cont-filter select:has(option:checked:not([value=\"\"])) + .span-colname {\n    transform: translateY(-5px);\n    font-size: 0.7rem;\n    opacity: 1;\n}\n\ntbody {\n    min-height: 15px;\n}\n\ntbody tr {\n    background-color: var(--he-table-row-bg);\n}\n\ntbody tr:nth-child(even) {\n    filter: brightness(0.97);\n}\n\ntbody tr:hover {\n    filter:brightness(0.93);\n}\n\ntbody td {\n    text-wrap: nowrap;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    max-width: var(--he-table-col-max-width);\n    padding: 5px 15px;\n    vertical-align: middle;\n    width: 0;\n}\n\ntbody td > * {\n    filter: unset;\n}\n\ntbody td:first-child {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    width: unset;\n}\n\ntbody td xmp {\n    margin: 0;\n    overflow: hidden;\n    text-overflow: ellipsis;\n}\n\ntbody #row-btn-more {\n    background-color: var(--he-table-clr-bg-more, white);\n    color: var(--he-table-clr-fg-more, black);\n    cursor: pointer;\n    text-align: center;\n}\n\ntbody #row-btn-more td:hover {\n    border-color: grey;\n    background-color: whitesmoke;\n}\n\ntbody #row-btn-more td {\n    padding: 0.4rem;\n    border: 1px solid darkgrey;\n    display: table-cell;\n}\n\n.cont-sorters {\n    display: inline-flex;\n    flex-direction: column;\n    font-size: 0.7rem;\n    gap: 0;\n    cursor: pointer;\n}\n\n.label-sorter {\n    opacity: 0;\n}\n\nthead th div .label-sorter:hover {\n    opacity: 1;\n}\n\nthead th div .label-sorter:has(input:checked) {\n    opacity: 1;\n}\n\n.label-sorter input {\n    display: none;\n}\n\ntable[loading] {\n    pointer-events: none;\n    cursor: no-drop;\n}\n\ntable[loading] tbody {\n    position: relative;\n}\n\ntable[loading] tbody::after {\n    content: \"\";\n    position: absolute;\n    height: 100%;\n    width: 100%;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    margin: auto;\n    background: linear-gradient(-90deg, #dbd8d8 0%, #fcfcfc 50%, #dbd8d8 100%);\n    background-size: 400% 400%;\n    animation: pulse 1.2s ease-in-out infinite;\n}\n\n@keyframes pulse {\n    0% {\n        background-position: 0% 0%\n    }\n    100% {\n        background-position: -135% 0%\n    }\n}\n\nhe-form-dialog {\n    --he-form-dialog-width: 350px;\n}\n");
 
 /**
  * A table supporting CRUD operations and with many additional features.
  *
- * # Features:
- *   - Create, remove, update and duplicate rows
- *   - Synchronize with backend: When a endpoint is defined, all CRUD operations, filtering and sorting is handled via the backend
+ * Features:
+ *   - Builtin dialog to create, remove, update and duplicate rows
+ *   - Synchronize with backend: When an endpoint is defined, all CRUD operations, filtering and sorting are handled via the backend
  *   - Sorting: Sort rows ascending or descending
- *   - Filtering: Filter on or multiple rows
+ *   - Filtering: Filter one or multiple rows
  *   - Pagination: Don't show all rows at once
- *   - Notify other elements: Other elements can "subscribe" to row selections of the table
+ *   - Notify other elements: Events are emitted when rows are selected
+ *   - Form compatibility: Selected rows can be submitted as part of a form
  *
- * # Element notification
- * TODO(marco)
+ * ## Defintion
  *
- * # Backend API
+ * When parsing the HTML of the table, the `innerHTML` is used to define the state.
+ * All `th` elements in the `innerHTML` are used as column definition.
+ * They are moved inside the shadow DOM after initialization and cannot be modified from the outside.
+ * The same happens with `td` elements, except that they are used as the initial table data.
+ * Since `th` and `td` cannot exist outside a table, they need to be wrapped inside a dummy `table` element.
+ *
+ * ```html
+ * <he-table>
+ *   <table>
+ *      <th column="COL1" type>My Column 1</th>
+ *      <th column="COL2">My Column 2</th>
+ *   </table>
+ * </he-table>
+ *
+ * ```
+ *
+ * ## Element notification
+ *
+ * When a row is selected, the `check` event is emitted.
+ * It contains as detail the count of checked rows in the table.
+ *
+ * ```javascript
+ * table.addEventListener('check', 
+ *   (e) => console.log('Number of checked rows:', e.detail.numRows)
+ * );
+ * ```
+ * TODO: Document notification attribute
+ *
+ * ## Backend API
+ *
  * If the attribute `endpoint` is set, all table operations are expected to be handled by the defined endpoint.
  * 
- * ## Retrieving Data
+ * ### Retrieving Data
+ *
  * The table makes a `GET` request to the endpoint
  * and all parameters are passed as query string in the URL.
  * These parameters are:
  *   - All filter values in the form `<columnName>=<filterValue>` 
  *   - `offset`: The current pagination offset
  *   - `count`: The amount of requested rows
- *   - The current sort column and direction in the form `sort=<columnName>-<'asc'|'desc'>` (e.g. `sort=COL1-desc`)
+ *   - The column currently sorted by and direction, in the form `sort=<columnName>-<'asc'|'desc'>` (e.g. `sort=COL1-desc`)
  *
  * Example request:
  * ```
@@ -41,7 +71,7 @@ const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\n    --he-table-row
  * ```
  *
  * The table expects as response a JSON list of objects, where
- * each list entry represents a row and each row is object, with 
+ * each list entry represents a row and each row is an object, with 
  * the column names as keys.
  *
  * Example response:
@@ -52,15 +82,83 @@ const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\n    --he-table-row
  * ]
  * ```
  * 
- * ## Creating Rows
- * TODO(marco)
+ * ### Creating Rows
  *
- * ## Deleting Rows
+ * When inserting new rows, the table makes a `POST` request to the endpoint.
+ * The request contains a JSON object in the body.
+ * This has the form:
+ *
+ * ```json
+ * {
+ *   data: [
+ *    { "COL1": 1, "COL2": "foo" },
+ *    { "COL1": 2, "COL2": "bar" },
+ *   ]
+ * }
+ * ```
+ *
+ * As response, the table expects a list of boolean values, indicating if the insertion of the
+ * corresponding row was successful or not.
+ *
+ * ```json
+ * [ true, false ]
+ * ```
+ *
+ * ### Editing Rows
+ *
+ * To modify a row, the table sends a `PATCH` request to the endpoint.
+ * The request is a JSON object of the form:
+ *
+ * ```json
+ * {
+ *   data: [
+ *    { "COL1": 1, "COL2": "baz" },
+ *    { "COL1": 100, "COL2": "bar" },
+ *   ],
+ *   old: [
+ *    { "COL1": 1, "COL2": "foo" },
+ *    { "COL1": 2, "COL2": "bar" },
+ *   ]
+ * }
+ * ```
+ *
+ * For each modified value, the entire old and new row is submitted, even the values that are not modified.
+ * The backend can use this information to make the appropriate updates.
+ *
+ * The response is expected to return the updated entries only:
+ *
+ * ```json
+ * [
+ *  { "COL1": 1, "COL2": "baz" },
+ *  { "COL1": 100, "COL2": "bar" },
+ * ]
+ * ```
+ *
+ * ### Deleting Rows
+ *
  * The table makes a `DELETE` request to the specified endpoint.
+ * The request is a JSON object containing a list of all rows to be deleted.
  *
- * TODO(marco)
+ * ```json
+ * {
+ *   data: [
+ *    { "COL1": 1, "COL2": "foo" },
+ *    { "COL1": 2, "COL2": "bar" },
+ *   ]
+ * }
+ * ```
  *
- * # Attributes
+ * As response, the table expects a list of boolean values, indicating if an error occured during deletion or not.
+ *
+ * ```json
+ * [ true, false ]
+ * ```
+ * ## Column Attributes
+ *
+ * The `th` element for each column can have additional attributes, which are specific to the single column.
+ * They are marked with `[th]` in font of the description.
+ *
+ * @element he-table
  *
  * @attr {?string} endpoint - The endpoint for table operations. 
  * @attr {?string} pagination - The amount rows for each pagination step
@@ -68,25 +166,21 @@ const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\n    --he-table-row
  * @attr {on|off} no-sorter - If set, hides the sorting button for all columns.
  * @attr {on|off} no-filter - If set, disables the filters for all rows.
  *
- * # Column Attributes
- * The `th` element for each column can have additional attributes, which are specific to the single column.
- * These are the following:
- *
- * @attr {string} column - The internal name of the column. This name needs to be unique for each column
- * @attr {?string} filter - The filter value for a given column
- * @attr {?string} pattern - The regex pattern to determine if the input for a given column is valid
- * @attr {'hidden'|'check'|'edit'|'number'|'date'|'datetime'|'text'|null} type - The type of the column
- * @attr {?string} remap - A mapping of old value to new value, in JSON format
- * @attr {?string} options - A JSON list of allowed values. The selection is enforced via `select` elements
- * @attr {on|off} no-edit - If set, the input field is hidden when editing a row
- * @attr {?string} default - The default value for a column
- * @attr {'asc'|'desc'} sort - The direction for sorting the table by the given column
- * @attr {Object.<string, string>} row-color - If a cell of the column has the given value, the background color of the row is set to the provided value. The color has to be in HSL format and is passed to the CSS `hsl()` function.
- *
- * @element he-table
+ * @attr {string} column - [th] The internal name of the column. This name needs to be unique for each column
+ * @attr {?string} filter - [th] The filter value for a given column
+ * @attr {?string} pattern - [th] The regex pattern to determine if the input for a given column is valid
+ * @attr {'hidden'|'check'|'edit'|'number'|'date'|'datetime'|'text'|null} type - [th] The type of the column
+ * @attr {?string} remap - [th] A mapping of old value to new value, in JSON format
+ * @attr {?string} options - [th] A JSON list of allowed values. The selection is enforced via `select` elements
+ * @attr {on|off} no-edit - [th] If set, the input field is hidden when editing a row
+ * @attr {?string} default - [th] The default value for a column
+ * @attr {'asc'|'desc'} sort - [th] The direction for sorting the table by the given column
+ * @attr {Object.<string, string>} row-color - [th] If a cell of the column has the given value, the background color of the row is set to the provided value. The color has to be in HSL format and is passed to the CSS `hsl()` function.
  *
  * @listens HeliumFormDialog#he-dialog-show - Shows the dialog
  * @listens HeliumFormDialog#he-dialog-close - Closes the dialog
+ *
+ * @fires check - The selection of rows in the table has changed
  *
  * @extends HTMLElement
  *

@@ -16,6 +16,8 @@
 }
 
 table {
+    table-layout: inherit;
+    width: inherit;
     border-spacing: 0;
     border-collapse: separate;
     border-radius: var(--he-table-radius, 4px);
@@ -23,7 +25,7 @@ table {
 
 thead {
     position: sticky;
-    top: 1px;
+    top: -1px;
     z-index: 2;
 }
 
@@ -35,7 +37,7 @@ thead th {
     text-align: center;
     vertical-align: middle;
     text-wrap: nowrap;
-    width: 0;
+    width: inherit;
     border-bottom: 1px solid grey;
 }
 
