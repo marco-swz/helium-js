@@ -58,7 +58,7 @@ class HeliumSelect extends HTMLElement {
         if (val) {
             this.setAttribute('disabled', true);
         } else {
-            this.getAttribute('disabled');
+            this.removeAttribute('disabled');
         }
     }
 
@@ -75,7 +75,7 @@ class HeliumSelect extends HTMLElement {
         if (val) {
             this.setAttribute('filter', true);
         } else {
-            this.getAttribute('filter');
+            this.removeAttribute('filter');
         }
     }
 
@@ -137,7 +137,7 @@ class HeliumSelect extends HTMLElement {
     }
 
     get value() {
-        return this.selection ? this.selection.value : '';
+        return this.$selection ? this.$selection.value : '';
     }
 
     /**
@@ -189,9 +189,9 @@ class HeliumSelect extends HTMLElement {
         this.$options.id = 'cont-options';
         this.$options.slot = 'content';
 
-        for (const opt of this.querySelectorAll('option')) {
-            opt.onclick = (e) => this._clickedOptionCallback.bind(this)(e);
-            this.$options.append(opt);
+        for (const $opt of this.querySelectorAll('option')) {
+            $opt.onclick = (e) => this._clickedOptionCallback.bind(this)(e);
+            this.$options.append($opt);
         }
 
         this.$popover.append(this.$options);
@@ -202,7 +202,100 @@ class HeliumSelect extends HTMLElement {
      * The native callback function for resetting the input a part of a form.
      */
     formResetCallback() {
-        this.select(0);
+        let $optionSelected = null;
+        for (const $opt of this.$options.children) {
+            if (!$opt.hidden && !$opt.disabled) {
+                $optionSelected = $opt;
+                break;
+            }
+        }
+
+        if ($optionSelected == null) {
+            this.$input.innerHTML = '';
+            this.internals.setFormValue(null);
+            return;
+        }
+
+        this._select($optionSelected);
+    }
+
+    getOptions() {
+        return this.$options.children;
+    }
+
+    /**
+     * 
+     * @param {Array<string>} [values=null]
+     * @returns {Self}
+     */
+    hideOptions(values=null) {
+        let $sel = null;
+        for (let $el of this.$options.children) {
+            if (values == null || values.includes($el.value)) {
+                $el.hidden = true;
+            } else if ($sel == null) {
+                $sel = $el;
+            }
+        }
+
+        if ($sel == null) {
+            this.$input.innerHTML = '';
+            this.internals.setFormValue(null);
+        } else {
+            this._select($sel);
+        }
+        return this;
+    }
+
+    /**
+     * Replaces all options with the ones provided.
+     * If the same value exists in the old and new options, the value is selected.
+     * @param {Object.<string, string>} newOptions A mapping from value to text
+     * @returns {Self}
+     */
+    replaceOptions(newOptions) {
+        this.$options.innerHTML = '';
+        const valOld = this.value;
+        let $optSelect = null;
+        for (const [val, txt] of Object.entries(newOptions)) {
+            let $opt = document.createElement('option');
+            $opt.value = val;
+            $opt.innerHTML = txt;
+            $opt.onclick = (e) => this._clickedOptionCallback.bind(this)(e);
+            this.$options.append($opt);
+
+            if (valOld === val) {
+                $optSelect = $opt;
+            }
+        }
+        if ($optSelect != null) {
+            this._select($optSelect);
+        } else {
+            this.select(0);
+        }
+        return this;
+    }
+
+    /**
+     * 
+     * @param {?Array<string>} [values=null]
+     * @returns {Self}
+     */
+    showOptions(values=null) {
+        let $sel = null;
+        for (let $el of this.$options.children) {
+            if (values == null || values.includes($el.value)) {
+                $el.hidden = false;
+                if ($sel == null) {
+                    $sel = $el;
+                }
+            }
+        }
+
+        if ($sel != null) {
+            this._select($sel);
+        }
+        return this;
     }
 
     /** 
@@ -251,19 +344,19 @@ class HeliumSelect extends HTMLElement {
 
 
     /** 
-     * @param {HTMLOptionElement} option
+     * @param {HTMLOptionElement} $option
      * @returns void
      */
-    _select(option) {
-        this.$input.innerHTML = option.innerHTML;
-        if (this.selection != null) {
-            this.selection.removeAttribute('selected');
+    _select($option) {
+        this.$input.innerHTML = $option.innerHTML;
+        if (this.$selection != null) {
+            this.$selection.removeAttribute('selected');
         }
-        this.selection = option;
-        this.selection.setAttribute('selected', '');
+        this.$selection = $option;
+        this.$selection.setAttribute('selected', '');
 
         if (!this.disabled) {
-            this.internals.setFormValue(this.selection.value);
+            this.internals.setFormValue(this.$selection.value);
         }
     }
 
