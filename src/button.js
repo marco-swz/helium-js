@@ -195,10 +195,14 @@ export class HeliumButton extends HTMLElement {
         let $inner = document.createElement('span');
         $inner.slot = 'inner';
         $inner.innerHTML = this.innerHTML;
+        this.innerHTML = '';
 
-
-        this.$button.append($inner);
+        this.append($inner);
         this.onload && this.onload();
+    }
+
+    setText(newText) {
+        this.$slot.assignedElements()[0].innerHTML = newText;
     }
 
     _closeDialog() {
