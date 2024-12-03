@@ -1,6 +1,10 @@
 :host {
-    --he-table-row-bg: white;
-    --he-table-col-max-width: 300px;
+    --he-table-row-backgroundColor: white;
+    --he-table-column-maxWidth: 300px;
+    --he-table-borderRadius: 4px;
+    --he-table-header-color: black;
+    --he-table-header-backgroundColor: white;
+
     overflow: auto;
     display: inline-block;
     width: fit-content;
@@ -20,7 +24,7 @@ table {
     width: inherit;
     border-spacing: 0;
     border-collapse: separate;
-    border-radius: var(--he-table-radius, 4px);
+    border-radius: var(--he-table-borderRadius);
 }
 
 thead {
@@ -30,8 +34,8 @@ thead {
 }
 
 thead th {
-    background-color: var(--he-table-clr-bg-header, white);
-    color: var(--he-table-clr-fg-header, black);
+    background-color: var(--he-table-header-backgroundColor);
+    color: var(--he-table-header-color);
     font-weight: 500;
     padding: 7px 12px;
     text-align: center;
@@ -56,7 +60,6 @@ thead td {
     background-color: #0082b4;
     padding: 0px 4px 8px 4px;
     width: 0;
-
 }
 
 thead td:first-child {
@@ -117,16 +120,16 @@ thead .inp-filter {
 }
 
 tbody tr:last-child td:first-child {
-    border-bottom-left-radius: var(--he-table-radius, 4px);
+    border-bottom-left-radius: var(--he-table-borderRadius);
 }
 tbody tr:last-child td:last-child {
-    border-bottom-right-radius: var(--he-table-radius, 4px);
+    border-bottom-right-radius: var(--he-table-borderRadius);
 }
 thead tr:first-child th:first-child {
-    border-top-left-radius: var(--he-table-radius, 4px);
+    border-top-left-radius: var(--he-table-borderRadius);
 }
 thead tr:first-child th:last-child {
-    border-top-right-radius: var(--he-table-radius, 4px);
+    border-top-right-radius: var(--he-table-borderRadius);
 }
 
 thead th[type="check"] {
@@ -144,7 +147,7 @@ thead .inp-filter:focus,
 }
 
 thead .inp-filter:focus + .span-colname, 
-.cont-filter input:not(:placeholder-shown) + .span-colname,
+.cont-filter input:not(:placeholder-shown):not([hidden]) + .span-colname,
 .cont-filter select:has(option:checked:not([value=""])) + .span-colname {
     transform: translateY(-5px);
     font-size: 0.7rem;
@@ -156,22 +159,22 @@ tbody {
 }
 
 tbody tr {
-    background-color: var(--he-table-row-bg);
+    background-color: var(--he-table-row-backgroundColor);
 }
 
 tbody tr:nth-child(even) {
-    filter: brightness(0.97);
+    background-color: hsl(from var(--he-table-row-backgroundColor) h s calc(l - 5));
 }
 
 tbody tr:hover {
-    filter:brightness(0.93);
+    background-color: hsl(from var(--he-table-row-backgroundColor) h s calc(l - 10));
 }
 
 tbody td {
     text-wrap: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: var(--he-table-col-max-width);
+    max-width: var(--he-table-column-maxWidth);
     padding: 5px 15px;
     vertical-align: middle;
     width: 0;
@@ -195,8 +198,8 @@ tbody td xmp {
 }
 
 tbody #row-btn-more {
-    background-color: var(--he-table-clr-bg-more, white);
-    color: var(--he-table-clr-fg-more, black);
+    background-color: white;
+    color: black;
     cursor: pointer;
     text-align: center;
 }
