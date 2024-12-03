@@ -15,6 +15,7 @@ export default {
         'src/toast.js',
         'src/helium.js',
         'src/combo_button.js',
+        'src/toggle.js',
     ],
     output: [
         {

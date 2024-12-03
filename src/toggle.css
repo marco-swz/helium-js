@@ -1,0 +1,35 @@
+:host {
+    --he-toggle-color: black;
+    --he-toggle-backgroundColor: white;
+    --he-toggle-hover-backgroundColor: hsl(240 4.8% 95.9%);
+    --he-toggle-outline-borderColor: lightgrey;
+    --he-toggle-checked-color: black;
+    --he-toggle-checked-backgroundColor: hsl(from var(--he-toggle-backgroundColor) h s calc(l - 10));
+    --he-toggle-height: 35px;
+    --he-toggle-minWidth: var(--he-toggle-height);
+    --he-toggle-cursor: pointer;
+
+    background-color: var(--he-toggle-backgroundColor);
+    color: var(--he-toggle-color);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    height: var(--he-toggle-height);
+    min-width: var(--he-toggle-minWidth);
+    cursor: var(--he-toggle-cursor);
+    font-weight: 600;
+}
+
+:host(:not(:disabled):hover) {
+    background-color: var(--he-toggle-hover-backgroundColor);
+}
+
+:host([checked]) {
+    color: var(--he-toggle-checked-color);
+    background-color: var(--he-toggle-checked-backgroundColor);
+}
+
+:host([variant=outline]) {
+    border: 1px solid var(--he-toggle-outline-borderColor);
+}
