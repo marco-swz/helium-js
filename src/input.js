@@ -114,12 +114,8 @@ export class HeliumInput extends HTMLElement {
     set disabled(val) {
         if (val) {
             this.setAttribute('disabled', true);
-            this.internals.states.add('disabled');
-            this.internals.setFormValue(null);
         } else {
             this.removeAttribute('disabled');
-            this.internals.states.delete('disabled');
-            this.internals.setFormValue(this.$input.value);
         }
 
     }
@@ -301,9 +297,11 @@ export class HeliumInput extends HTMLElement {
             case 'disabled':
                 if (newValue != null) {
                     this.internals.setFormValue(null);
+                    this.internals.states.add('disabled');
                     this.$input.disabled = true;
                 } else {
                     this.internals.setFormValue(this.value);
+                    this.internals.states.delete('disabled');
                     this.$input.disabled = false;
                 }
                 break;
@@ -406,6 +404,15 @@ export class HeliumInput extends HTMLElement {
      */
     reset() {
         this.formResetCallback();
+        return this;
+    }
+
+    /**
+     * Selects (highlights) the input text.
+     * @returns {Self}
+     */
+    select() {
+        this.$input.select();
         return this;
     }
 
