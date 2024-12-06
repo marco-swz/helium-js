@@ -45,10 +45,10 @@ class HeliumCheck extends HTMLElement {
         shadow.adoptedStyleSheets = [sheet];
 
         this.$internals = this.attachInternals();
+        this.addEventListener('click', this.toggle);
     }
 
     connectedCallback() {
-        this.addEventListener('click', () => this.toggle());
     }
 
     /**
@@ -57,7 +57,7 @@ class HeliumCheck extends HTMLElement {
      */
     set checked(val) {
         if (val) {
-            this.setAttribute('checked', true);
+            this.setAttribute('checked', '');
             this.$internals.states.add('checked');
             this.$internals.setFormValue('on', 'checked');
         } else {
