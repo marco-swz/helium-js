@@ -19,6 +19,7 @@
     min-width: var(--he-toggle-minWidth);
     cursor: var(--he-toggle-cursor);
     font-weight: 600;
+    padding: 0 10px;
 }
 
 :host(:not(:disabled):hover) {
