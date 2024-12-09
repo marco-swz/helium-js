@@ -4,10 +4,12 @@
     --he-table-borderRadius: 4px;
     --he-table-header-color: black;
     --he-table-header-backgroundColor: white;
+    --he-table-tableLayout: auto;
+    --he-table-width: fit-content;
 
     overflow: auto;
     display: inline-block;
-    width: fit-content;
+    scrollbar-gutter: stable both-edges;
 }
 
 :host::-webkit-scrollbar {
@@ -20,8 +22,8 @@
 }
 
 table {
-    table-layout: inherit;
-    width: inherit;
+    table-layout: var(--he-table-tableLayout);
+    width: var(--he-table-width);
     border-spacing: 0;
     border-collapse: separate;
     border-radius: var(--he-table-borderRadius);
@@ -163,7 +165,7 @@ tbody tr {
 }
 
 tbody tr:nth-child(even) {
-    background-color: hsl(from var(--he-table-row-backgroundColor) h s calc(l - 5));
+    background-color: hsl(from var(--he-table-row-backgroundColor) h s calc(l - 4));
 }
 
 tbody tr:hover {

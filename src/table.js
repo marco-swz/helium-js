@@ -378,7 +378,7 @@ export class HeliumTable extends HTMLElement {
                     $col.setAttribute('strict-filter', '');
                 }
 
-                this._applyFilters();
+                this._applyFilters([$col]);
                 return this;
             }
         }
@@ -466,7 +466,7 @@ export class HeliumTable extends HTMLElement {
             keyColumn = [keyColumn];
         }
 
-        /** @type {Object.<string, HTMLTableRowElement} */
+        /** @type {Object.<string, HTMLTableRowElement>} */
         let rowMap = {};
         for (const $row of this.$body.rows) {
             const rowData = this._getRowData($row);
@@ -474,6 +474,7 @@ export class HeliumTable extends HTMLElement {
             rowMap[key] = $row;
         }
 
+        const cols = this._getColumns(true);
         for (const entry of data) {
             const key = keyColumn.map((x) => entry[x]).join('-');
             let $row = rowMap[key];
@@ -481,12 +482,12 @@ export class HeliumTable extends HTMLElement {
 
             if ($row == null) {
                 $row = this._renderRow(entry);
-                this._applyRowFilter($row, true);
                 this.$body.append($row);
+                this._applyRowFilter($row, cols);
                 continue;
             }
 
-            for (const $col of this._getColumns(true)) {
+            for (const $col of cols) {
                 const colName = $col.getAttribute('column');
                 const newVal = entry[colName];
                 if (newVal == null) {
@@ -495,7 +496,16 @@ export class HeliumTable extends HTMLElement {
 
                 let $cell = $row.cells[$col.cellIndex];
                 $cell.setAttribute('data', newVal);
-                $cell.innerHTML = this._renderText($cell, newVal);
+                const text = this._renderText($col, newVal);
+                $cell.innerHTML = text;
+                $cell.title = text;
+                let colors = this.rowColors[colName];
+                if (colors) {
+                    let color = colors[newVal];
+                    if (color) {
+                        $row.style.setProperty('--he-table-row-backgroundColor', color);
+                    }
+                }
             }
         }
 
@@ -676,20 +686,25 @@ export class HeliumTable extends HTMLElement {
         }
     }
 
-    _applyFilters() {
+    /**
+     * 
+     * @param {Array<HTMLTableCellElement>} cols
+     * @returns {void}
+     */
+    _applyFilters(cols) {
         /** @type {Object.<string, HeliumCheck} */
         let checks = {};
 
         for (const $row of this.$body.children) {
-            const $check = this._applyRowFilter($row);
+            const $check = this._applyRowFilter($row, cols);
             if ($check != null) {
                 checks[$row.id] = $check;
             }
         }
 
-        for (const $col of this._getColumns(true)) {
-            $col.setAttribute('filter', $col.querySelector('.inp-filter').value);
-        }
+        //for (const $col of this._getColumns(true)) {
+        //    $col.setAttribute('filter', $col.querySelector('.inp-filter').value);
+        //}
 
         this._updateCheckAll(Object.values(checks));
         this._updateExternElements(Object.values(checks));
@@ -698,15 +713,13 @@ export class HeliumTable extends HTMLElement {
     /**
      * 
      * @param {HTMLTableRowElement} $row
-     * @param {boolean} strict 
-     * @param {boolean} [updateFilterAttr=false] 
+     * @param {Array<HTMLTableCellElement>} cols
      * @returns {void}
      */
-    _applyRowFilter($row, updateFilterAttr=false) {
+    _applyRowFilter($row, cols) {
         const $check = $row.querySelector('he-check');
         let hideMask = $row.getAttribute('mask') ?? 0;
 
-        const cols = this._getColumns(true);
         for (const $col of cols) {
             const strict = $col.getAttribute('strict-filter') != null;
             const $filter = $col.querySelector('.inp-filter');
@@ -714,14 +727,6 @@ export class HeliumTable extends HTMLElement {
                 continue;
             }
             let filterValue = $filter.value;
-
-            // The filter value is stored in two locations: the `th` element of the column and
-            // the filter input element. The first is changed here and the latter by the user.
-            // This is used to determine, if a filter has changed or not, so we don't need to 
-            // filter all column every time.
-            if ($col.getAttribute('filter') === filterValue) {
-                continue;
-            }
 
             const data = $row.children[$col.cellIndex].getAttribute('data');
 
@@ -732,24 +737,20 @@ export class HeliumTable extends HTMLElement {
 
             if (isMatch) {
                 // Clear bit for column filter
-                hideMask &= ~1 << $col.cellIndex;
+                hideMask &= ~(1 << $col.cellIndex);
             } else {
                 // Set bit bit for column filter
                 hideMask |= 1 << $col.cellIndex;
             }
         }
 
-        if (updateFilterAttr) {
-            for (const $col of cols) {
-                $col.setAttribute('filter', $col.querySelector('.inp-filter').value);
-            }
-        }
-
         $row.setAttribute('mask', hideMask);
         if (hideMask > 0) {
             $row.style.visibility = 'collapse';
+            //$row.hidden = true;
             $check.checked = false;
         } else {
+            //$row.hidden = false;
             $row.style.visibility = null;
         }
 
@@ -780,7 +781,8 @@ export class HeliumTable extends HTMLElement {
         }
     }
 
-    _filterChangeCallback() {
+    _filterChangeCallback(e) {
+        const $col = e.currentTarget.closest('th');
         this.offset = 0;
 
         if (this.endpoint != null) {
@@ -788,7 +790,8 @@ export class HeliumTable extends HTMLElement {
             return;
         }
 
-        this._applyFilters();
+
+        this._applyFilters([$col]);
     }
 
     /**
@@ -1000,7 +1003,6 @@ export class HeliumTable extends HTMLElement {
      * @returns {HTMLTableRowElement}
      */
     _renderRow(data) {
-
         let $row = document.createElement('tr');
         $row.id = 'row-' + this.nextRowId++;
         $row.onclick = (e) => this._rowClickCallback.bind(this)(e);
@@ -1035,7 +1037,7 @@ export class HeliumTable extends HTMLElement {
                     if (colors) {
                         let color = colors[val];
                         if (color) {
-                            $row.style.cssText = `--he-table-row-backgroundColor: ${color}`;
+                            $row.style.setProperty('--he-table-row-backgroundColor', color);
                         }
                     }
 
@@ -1139,10 +1141,9 @@ export class HeliumTable extends HTMLElement {
                     this.$checkAll = document.createElement('he-check');
                     this.$checkAll.id = 'check-all';
                     this.$checkAll.onchange = (e) => this._checkAllCheckCallback.bind(this)(e);
-                    let $cellCheckAll = document.createElement('th');
-                    $cellCheckAll.setAttribute('type', 'check');
-                    $cellCheckAll.append(this.$checkAll);
-                    $rowColNames.append($cellCheckAll);
+                    $column.setAttribute('type', 'check');
+                    $column.append(this.$checkAll);
+                    $rowColNames.append($column);
                     continue;
                 case 'edit':
                 case 'delete':
