@@ -461,7 +461,7 @@ export class HeliumTable extends HTMLElement {
      * @param {Array<Object.<string, string>>} data 
      * @returns {Self}
      */
-    mergeData(keyColumn, data, removeOld=false) {
+    mergeData(keyColumn, data, removeOld = false) {
         if (!Array.isArray(keyColumn)) {
             keyColumn = [keyColumn];
         }
@@ -489,11 +489,11 @@ export class HeliumTable extends HTMLElement {
 
             for (const $col of cols) {
                 const colName = $col.getAttribute('column');
-                const newVal = entry[colName];
-                if (newVal == null) {
+                if (!(colName in entry)) {
                     continue;
                 }
 
+                const newVal = entry[colName] ?? '';
                 let $cell = $row.cells[$col.cellIndex];
                 $cell.setAttribute('data', newVal);
                 const text = this._renderText($col, newVal);
@@ -504,9 +504,12 @@ export class HeliumTable extends HTMLElement {
                     let color = colors[newVal];
                     if (color) {
                         $row.style.setProperty('--he-table-row-backgroundColor', color);
+                    } else {
+                        $row.style.removeProperty('--he-table-row-backgroundColor');
                     }
                 }
             }
+            this._applyRowFilter($row, cols);
         }
 
         if (removeOld) {
@@ -1224,7 +1227,8 @@ export class HeliumTable extends HTMLElement {
                 $inpFilter.id = 'filter-' + colName;
                 $inpFilter.type = 'text';
                 $inpFilter.name = colName;
-                $inpFilter.autocomplete = 'off';
+                // Using a random text seems to disable autocomplete properly
+                $inpFilter.autocomplete = 'efase';
                 $inpFilter.placeholder = ' ';
                 $inpFilter.classList.add('inp-filter');
                 $inpFilter.value = $column.getAttribute('filter') ?? '';

@@ -164,12 +164,8 @@ tbody tr {
     background-color: var(--he-table-row-backgroundColor);
 }
 
-tbody tr:nth-child(even) {
-    background-color: hsl(from var(--he-table-row-backgroundColor) h s calc(l - 4));
-}
-
 tbody tr:hover {
-    background-color: hsl(from var(--he-table-row-backgroundColor) h s calc(l - 10));
+    background-color: hsl(from var(--he-table-row-backgroundColor) h s calc(l - 5));
 }
 
 tbody td {
@@ -180,6 +176,7 @@ tbody td {
     padding: 5px 15px;
     vertical-align: middle;
     width: 0;
+    border-bottom: 1px solid hsl(from var(--he-table-row-backgroundColor) h s calc(l - 20));
 }
 
 tbody td > * {
