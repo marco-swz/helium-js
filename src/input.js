@@ -63,6 +63,8 @@ export class HeliumInput extends HTMLElement {
         'autocomplete',
         'placeholder',
         'value',
+        'oninput',
+        'onchange',
     ];
 
     /** @type {HTMLInputElement} */
@@ -117,7 +119,6 @@ export class HeliumInput extends HTMLElement {
         } else {
             this.removeAttribute('disabled');
         }
-
     }
 
     get disabled() {
@@ -130,7 +131,7 @@ export class HeliumInput extends HTMLElement {
      */
     set invalid(val) {
         if (val) {
-            this.setAttribute('invalid', true);
+            this.setAttribute('invalid', '');
             this.internals.states.add('invalid');
         } else {
             this.removeAttribute('invalid');
@@ -140,6 +141,20 @@ export class HeliumInput extends HTMLElement {
 
     get invalid() {
         return this.getAttribute('invalid') != null;
+    }
+
+    set loading(val) {
+        if (val) {
+            this.setAttribute('loading', '');
+            this.internals.states.add('loading');
+        } else {
+            this.removeAttribute('loading');
+            this.internals.states.delete('loading');
+        }
+    }
+
+    get loading() {
+        return this.getAttribute('loading') != null;
     }
 
     /**
