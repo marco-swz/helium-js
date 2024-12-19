@@ -108,7 +108,7 @@ thead .span-colname {
 thead .inp-filter {
     margin: 0;
     padding: 1px 5px;
-    font-size: 0.9rem;
+    font-size: 12px;
     font-weight: 500;
     background-color: transparent;
     outline: none;
