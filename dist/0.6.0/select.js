@@ -233,8 +233,11 @@ class HeliumSelect extends HTMLElement {
         for (let $el of this.$options.children) {
             if (values == null || values.includes($el.value)) {
                 $el.hidden = true;
-            } else if ($sel == null) {
-                $sel = $el;
+            } else {
+                $el.hidden = false;
+                if ($sel == null) {
+                    $sel = $el;
+                }
             }
         }
 
