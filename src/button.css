@@ -23,6 +23,7 @@
     outline-style: none;
     box-shadow: none !important;
     width: var(--he-button-width);
+    min-width: var(--he-button-minWidth);
 }
 
 :host([theme=danger]) {
@@ -96,6 +97,7 @@
     font-weight: 600;
     width: inherit;
     overflow: hidden;
+    min-width: inherit;
 }
 
 :host([disabled]) #he-button {
