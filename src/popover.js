@@ -198,7 +198,6 @@ export class HeliumPopover extends HTMLElement {
         if (e.newState === "open") {
             this.internals.states.add('open');
 
-            console.log(this.$anchor);
             if (this.$anchor) {
                 let positionDefault = 'bottom-left';
                 if (heSpaceBelow(this) < this.$popover.offsetHeight + 20) {

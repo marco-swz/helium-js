@@ -199,7 +199,6 @@ class HeliumPopover extends HTMLElement {
         if (e.newState === "open") {
             this.internals.states.add('open');
 
-            console.log(this.$anchor);
             if (this.$anchor) {
                 let positionDefault = 'bottom-left';
                 if (heSpaceBelow(this) < this.$popover.offsetHeight + 20) {
@@ -544,6 +543,12 @@ class HeliumInput extends HTMLElement {
                     this.internals.states.delete('disabled');
                     this.$input.disabled = false;
                 }
+                break;
+            case 'oninput':
+                this.$input.oninput = this.oninput;
+                break;
+            case 'onchange':
+                this.$input.onchange = this.onchange;
                 break;
             default:
                 if (newValue != null) {

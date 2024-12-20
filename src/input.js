@@ -320,6 +320,12 @@ export class HeliumInput extends HTMLElement {
                     this.$input.disabled = false;
                 }
                 break;
+            case 'oninput':
+                this.$input.oninput = this.oninput;
+                break;
+            case 'onchange':
+                this.$input.onchange = this.onchange;
+                break;
             default:
                 if (newValue != null) {
                     this.$input.setAttribute(name, newValue);
