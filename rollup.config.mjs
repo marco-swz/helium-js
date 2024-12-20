@@ -16,6 +16,7 @@ export default {
         'src/helium.js',
         'src/combo_button.js',
         'src/toggle.js',
+        'src/breadcrumb.js',
     ],
     output: [
         {
