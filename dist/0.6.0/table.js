@@ -976,6 +976,9 @@ class HeliumTable extends HTMLElement {
             let optionMap = {};
             if (options != null) {
                 const remap = this.remap[colName];
+                if (remap == null) {
+                    continue;
+                }
                 for (const val of options) {
                     const mapped = remap[val];
                     if (mapped) {
