@@ -1171,6 +1171,18 @@ export class HeliumTable extends HTMLElement {
         for (let $column of columns) {
             let colName = $column.getAttribute('column') ?? $column.innerText;
 
+            try {
+                this.remap[colName] = JSON.parse($column.getAttribute('remap'));
+            } catch (error) {
+                throw new Error('The provided remap is not valid JSON!');
+            }
+
+            try {
+                this.rowColors[colName] = JSON.parse($column.getAttribute('row-color'));
+            } catch (error) {
+                throw new Error('The provided row-color is not valid JSON!');
+            }
+
             const attrFilter = this.getAttribute('filter');
             let $filterCell = document.createElement('td');
             $rowFilters.append($filterCell);
@@ -1236,18 +1248,6 @@ export class HeliumTable extends HTMLElement {
 
             $column.append($contHeaderCell);
             $rowColNames.append($column);
-
-            try {
-                this.remap[colName] = JSON.parse($column.getAttribute('remap'));
-            } catch (error) {
-                throw new Error('The provided remap is not valid JSON!');
-            }
-
-            try {
-                this.rowColors[colName] = JSON.parse($column.getAttribute('row-color'));
-            } catch (error) {
-                throw new Error('The provided row-color is not valid JSON!');
-            }
 
             //const options = this._getColumnOptions($column);
         }
