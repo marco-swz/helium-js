@@ -44,7 +44,12 @@ thead th {
     vertical-align: middle;
     text-wrap: nowrap;
     width: inherit;
-    border-bottom: 1px solid grey;
+}
+
+:host([filter=below]) {
+    & thead th {
+        padding-bottom: 0;
+    }
 }
 
 thead th:hover .label-sorter {
@@ -59,16 +64,14 @@ thead th div {
 }
 
 thead td {
-    background-color: #0082b4;
-    padding: 0px 4px 8px 4px;
+    background-color: var(--he-table-header-backgroundColor);
     width: 0;
 }
 
-thead td:first-child {
-    display: flex;;
-    align-items: center;;
-    padding: 3px 15px;
-    border-radius: 0;
+thead td:first-child:has(#check-all) {
+    display: flex;
+    align-items: center;
+    padding: 5px 15px;
     width: fit-content;
 }
 
@@ -96,13 +99,36 @@ thead .cont-filter {
     width: 100%;
 }
 
-thead .span-colname {
-    position: absolute;
-    left: 0.3rem;
-    pointer-events: none;
-    transition: 0.1s ease all;
-    top: 0px;
+.span-colname {
     font-weight: 600;
+}
+
+:host([filter=behind]) {
+    & .span-colname {
+        position: absolute;
+        left: 0.3rem;
+        pointer-events: none;
+        transition: 0.1s ease all;
+        top: 0px;
+    }
+
+    & .inp-filter:focus,
+    & .cont-filter input:not(:placeholder-shown),
+    & .cont-filter select:has(option:checked:not([value=""])) {
+        transform: translateY(7px);
+        font-weight: 600;
+        border-bottom: 0.1rem solid darkgrey;
+        padding: 4px 5px;
+        padding-bottom: 1px;
+    }
+
+    & .inp-filter:focus + .span-colname, 
+    & .cont-filter input:not(:placeholder-shown):not([hidden]) + .span-colname,
+    & .cont-filter select:has(option:checked:not([value=""])) + .span-colname {
+        transform: translateY(-5px);
+        font-size: 0.7rem;
+        opacity: 1;
+    }
 }
 
 thead .inp-filter {
@@ -138,22 +164,23 @@ thead th[type="check"] {
     padding-top: 14px;
 }
 
-thead .inp-filter:focus,
-.cont-filter input:not(:placeholder-shown),
-.cont-filter select:has(option:checked:not([value=""])) {
-    transform: translateY(7px);
-    font-weight: 600;
-    border-bottom: 0.1rem solid darkgrey;
-    padding: 4px 5px;
-    padding-bottom: 1px;
+thead tr:last-child > * {
+    border-bottom: 1px solid black;
 }
 
-thead .inp-filter:focus + .span-colname, 
-.cont-filter input:not(:placeholder-shown):not([hidden]) + .span-colname,
-.cont-filter select:has(option:checked:not([value=""])) + .span-colname {
-    transform: translateY(-5px);
-    font-size: 0.7rem;
-    opacity: 1;
+thead tr.row-filter {
+    & .inp-filter {
+        background-color: whitesmoke;
+        border-bottom: 1px solid grey;
+        font-size: 14px;
+        margin: 0px 10px 5px 10px;
+        padding: 2px 5px;
+        font-weight: 700;
+    }
+
+    & td {
+        overflow: hidden;
+    }
 }
 
 tbody {
@@ -183,7 +210,7 @@ tbody td > * {
     filter: unset;
 }
 
-tbody td:first-child {
+tbody td:first-child:has(he-check) {
     display: flex;
     align-items: center;
     justify-content: center;

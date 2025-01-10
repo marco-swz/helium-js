@@ -157,8 +157,8 @@ import sheet from './table.css';
  * @attr {?string} endpoint - The endpoint for table operations. 
  * @attr {?string} pagination - The amount rows for each pagination step
  * @attr {on|off} submit-all - If set, all rows of the table are passed on to forms, instead of checked one.
- * @attr {on|off} no-sorter - If set, hides the sorting button for all columns.
- * @attr {on|off} no-filter - If set, disables the filters for all rows.
+ * @attr {on|off} sorter - If set, show a sorting button for all columns.
+ * @attr {null|'behind'|'below'} filter - If set, disables the filters for all rows.
  *
  * @attr {string} column - [th] The internal name of the column. This name needs to be unique for each column
  * @attr {?string} filter - [th] The filter value for a given column
@@ -369,7 +369,7 @@ export class HeliumTable extends HTMLElement {
         for (let i = 0; i < columns.length; ++i) {
             let $col = columns[i];
             if ($col.getAttribute('column') === colName) {
-                let $filter = $col.querySelector('.inp-filter');
+                let $filter = this.$form.querySelector(`.inp-filter[name="${colName}"]`);
                 $filter.value = filterValue;
 
                 if (partial) {
@@ -725,7 +725,7 @@ export class HeliumTable extends HTMLElement {
 
         for (const $col of cols) {
             const strict = $col.getAttribute('strict-filter') != null;
-            const $filter = $col.querySelector('.inp-filter');
+            const $filter = this.$form.querySelector(`.inp-filter[name="${$col.getAttribute('column')}"]`);
             if ($filter == null) {
                 continue;
             }
@@ -886,7 +886,7 @@ export class HeliumTable extends HTMLElement {
         $contSorters.append($labelSortAsc);
         $contSorters.append($labelSortDesc);
 
-        if (this.getAttribute('no-sorter')) {
+        if (this.getAttribute('sorter') == null) {
             $contSorters.style.display = 'none';
         }
 
@@ -1117,29 +1117,69 @@ export class HeliumTable extends HTMLElement {
         return text;
     }
 
-    _renderTable() {
-        const shadow = this.shadowRoot;
+    /**
+     * 
+     * @param {HTMLTableCellElement} $column
+     * @returns {HTMLElement}
+     */
+    _renderFilter($column, colName) {
+        const options = $column.getAttribute('options');
 
-        this.id = this.id == ''
-            ? 'he-table-' + Math.floor(Math.random() * (1e10 + 1))
-            : this.id;
+        let $filter = null;
+        if (options) {
+            try {
+                this.options[colName] = JSON.parse(options);
+            } catch (error) {
+                throw new Error('The provided options are not valid JSON!');
+            }
 
-        let $table = document.createElement('table');
+            $filter = document.createElement('select');
+            let $optionEmpty = document.createElement('option');
+            $optionEmpty.value = '';
+            $filter.append($optionEmpty);
 
-        this.$form = document.createElement('form');
-        this.$form.id = "form-tbl";
-        this.$form.append($table);
+            for (const val of this.options[colName]) {
+                const text = this._renderText($column, val);
+                let $option = document.createElement('option');
+                $option.innerHTML = text;
+                $option.value = val;
+                $filter.append($option);
+            }
+        } else {
+            $filter = document.createElement('input');
+            $filter.type = 'text';
+            // Using a random text seems to disable autocomplete properly
+            $filter.autocomplete = 'efase';
+            $filter.placeholder = ' ';
+        }
 
-        shadow.append(this.$form);
+        $filter.onchange = (e) => this._filterChangeCallback(e);
+        $filter.value = $column.getAttribute('filter') ?? '';
+        $filter.id = 'filter-' + colName;
+        $filter.name = colName;
+        $filter.classList.add('inp-filter');
 
+        return $filter;
+    }
+
+    _renderHead(columns) {
         let $rowFilters = document.createElement('tr');
+        $rowFilters.classList.add('row-filter');
         let $rowColNames = document.createElement('tr');
+        $rowColNames.classList.add('row-colName');
 
-        const columns = this.querySelectorAll('th');
         for (let $column of columns) {
             let colName = $column.getAttribute('column') ?? $column.innerText;
-            //$column.style.maxWidth = `var(--he-table-col-max-width-${colName}, --he-table-col-max-width)`;
-            //$column.style.width = `var(--he-table-col-width-${colName}, unset)`;
+
+            const attrFilter = this.getAttribute('filter');
+            let $filterCell = document.createElement('td');
+            $rowFilters.append($filterCell);
+
+            const isHidden = $column.getAttribute('type') === 'hidden';
+            if (isHidden) {
+                $column.style.display = 'none';
+                $filterCell.style.display = 'none';
+            }
 
             const colType = $column.getAttribute('type');
             switch (colType) {
@@ -1148,7 +1188,11 @@ export class HeliumTable extends HTMLElement {
                     this.$checkAll.id = 'check-all';
                     this.$checkAll.onchange = (e) => this._checkAllCheckCallback.bind(this)(e);
                     $column.setAttribute('type', 'check');
-                    $column.append(this.$checkAll);
+                    if (attrFilter === 'below') {
+                        $filterCell.append(this.$checkAll);
+                    } else {
+                        $column.append(this.$checkAll);
+                    }
                     $rowColNames.append($column);
                     continue;
                 case 'edit':
@@ -1161,26 +1205,37 @@ export class HeliumTable extends HTMLElement {
             }
 
             let $contHeaderCell = document.createElement('div');
-            let $contFilter = document.createElement('div');
-            $contFilter.classList.add('cont-filter')
-            $contHeaderCell.append($contFilter);
-
             let $spanName = document.createElement('span');
             $spanName.innerHTML = $column.innerHTML.trim();
-            $spanName.classList.add('span-colname');
             $column.innerHTML = '';
-            $contFilter.append($spanName);
+            $spanName.classList.add('span-colname');
+
+            let $filter = this._renderFilter($column, colName);
+            if (attrFilter === 'behind') {
+                let $contFilter = document.createElement('div');
+                $contFilter.classList.add('cont-filter')
+                $contHeaderCell.append($contFilter);
+                $contFilter.prepend($filter);
+                $contFilter.append($spanName);
+
+            } else if (attrFilter === 'below') {
+                $contHeaderCell.append($spanName);
+                $filterCell.append($filter);
+
+            } else {
+                $contHeaderCell.append($spanName);
+                $filterCell.append($filter);
+                $spanName.style.position = 'unset';
+                $filter.hidden = true;
+            }
 
             const sort = $column.getAttribute('sort');
             let $contSorters = this._renderSorters(colName, sort);
             $column.setAttribute('column', colName);
             $contHeaderCell.append($contSorters);
+
             $column.append($contHeaderCell);
             $rowColNames.append($column);
-
-            if ($column.getAttribute('type') === 'hidden') {
-                $column.style.display = 'none';
-            }
 
             try {
                 this.remap[colName] = JSON.parse($column.getAttribute('remap'));
@@ -1195,58 +1250,32 @@ export class HeliumTable extends HTMLElement {
             }
 
             //const options = this._getColumnOptions($column);
-            const options = $column.getAttribute('options');
-
-            if (options) {
-                try {
-                    this.options[colName] = JSON.parse(options);
-                } catch (error) {
-                    throw new Error('The provided options are not valid JSON!');
-                }
-
-                let $selFilter = document.createElement('select');
-                $selFilter.id = 'filter-' + colName;
-                $selFilter.name = colName;
-                $selFilter.classList.add('inp-filter');
-                $selFilter.onchange = (e) => this._filterChangeCallback(e);
-                let $optionEmpty = document.createElement('option');
-                $optionEmpty.value = '';
-                $selFilter.append($optionEmpty);
-
-                for (const val of this.options[colName]) {
-                    const text = this._renderText($column, val);
-                    let $option = document.createElement('option');
-                    $option.innerHTML = text;
-                    $option.value = val;
-                    $selFilter.append($option);
-                }
-                if (this.getAttribute('no-filter')) {
-                    $spanName.style.position = 'unset';
-                    $inpFilter.hidden = true;
-                }
-                $contFilter.prepend($selFilter);
-            } else {
-                let $inpFilter = document.createElement('input');
-                $inpFilter.id = 'filter-' + colName;
-                $inpFilter.type = 'text';
-                $inpFilter.name = colName;
-                // Using a random text seems to disable autocomplete properly
-                $inpFilter.autocomplete = 'efase';
-                $inpFilter.placeholder = ' ';
-                $inpFilter.classList.add('inp-filter');
-                $inpFilter.value = $column.getAttribute('filter') ?? '';
-                $inpFilter.onchange = (e) => this._filterChangeCallback(e);
-                if (this.getAttribute('no-filter')) {
-                    $spanName.style.position = 'unset';
-                    $inpFilter.hidden = true;
-                }
-                $contFilter.prepend($inpFilter);
-            }
         }
 
         let $tHead = document.createElement('thead');
         $tHead.append($rowColNames);
         $tHead.append($rowFilters);
+
+        return $tHead;
+    }
+
+    _renderTable() {
+        const shadow = this.shadowRoot;
+        const columns = this.querySelectorAll('th');
+
+        this.id = this.id == ''
+            ? 'he-table-' + Math.floor(Math.random() * (1e10 + 1))
+            : this.id;
+
+        let $table = document.createElement('table');
+
+        this.$form = document.createElement('form');
+        this.$form.id = "form-tbl";
+        this.$form.append($table);
+
+        shadow.append(this.$form);
+
+        const $tHead = this._renderHead(columns);
         $table.append($tHead);
 
         this.$body = document.createElement('tbody');
