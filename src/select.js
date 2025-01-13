@@ -296,6 +296,8 @@ export class HeliumSelect extends HTMLElement {
             }
         }
 
+        $sel = this.$selection ?? $sel;
+
         if ($sel != null) {
             this._select($sel);
         }
