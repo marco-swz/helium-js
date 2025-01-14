@@ -1314,8 +1314,9 @@ export class HeliumTable extends HTMLElement {
      */
     _rowClickCallback(e) {
         const $row = e.currentTarget;
+        let checked = null;
         if (this.$checkAll) {
-            let checked = this.$body.querySelectorAll('.check-row:state(checked)');
+            checked = this.$body.querySelectorAll('.check-row:state(checked)');
 
             if (!e.target.classList.contains('check-row')) {
                 for (let check of checked) {
@@ -1327,15 +1328,14 @@ export class HeliumTable extends HTMLElement {
 
             checked = this.$body.querySelectorAll('.check-row:state(checked)');
             this._updateCheckAll(checked);
-            this._updateExternElements(checked);
-        } else {
-            const $rowOld = this.$body.querySelector('tr[selected]');
-            if ($rowOld) {
-                $rowOld.removeAttribute('selected');
-            }
-            $row.setAttribute('selected', '');
-            this._updateExternElements([$row]);
+        } 
+
+        const $rowOld = this.$body.querySelector('tr[selected]');
+        if ($rowOld) {
+            $rowOld.removeAttribute('selected');
         }
+        $row.setAttribute('selected', '');
+        this._updateExternElements(checked ?? [$row]);
     }
 
     /**

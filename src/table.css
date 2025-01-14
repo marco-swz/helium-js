@@ -6,6 +6,7 @@
     --he-table-header-backgroundColor: white;
     --he-table-tableLayout: auto;
     --he-table-width: fit-content;
+    --he-table-row-borderBottomColor: hsl(from var(--he-table-row-backgroundColor) h s calc(l - 20));
 
     overflow: auto;
     display: inline-block;
@@ -203,7 +204,8 @@ tbody td {
     padding: 5px 15px;
     vertical-align: middle;
     width: 0;
-    border-bottom: 1px solid hsl(from var(--he-table-row-backgroundColor) h s calc(l - 20));
+    border-bottom: 1px solid black;
+    border-bottom-color: var(--he-table-row-borderBottomColor);
 }
 
 tbody td > * {
@@ -216,6 +218,11 @@ tbody td:first-child:has(he-check) {
     justify-content: center;
     width: unset;
 }
+
+tbody tr[selected] td {
+    border-bottom-color: var(--he-table-row-selected-borderBottomColor, var(--he-table-row-borderBottomColor));
+}
+
 
 tbody td xmp {
     margin: 0;
