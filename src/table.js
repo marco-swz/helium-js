@@ -469,6 +469,12 @@ export class HeliumTable extends HTMLElement {
         /** @type {Object.<string, HTMLTableRowElement>} */
         let rowMap = {};
         for (const $row of this.$body.rows) {
+            if ($row.id === 'row-empty') {
+                if (data.length > 0) {
+                    $row.remove();
+                }
+                continue;
+            }
             const rowData = this._getRowData($row);
             const key = keyColumn.map((x) => rowData[x]).join('-');
             rowMap[key] = $row;
@@ -525,7 +531,6 @@ export class HeliumTable extends HTMLElement {
 
     /**
      * @param {Array<Object.<string, string>>} data 
-     * @returns {HTMLDialogElement}
      */
     replaceBody(data) {
         this.$body.innerHTML = '';
@@ -535,6 +540,10 @@ export class HeliumTable extends HTMLElement {
         if (this.$checkAll) {
             this.$checkAll.checked = false;
             this.$checkAll.indeterminate = false;
+        }
+
+        if (data.length === 0) {
+            this.$body.append(this._renderRowEmpty());
         }
 
         let renderMore = false;
@@ -720,6 +729,9 @@ export class HeliumTable extends HTMLElement {
      * @returns {void}
      */
     _applyRowFilter($row, cols) {
+        if ($row.id === 'row-empty') {
+            return;
+        }
         const $check = $row.querySelector('he-check');
         let hideMask = $row.getAttribute('mask') ?? 0;
 
@@ -809,16 +821,19 @@ export class HeliumTable extends HTMLElement {
     }
 
     /**
-     * @param {HTMLTableRowElement} row The table row to get the values from
+     * @param {HTMLTableRowElement} $row The table row to get the values from
      * @param {boolean} [returnDisplayValues=false] If `true`, returns the visible values instead of the `data` values
      * @returns {Object.<string, string>}
      */
-    _getRowData(row, returnDisplayValues = false) {
+    _getRowData($row, returnDisplayValues = false) {
+        if ($row.id === 'row-empty') {
+            throw new Error('Attempt to get data of empty row!');
+        }
         let data = {};
         let columns = this._getColumns(true);
         for (let i = 0; i < columns.length; ++i) {
             let $column = columns[i];
-            let $cell = row.children[$column.cellIndex];
+            let $cell = $row.children[$column.cellIndex];
 
             const colName = $column.getAttribute('column');
             data[colName] = returnDisplayValues
@@ -841,99 +856,6 @@ export class HeliumTable extends HTMLElement {
     _handlePagination() {
         this.offset += this.pagination ?? 0;
         this._requestRows(this._appendRows);
-    }
-
-    /**
-     * @param {string} colName - The name of column for the sorters
-     * @param {'asc'|'desc'} checked - Sets the corresponding sorter to `checked`
-     * @returns HTMLDivElement
-     */
-    _renderSorters(colName, checked) {
-        let $radioSortAsc = document.createElement('input');
-        $radioSortAsc.type = 'radio';
-        $radioSortAsc.name = 'sort';
-        $radioSortAsc.value = colName + '-asc';
-        $radioSortAsc.id = colName + '-asc';
-        $radioSortAsc.onclick = (e) => this._sortClickCallback.bind(this)(e, false);
-        if (checked === 'asc') {
-            $radioSortAsc.checked = true;
-        }
-
-        let $labelSortAsc = document.createElement('label');
-        $labelSortAsc.for = colName + 'asc';
-        $labelSortAsc.innerHTML = '▲';
-        $labelSortAsc.classList.add('label-sorter');
-        $labelSortAsc.append($radioSortAsc);
-
-        let $radioSortDesc = document.createElement('input');
-        $radioSortDesc.type = 'radio';
-        $radioSortDesc.name = 'sort';
-        $radioSortDesc.value = colName + '-desc';
-        $radioSortDesc.id = colName + '-desc';
-        $radioSortDesc.onclick = (e) => this._sortClickCallback.bind(this)(e, true);
-        if (checked === 'desc') {
-            $radioSortDesc.checked = true;
-        }
-
-        let $labelSortDesc = document.createElement('label');
-        $labelSortDesc.for = colName + 'desc';
-        $labelSortDesc.classList.add('label-sorter');
-        $labelSortDesc.innerHTML = '▼';
-        $labelSortDesc.append($radioSortDesc);
-
-        let $contSorters = document.createElement('div');
-        $contSorters.classList.add('cont-sorters')
-        $contSorters.append($labelSortAsc);
-        $contSorters.append($labelSortDesc);
-
-        if (this.getAttribute('sorter') == null) {
-            $contSorters.style.display = 'none';
-        }
-
-        return $contSorters;
-    }
-
-    _showDialogEdit($row) {
-        let data = this._getRowData($row, false);
-
-        this.$diagEdit.setValues(data);
-        this.dataOld = data;
-        this.idsEdit = [$row.id];
-        this.editRequestType = 'PATCH';
-        this.$diagEdit.setAttribute('title-text', 'Bearbeiten');
-        this.$diagEdit.showModal();
-    }
-
-    /**
-     * @param {InputEvent} e 
-     * @param {bool} isDesc 
-     * @returns void
-     */
-    _sortClickCallback(e, isDesc) {
-        if (this.endpoint) {
-            this._requestRows(this.replaceBody);
-            return;
-        }
-
-        let $sort = e.currentTarget;
-        const colIdx = Array.prototype.indexOf.call(
-            $sort.parentElement.parentElement.parentElement.parentElement.parentElement.children,
-            $sort.parentElement.parentElement.parentElement.parentElement
-        );
-
-        let values = [];
-        for (const row of this.$body.children) {
-            values.push([row.children[colIdx].getAttribute('data'), row]);
-        }
-
-        let newOrder = isDesc
-            ? Array.from(values).sort((a, b) => b[0].localeCompare(a[0]))
-            : Array.from(values).sort((a, b) => a[0].localeCompare(b[0]));
-
-
-        for (const row of newOrder) {
-            this.$body.append(row[1]);
-        }
     }
 
     /**
@@ -1056,6 +978,17 @@ export class HeliumTable extends HTMLElement {
         return $row;
     }
 
+    _renderRowEmpty() {
+        let $row = document.createElement('tr');
+        $row.id = 'row-empty';
+        for (let i=0; i<this._getColumns().length; ++i) {
+            let $cell = document.createElement('td');
+            //$cell.colSpan = '1000';
+            $row.append($cell);
+        }
+        return $row;
+    }
+
     /**
      * Sends a new `GET` request to update all rows.
      * Only if an endpoint is defined!
@@ -1086,6 +1019,57 @@ export class HeliumTable extends HTMLElement {
             .catch(errorMsg => { console.error(errorMsg); })
             .finally(() => this.loading = false);
     }
+
+    /**
+     * @param {string} colName - The name of column for the sorters
+     * @param {'asc'|'desc'} checked - Sets the corresponding sorter to `checked`
+     * @returns HTMLDivElement
+     */
+    _renderSorters(colName, checked) {
+        let $radioSortAsc = document.createElement('input');
+        $radioSortAsc.type = 'radio';
+        $radioSortAsc.name = 'sort';
+        $radioSortAsc.value = colName + '-asc';
+        $radioSortAsc.id = colName + '-asc';
+        $radioSortAsc.onclick = (e) => this._sortClickCallback.bind(this)(e, false);
+        if (checked === 'asc') {
+            $radioSortAsc.checked = true;
+        }
+
+        let $labelSortAsc = document.createElement('label');
+        $labelSortAsc.for = colName + 'asc';
+        $labelSortAsc.innerHTML = '▲';
+        $labelSortAsc.classList.add('label-sorter');
+        $labelSortAsc.append($radioSortAsc);
+
+        let $radioSortDesc = document.createElement('input');
+        $radioSortDesc.type = 'radio';
+        $radioSortDesc.name = 'sort';
+        $radioSortDesc.value = colName + '-desc';
+        $radioSortDesc.id = colName + '-desc';
+        $radioSortDesc.onclick = (e) => this._sortClickCallback.bind(this)(e, true);
+        if (checked === 'desc') {
+            $radioSortDesc.checked = true;
+        }
+
+        let $labelSortDesc = document.createElement('label');
+        $labelSortDesc.for = colName + 'desc';
+        $labelSortDesc.classList.add('label-sorter');
+        $labelSortDesc.innerHTML = '▼';
+        $labelSortDesc.append($radioSortDesc);
+
+        let $contSorters = document.createElement('div');
+        $contSorters.classList.add('cont-sorters')
+        $contSorters.append($labelSortAsc);
+        $contSorters.append($labelSortDesc);
+
+        if (this.getAttribute('sorter') == null) {
+            $contSorters.style.display = 'none';
+        }
+
+        return $contSorters;
+    }
+
 
     /**
       * Returns the *text* representation of a value depending on the data type.
@@ -1147,7 +1131,7 @@ export class HeliumTable extends HTMLElement {
             }
         } else {
             $filter = document.createElement('input');
-            $filter.type = 'text';
+            $filter.type = $column.getAttribute('filter-type') ?? 'text';
             // Using a random text seems to disable autocomplete properly
             $filter.autocomplete = 'efase';
             $filter.placeholder = ' ';
@@ -1183,9 +1167,10 @@ export class HeliumTable extends HTMLElement {
                 throw new Error('The provided row-color is not valid JSON!');
             }
 
-            const attrFilter = this.getAttribute('filter');
             let $filterCell = document.createElement('td');
             $rowFilters.append($filterCell);
+
+            const attrFilter = this.getAttribute('filter');
 
             const isHidden = $column.getAttribute('type') === 'hidden';
             if (isHidden) {
@@ -1238,7 +1223,6 @@ export class HeliumTable extends HTMLElement {
                 $contHeaderCell.append($spanName);
                 $filterCell.append($filter);
                 $spanName.style.position = 'unset';
-                $filter.hidden = true;
             }
 
             const sort = $column.getAttribute('sort');
@@ -1281,24 +1265,28 @@ export class HeliumTable extends HTMLElement {
         this.$body = document.createElement('tbody');
 
         const rows = this.querySelectorAll('tr:has(td)');
-        for (const row of rows) {
-            let rowData = {};
-            // There can be more `th`s than `td`s because of special column types.
-            // This variable ensures correct indexing.
-            let tdIdx = 0;
-            for (let i = 0; i < columns.length; ++i) {
-                const column = columns[i]
-                const colName = column.getAttribute('column');
-                if (!colName || ['check', 'edit', 'duplicate', 'delete'].includes(column.getAttribute('type'))) {
-                    continue;
+        if (rows.length === 0) {
+            this.$body.append(this._renderRowEmpty());
+        } else {
+            for (const row of rows) {
+                let rowData = {};
+                // There can be more `th`s than `td`s because of special column types.
+                // This variable ensures correct indexing.
+                let tdIdx = 0;
+                for (let i = 0; i < columns.length; ++i) {
+                    const column = columns[i]
+                    const colName = column.getAttribute('column');
+                    if (!colName || ['check', 'edit', 'duplicate', 'delete'].includes(column.getAttribute('type'))) {
+                        continue;
+                    }
+                    const cell = row.children[tdIdx];
+                    const data = cell.getAttribute('data') ?? cell.innerText;
+                    rowData[colName] = data;
+                    ++tdIdx;
                 }
-                const cell = row.children[tdIdx];
-                const data = cell.getAttribute('data') ?? cell.innerText;
-                rowData[colName] = data;
-                ++tdIdx;
+                let $rowRendered = this._renderRow(rowData);
+                this.$body.append($rowRendered);
             }
-            let $rowRendered = this._renderRow(rowData);
-            this.$body.append($rowRendered);
         }
         $table.append(this.$body);
 
@@ -1337,6 +1325,50 @@ export class HeliumTable extends HTMLElement {
         $row.setAttribute('selected', '');
         this._updateExternElements(checked ?? [$row]);
     }
+
+    _showDialogEdit($row) {
+        let data = this._getRowData($row, false);
+
+        this.$diagEdit.setValues(data);
+        this.dataOld = data;
+        this.idsEdit = [$row.id];
+        this.editRequestType = 'PATCH';
+        this.$diagEdit.setAttribute('title-text', 'Bearbeiten');
+        this.$diagEdit.showModal();
+    }
+
+    /**
+     * @param {InputEvent} e 
+     * @param {bool} isDesc 
+     * @returns void
+     */
+    _sortClickCallback(e, isDesc) {
+        if (this.endpoint) {
+            this._requestRows(this.replaceBody);
+            return;
+        }
+
+        let $sort = e.currentTarget;
+        const colIdx = Array.prototype.indexOf.call(
+            $sort.parentElement.parentElement.parentElement.parentElement.parentElement.children,
+            $sort.parentElement.parentElement.parentElement.parentElement
+        );
+
+        let values = [];
+        for (const row of this.$body.children) {
+            values.push([row.children[colIdx].getAttribute('data'), row]);
+        }
+
+        let newOrder = isDesc
+            ? Array.from(values).sort((a, b) => b[0].localeCompare(a[0]))
+            : Array.from(values).sort((a, b) => a[0].localeCompare(b[0]));
+
+
+        for (const row of newOrder) {
+            this.$body.append(row[1]);
+        }
+    }
+
 
     /**
      * 

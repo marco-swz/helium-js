@@ -7,7 +7,7 @@ import './utils-BGzlNXdX.js';
 import './dialog.js';
 import './select.js';
 
-const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\n    --he-table-row-backgroundColor: white;\n    --he-table-column-maxWidth: 300px;\n    --he-table-borderRadius: 4px;\n    --he-table-header-color: black;\n    --he-table-header-backgroundColor: white;\n    --he-table-tableLayout: auto;\n    --he-table-width: fit-content;\n    --he-table-row-borderBottomColor: hsl(from var(--he-table-row-backgroundColor) h s calc(l - 20));\n\n    overflow: auto;\n    display: inline-block;\n    scrollbar-gutter: stable both-edges;\n}\n\n:host::-webkit-scrollbar {\n    width: 10px !important;\n}\n\n:host::-webkit-scrollbar-thumb {\n    background-color: darkgrey !important;\n    border-radius: 10px !important;\n}\n\ntable {\n    table-layout: var(--he-table-tableLayout);\n    width: var(--he-table-width);\n    border-spacing: 0;\n    border-collapse: separate;\n    border-radius: var(--he-table-borderRadius);\n}\n\nthead {\n    position: sticky;\n    top: -1px;\n    z-index: 2;\n}\n\nthead th {\n    background-color: var(--he-table-header-backgroundColor);\n    color: var(--he-table-header-color);\n    font-weight: 500;\n    padding: 7px 12px;\n    text-align: center;\n    vertical-align: middle;\n    text-wrap: nowrap;\n    width: inherit;\n}\n\n:host([filter=below]) {\n    & thead th {\n        padding-bottom: 0;\n    }\n}\n\nthead th:hover .label-sorter {\n    opacity: 0.5;\n}\n\nthead th div {\n    display: flex;\n    align-items: center;\n    gap: 0.7rem;\n    justify-content: space-between;\n}\n\nthead td {\n    background-color: var(--he-table-header-backgroundColor);\n    width: 0;\n}\n\nthead td:first-child:has(#check-all) {\n    display: flex;\n    align-items: center;\n    padding: 5px 15px;\n    width: fit-content;\n}\n\nthead td:last-child {\n    border-radius: 0;\n    padding-right: 15px;\n}\n\nthead select {\n    padding: 0px 3px;\n}\n\nthead a {\n    color: rgba(255, 255, 255, 0.5411764706);\n    padding-left: 5px;\n\n}\n\nthead a:hover {\n    color: white;\n}\n\nthead .cont-filter {\n    position: relative;    \n    width: 100%;\n}\n\n.span-colname {\n    font-weight: 600;\n}\n\n:host([filter=behind]) {\n    & .span-colname {\n        position: absolute;\n        left: 0.3rem;\n        pointer-events: none;\n        transition: 0.1s ease all;\n        top: 0px;\n    }\n\n    & .inp-filter:focus,\n    & .cont-filter input:not(:placeholder-shown),\n    & .cont-filter select:has(option:checked:not([value=\"\"])) {\n        transform: translateY(7px);\n        font-weight: 600;\n        border-bottom: 0.1rem solid darkgrey;\n        padding: 4px 5px;\n        padding-bottom: 1px;\n    }\n\n    & .inp-filter:focus + .span-colname, \n    & .cont-filter input:not(:placeholder-shown):not([hidden]) + .span-colname,\n    & .cont-filter select:has(option:checked:not([value=\"\"])) + .span-colname {\n        transform: translateY(-5px);\n        font-size: 0.7rem;\n        opacity: 1;\n    }\n}\n\nthead .inp-filter {\n    margin: 0;\n    padding: 1px 5px;\n    font-size: 12px;\n    font-weight: 500;\n    background-color: transparent;\n    outline: none;\n    border: 0;\n    color: black;\n    width: 100%;\n    -webkit-appearance: none;\n    -moz-appearance: none;\n    appearance: none;\n    text-indent: 1px;\n}\n\ntbody tr:last-child td:first-child {\n    border-bottom-left-radius: var(--he-table-borderRadius);\n}\ntbody tr:last-child td:last-child {\n    border-bottom-right-radius: var(--he-table-borderRadius);\n}\nthead tr:first-child th:first-child {\n    border-top-left-radius: var(--he-table-borderRadius);\n}\nthead tr:first-child th:last-child {\n    border-top-right-radius: var(--he-table-borderRadius);\n}\n\nthead th[type=\"check\"] {\n    padding-top: 14px;\n}\n\nthead tr:last-child > * {\n    border-bottom: 1px solid black;\n}\n\nthead tr.row-filter {\n    & .inp-filter {\n        background-color: whitesmoke;\n        border-bottom: 1px solid grey;\n        font-size: 14px;\n        margin: 0px 10px 5px 10px;\n        padding: 2px 5px;\n        font-weight: 700;\n    }\n\n    & td {\n        overflow: hidden;\n    }\n}\n\ntbody {\n    min-height: 15px;\n}\n\ntbody tr {\n    background-color: var(--he-table-row-backgroundColor);\n}\n\ntbody tr:hover {\n    background-color: hsl(from var(--he-table-row-backgroundColor) h s calc(l - 5));\n}\n\ntbody td {\n    text-wrap: nowrap;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    max-width: var(--he-table-column-maxWidth);\n    padding: 5px 15px;\n    vertical-align: middle;\n    width: 0;\n    border-bottom: 1px solid black;\n    border-bottom-color: var(--he-table-row-borderBottomColor);\n}\n\ntbody td > * {\n    filter: unset;\n}\n\ntbody td:first-child:has(he-check) {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    width: unset;\n}\n\ntbody tr[selected] td {\n    border-bottom-color: var(--he-table-row-selected-borderBottomColor, var(--he-table-row-borderBottomColor));\n}\n\n\ntbody td xmp {\n    margin: 0;\n    overflow: hidden;\n    text-overflow: ellipsis;\n}\n\ntbody #row-btn-more {\n    background-color: white;\n    color: black;\n    cursor: pointer;\n    text-align: center;\n}\n\ntbody #row-btn-more td:hover {\n    border-color: grey;\n    background-color: whitesmoke;\n}\n\ntbody #row-btn-more td {\n    padding: 0.4rem;\n    border: 1px solid darkgrey;\n    display: table-cell;\n}\n\n.cont-sorters {\n    display: inline-flex;\n    flex-direction: column;\n    font-size: 0.7rem;\n    gap: 0;\n    cursor: pointer;\n}\n\n.label-sorter {\n    opacity: 0;\n}\n\nthead th div .label-sorter:hover {\n    opacity: 1;\n}\n\nthead th div .label-sorter:has(input:checked) {\n    opacity: 1;\n}\n\n.label-sorter input {\n    display: none;\n}\n\ntable[loading] {\n    pointer-events: none;\n    cursor: no-drop;\n}\n\ntable[loading] tbody {\n    position: relative;\n}\n\ntable[loading] tbody::after {\n    content: \"\";\n    position: absolute;\n    height: 100%;\n    width: 100%;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    margin: auto;\n    background: linear-gradient(-90deg, #dbd8d8 0%, #fcfcfc 50%, #dbd8d8 100%);\n    background-size: 400% 400%;\n    animation: pulse 1.2s ease-in-out infinite;\n}\n\n@keyframes pulse {\n    0% {\n        background-position: 0% 0%\n    }\n    100% {\n        background-position: -135% 0%\n    }\n}\n\nhe-form-dialog {\n    --he-form-dialog-width: 350px;\n}\n");
+const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\n    --he-table-row-backgroundColor: white;\n    --he-table-column-maxWidth: 300px;\n    --he-table-borderRadius: 4px;\n    --he-table-header-color: black;\n    --he-table-header-backgroundColor: white;\n    --he-table-header-borderBottom: 1px solid black;\n    --he-table-tableLayout: auto;\n    --he-table-width: fit-content;\n    --he-table-row-borderBottomColor: hsl(from var(--he-table-row-backgroundColor) h s calc(l - 20));\n\n    overflow: auto;\n    display: inline-block;\n    scrollbar-gutter: stable both-edges;\n}\n\n:host::-webkit-scrollbar {\n    width: 10px !important;\n}\n\n:host::-webkit-scrollbar-thumb {\n    background-color: darkgrey !important;\n    border-radius: 10px !important;\n}\n\ntable {\n    table-layout: var(--he-table-tableLayout);\n    width: var(--he-table-width);\n    border-spacing: 0;\n    border-collapse: separate;\n    border-radius: var(--he-table-borderRadius);\n}\n\nthead {\n    position: sticky;\n    top: -1px;\n    z-index: 2;\n}\n\nthead tr:last-child {\n    display: none;\n}\n\nthead th {\n    background-color: var(--he-table-header-backgroundColor);\n    color: var(--he-table-header-color);\n    font-weight: 500;\n    padding: 5px 0px 5px 15px;\n    text-align: center;\n    vertical-align: middle;\n    text-wrap: nowrap;\n    width: inherit;\n}\n\n:host([filter=below]) {\n    & thead th {\n        padding-bottom: 0;\n    }\n}\n\nthead th:hover .label-sorter {\n    opacity: 0.5;\n}\n\nthead th div {\n    display: flex;\n    align-items: center;\n    gap: 0.7rem;\n    justify-content: space-between;\n}\n\nthead td {\n    background-color: var(--he-table-header-backgroundColor);\n    width: 0;\n}\n\nthead td:has(#check-all) {\n    display: flex;\n    align-items: center;\n    padding: 6px 15px;\n    width: fit-content;\n}\n\nthead td:last-child {\n    border-radius: 0;\n    padding-right: 15px;\n}\n\nthead select {\n    padding: 0px 3px;\n}\n\nthead a {\n    color: rgba(255, 255, 255, 0.5411764706);\n    padding-left: 5px;\n\n}\n\nthead a:hover {\n    color: white;\n}\n\nthead .cont-filter {\n    position: relative;    \n    width: 100%;\n}\n\n.span-colname {\n    font-weight: 600;\n}\n\n:host([filter=below]) {\n    & thead tr:last-child {\n        display: table-row;\n\n        & td {\n            border-bottom: var(--he-table-header-borderBottom);\n        }\n    }\n}\n\n:host(:not([filter])), :host([filter=behind]) {\n    & thead tr:last-child {\n        display: none;\n    }\n\n    & thead tr:first-child th {\n        border-bottom: var(--he-table-header-borderBottom);\n    }\n}\n\n:host([filter=behind]) {\n    & .span-colname {\n        position: absolute;\n        left: 0.3rem;\n        pointer-events: none;\n        transition: 0.1s ease all;\n        top: 0px;\n    }\n\n    & .inp-filter:focus,\n    & .cont-filter input:not(:placeholder-shown),\n    & .cont-filter select:has(option:checked:not([value=\"\"])) {\n        transform: translateY(7px);\n        font-weight: 600;\n        border-bottom: 0.1rem solid darkgrey;\n        padding: 4px 5px;\n        padding-bottom: 1px;\n    }\n\n    & .inp-filter:focus + .span-colname, \n    & .cont-filter input:not(:placeholder-shown):not([hidden]) + .span-colname,\n    & .cont-filter select:has(option:checked:not([value=\"\"])) + .span-colname {\n        transform: translateY(-5px);\n        font-size: 0.7rem;\n        opacity: 1;\n    }\n}\n\nthead .inp-filter {\n    margin: 0;\n    padding: 1px 5px;\n    font-size: 12px;\n    font-weight: 500;\n    background-color: transparent;\n    outline: none;\n    border: 0;\n    color: black;\n    -webkit-appearance: none;\n    -moz-appearance: none;\n    appearance: none;\n    text-indent: 1px;\n}\n\ntbody tr:last-child td:first-child {\n    border-bottom-left-radius: var(--he-table-borderRadius);\n}\ntbody tr:last-child td:last-child {\n    border-bottom-right-radius: var(--he-table-borderRadius);\n}\nthead tr:first-child th:first-child {\n    border-top-left-radius: var(--he-table-borderRadius);\n}\nthead tr:first-child th:last-child {\n    border-top-right-radius: var(--he-table-borderRadius);\n}\n\nthead th[type=\"check\"] {\n    padding: 14px 0 6px 0;\n}\n\nthead tr.row-filter {\n    & .inp-filter {\n        background-color: whitesmoke;\n        border-bottom: 1px solid grey;\n        font-size: 14px;\n        padding: 2px 5px;\n        font-weight: 700;\n        width: 100%;\n    }\n\n    & td {\n        overflow: hidden;\n        padding: 2px 7px;\n        padding-top: 0;\n    }\n}\n\ntbody tr {\n    background-color: var(--he-table-row-backgroundColor);\n}\n\ntbody tr:hover {\n    background-color: hsl(from var(--he-table-row-backgroundColor) h s calc(l - 5));\n}\n\n/*tbody tr[selected] {*/\n    /*background-color: hsl(from var(--he-table-row-backgroundColor) h s calc(l - 7));*/\n/*}*/\n\ntbody td {\n    text-wrap: nowrap;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    max-width: var(--he-table-column-maxWidth);\n    padding: 5px 15px;\n    vertical-align: middle;\n    width: 0;\n    border-bottom: 1px solid black;\n    border-bottom-color: var(--he-table-row-borderBottomColor);\n    height: 20px;\n}\n\ntbody td > * {\n    filter: unset;\n}\n\ntbody td:first-child:has(he-check) {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    width: unset;\n}\n\ntbody tr[selected] td {\n    border-bottom-color: var(--he-table-row-selected-borderBottomColor, var(--he-table-row-borderBottomColor));\n}\n\n\ntbody td xmp {\n    margin: 0;\n    overflow: hidden;\n    text-overflow: ellipsis;\n}\n\ntbody #row-btn-more {\n    background-color: white;\n    color: black;\n    cursor: pointer;\n    text-align: center;\n}\n\ntbody #row-btn-more td:hover {\n    border-color: grey;\n    background-color: whitesmoke;\n}\n\ntbody #row-btn-more td {\n    padding: 0.4rem;\n    border: 1px solid darkgrey;\n    display: table-cell;\n}\n\ntbody #row-empty {\n    &:hover {\n        background-color: white;\n    }\n\n    & td {\n        border-bottom: 0;\n    }\n}\n\n.cont-sorters {\n    display: inline-flex;\n    flex-direction: column;\n    font-size: 0.7rem;\n    gap: 0;\n    cursor: pointer;\n}\n\n.label-sorter {\n    opacity: 0;\n}\n\nthead th div .label-sorter:hover {\n    opacity: 1;\n}\n\nthead th div .label-sorter:has(input:checked) {\n    opacity: 1;\n}\n\n.label-sorter input {\n    display: none;\n}\n\ntable[loading] {\n    pointer-events: none;\n    cursor: no-drop;\n}\n\ntable[loading] tbody {\n    position: relative;\n}\n\ntable[loading] tbody::after {\n    content: \"\";\n    position: absolute;\n    height: 100%;\n    width: 100%;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    margin: auto;\n    background: linear-gradient(-90deg, #dbd8d8 0%, #fcfcfc 50%, #dbd8d8 100%);\n    background-size: 400% 400%;\n    animation: pulse 1.2s ease-in-out infinite;\n}\n\n@keyframes pulse {\n    0% {\n        background-position: 0% 0%\n    }\n    100% {\n        background-position: -135% 0%\n    }\n}\n\nhe-form-dialog {\n    --he-form-dialog-width: 350px;\n}\n");
 
 /**
  * A table supporting CRUD operations and with many additional features.
@@ -475,6 +475,12 @@ class HeliumTable extends HTMLElement {
         /** @type {Object.<string, HTMLTableRowElement>} */
         let rowMap = {};
         for (const $row of this.$body.rows) {
+            if ($row.id === 'row-empty') {
+                if (data.length > 0) {
+                    $row.remove();
+                }
+                continue;
+            }
             const rowData = this._getRowData($row);
             const key = keyColumn.map((x) => rowData[x]).join('-');
             rowMap[key] = $row;
@@ -531,7 +537,6 @@ class HeliumTable extends HTMLElement {
 
     /**
      * @param {Array<Object.<string, string>>} data 
-     * @returns {HTMLDialogElement}
      */
     replaceBody(data) {
         this.$body.innerHTML = '';
@@ -541,6 +546,10 @@ class HeliumTable extends HTMLElement {
         if (this.$checkAll) {
             this.$checkAll.checked = false;
             this.$checkAll.indeterminate = false;
+        }
+
+        if (data.length === 0) {
+            this.$body.append(this._renderRowEmpty());
         }
 
         let renderMore = false;
@@ -726,6 +735,9 @@ class HeliumTable extends HTMLElement {
      * @returns {void}
      */
     _applyRowFilter($row, cols) {
+        if ($row.id === 'row-empty') {
+            return;
+        }
         const $check = $row.querySelector('he-check');
         let hideMask = $row.getAttribute('mask') ?? 0;
 
@@ -815,16 +827,19 @@ class HeliumTable extends HTMLElement {
     }
 
     /**
-     * @param {HTMLTableRowElement} row The table row to get the values from
+     * @param {HTMLTableRowElement} $row The table row to get the values from
      * @param {boolean} [returnDisplayValues=false] If `true`, returns the visible values instead of the `data` values
      * @returns {Object.<string, string>}
      */
-    _getRowData(row, returnDisplayValues = false) {
+    _getRowData($row, returnDisplayValues = false) {
+        if ($row.id === 'row-empty') {
+            throw new Error('Attempt to get data of empty row!');
+        }
         let data = {};
         let columns = this._getColumns(true);
         for (let i = 0; i < columns.length; ++i) {
             let $column = columns[i];
-            let $cell = row.children[$column.cellIndex];
+            let $cell = $row.children[$column.cellIndex];
 
             const colName = $column.getAttribute('column');
             data[colName] = returnDisplayValues
@@ -847,99 +862,6 @@ class HeliumTable extends HTMLElement {
     _handlePagination() {
         this.offset += this.pagination ?? 0;
         this._requestRows(this._appendRows);
-    }
-
-    /**
-     * @param {string} colName - The name of column for the sorters
-     * @param {'asc'|'desc'} checked - Sets the corresponding sorter to `checked`
-     * @returns HTMLDivElement
-     */
-    _renderSorters(colName, checked) {
-        let $radioSortAsc = document.createElement('input');
-        $radioSortAsc.type = 'radio';
-        $radioSortAsc.name = 'sort';
-        $radioSortAsc.value = colName + '-asc';
-        $radioSortAsc.id = colName + '-asc';
-        $radioSortAsc.onclick = (e) => this._sortClickCallback.bind(this)(e, false);
-        if (checked === 'asc') {
-            $radioSortAsc.checked = true;
-        }
-
-        let $labelSortAsc = document.createElement('label');
-        $labelSortAsc.for = colName + 'asc';
-        $labelSortAsc.innerHTML = '▲';
-        $labelSortAsc.classList.add('label-sorter');
-        $labelSortAsc.append($radioSortAsc);
-
-        let $radioSortDesc = document.createElement('input');
-        $radioSortDesc.type = 'radio';
-        $radioSortDesc.name = 'sort';
-        $radioSortDesc.value = colName + '-desc';
-        $radioSortDesc.id = colName + '-desc';
-        $radioSortDesc.onclick = (e) => this._sortClickCallback.bind(this)(e, true);
-        if (checked === 'desc') {
-            $radioSortDesc.checked = true;
-        }
-
-        let $labelSortDesc = document.createElement('label');
-        $labelSortDesc.for = colName + 'desc';
-        $labelSortDesc.classList.add('label-sorter');
-        $labelSortDesc.innerHTML = '▼';
-        $labelSortDesc.append($radioSortDesc);
-
-        let $contSorters = document.createElement('div');
-        $contSorters.classList.add('cont-sorters');
-        $contSorters.append($labelSortAsc);
-        $contSorters.append($labelSortDesc);
-
-        if (this.getAttribute('sorter') == null) {
-            $contSorters.style.display = 'none';
-        }
-
-        return $contSorters;
-    }
-
-    _showDialogEdit($row) {
-        let data = this._getRowData($row, false);
-
-        this.$diagEdit.setValues(data);
-        this.dataOld = data;
-        this.idsEdit = [$row.id];
-        this.editRequestType = 'PATCH';
-        this.$diagEdit.setAttribute('title-text', 'Bearbeiten');
-        this.$diagEdit.showModal();
-    }
-
-    /**
-     * @param {InputEvent} e 
-     * @param {bool} isDesc 
-     * @returns void
-     */
-    _sortClickCallback(e, isDesc) {
-        if (this.endpoint) {
-            this._requestRows(this.replaceBody);
-            return;
-        }
-
-        let $sort = e.currentTarget;
-        const colIdx = Array.prototype.indexOf.call(
-            $sort.parentElement.parentElement.parentElement.parentElement.parentElement.children,
-            $sort.parentElement.parentElement.parentElement.parentElement
-        );
-
-        let values = [];
-        for (const row of this.$body.children) {
-            values.push([row.children[colIdx].getAttribute('data'), row]);
-        }
-
-        let newOrder = isDesc
-            ? Array.from(values).sort((a, b) => b[0].localeCompare(a[0]))
-            : Array.from(values).sort((a, b) => a[0].localeCompare(b[0]));
-
-
-        for (const row of newOrder) {
-            this.$body.append(row[1]);
-        }
     }
 
     /**
@@ -1062,6 +984,17 @@ class HeliumTable extends HTMLElement {
         return $row;
     }
 
+    _renderRowEmpty() {
+        let $row = document.createElement('tr');
+        $row.id = 'row-empty';
+        for (let i=0; i<this._getColumns().length; ++i) {
+            let $cell = document.createElement('td');
+            //$cell.colSpan = '1000';
+            $row.append($cell);
+        }
+        return $row;
+    }
+
     /**
      * Sends a new `GET` request to update all rows.
      * Only if an endpoint is defined!
@@ -1092,6 +1025,57 @@ class HeliumTable extends HTMLElement {
             .catch(errorMsg => { console.error(errorMsg); })
             .finally(() => this.loading = false);
     }
+
+    /**
+     * @param {string} colName - The name of column for the sorters
+     * @param {'asc'|'desc'} checked - Sets the corresponding sorter to `checked`
+     * @returns HTMLDivElement
+     */
+    _renderSorters(colName, checked) {
+        let $radioSortAsc = document.createElement('input');
+        $radioSortAsc.type = 'radio';
+        $radioSortAsc.name = 'sort';
+        $radioSortAsc.value = colName + '-asc';
+        $radioSortAsc.id = colName + '-asc';
+        $radioSortAsc.onclick = (e) => this._sortClickCallback.bind(this)(e, false);
+        if (checked === 'asc') {
+            $radioSortAsc.checked = true;
+        }
+
+        let $labelSortAsc = document.createElement('label');
+        $labelSortAsc.for = colName + 'asc';
+        $labelSortAsc.innerHTML = '▲';
+        $labelSortAsc.classList.add('label-sorter');
+        $labelSortAsc.append($radioSortAsc);
+
+        let $radioSortDesc = document.createElement('input');
+        $radioSortDesc.type = 'radio';
+        $radioSortDesc.name = 'sort';
+        $radioSortDesc.value = colName + '-desc';
+        $radioSortDesc.id = colName + '-desc';
+        $radioSortDesc.onclick = (e) => this._sortClickCallback.bind(this)(e, true);
+        if (checked === 'desc') {
+            $radioSortDesc.checked = true;
+        }
+
+        let $labelSortDesc = document.createElement('label');
+        $labelSortDesc.for = colName + 'desc';
+        $labelSortDesc.classList.add('label-sorter');
+        $labelSortDesc.innerHTML = '▼';
+        $labelSortDesc.append($radioSortDesc);
+
+        let $contSorters = document.createElement('div');
+        $contSorters.classList.add('cont-sorters');
+        $contSorters.append($labelSortAsc);
+        $contSorters.append($labelSortDesc);
+
+        if (this.getAttribute('sorter') == null) {
+            $contSorters.style.display = 'none';
+        }
+
+        return $contSorters;
+    }
+
 
     /**
       * Returns the *text* representation of a value depending on the data type.
@@ -1153,7 +1137,7 @@ class HeliumTable extends HTMLElement {
             }
         } else {
             $filter = document.createElement('input');
-            $filter.type = 'text';
+            $filter.type = $column.getAttribute('filter-type') ?? 'text';
             // Using a random text seems to disable autocomplete properly
             $filter.autocomplete = 'efase';
             $filter.placeholder = ' ';
@@ -1189,9 +1173,10 @@ class HeliumTable extends HTMLElement {
                 throw new Error('The provided row-color is not valid JSON!');
             }
 
-            const attrFilter = this.getAttribute('filter');
             let $filterCell = document.createElement('td');
             $rowFilters.append($filterCell);
+
+            const attrFilter = this.getAttribute('filter');
 
             const isHidden = $column.getAttribute('type') === 'hidden';
             if (isHidden) {
@@ -1244,7 +1229,6 @@ class HeliumTable extends HTMLElement {
                 $contHeaderCell.append($spanName);
                 $filterCell.append($filter);
                 $spanName.style.position = 'unset';
-                $filter.hidden = true;
             }
 
             const sort = $column.getAttribute('sort');
@@ -1287,24 +1271,28 @@ class HeliumTable extends HTMLElement {
         this.$body = document.createElement('tbody');
 
         const rows = this.querySelectorAll('tr:has(td)');
-        for (const row of rows) {
-            let rowData = {};
-            // There can be more `th`s than `td`s because of special column types.
-            // This variable ensures correct indexing.
-            let tdIdx = 0;
-            for (let i = 0; i < columns.length; ++i) {
-                const column = columns[i];
-                const colName = column.getAttribute('column');
-                if (!colName || ['check', 'edit', 'duplicate', 'delete'].includes(column.getAttribute('type'))) {
-                    continue;
+        if (rows.length === 0) {
+            this.$body.append(this._renderRowEmpty());
+        } else {
+            for (const row of rows) {
+                let rowData = {};
+                // There can be more `th`s than `td`s because of special column types.
+                // This variable ensures correct indexing.
+                let tdIdx = 0;
+                for (let i = 0; i < columns.length; ++i) {
+                    const column = columns[i];
+                    const colName = column.getAttribute('column');
+                    if (!colName || ['check', 'edit', 'duplicate', 'delete'].includes(column.getAttribute('type'))) {
+                        continue;
+                    }
+                    const cell = row.children[tdIdx];
+                    const data = cell.getAttribute('data') ?? cell.innerText;
+                    rowData[colName] = data;
+                    ++tdIdx;
                 }
-                const cell = row.children[tdIdx];
-                const data = cell.getAttribute('data') ?? cell.innerText;
-                rowData[colName] = data;
-                ++tdIdx;
+                let $rowRendered = this._renderRow(rowData);
+                this.$body.append($rowRendered);
             }
-            let $rowRendered = this._renderRow(rowData);
-            this.$body.append($rowRendered);
         }
         $table.append(this.$body);
 
@@ -1343,6 +1331,50 @@ class HeliumTable extends HTMLElement {
         $row.setAttribute('selected', '');
         this._updateExternElements(checked ?? [$row]);
     }
+
+    _showDialogEdit($row) {
+        let data = this._getRowData($row, false);
+
+        this.$diagEdit.setValues(data);
+        this.dataOld = data;
+        this.idsEdit = [$row.id];
+        this.editRequestType = 'PATCH';
+        this.$diagEdit.setAttribute('title-text', 'Bearbeiten');
+        this.$diagEdit.showModal();
+    }
+
+    /**
+     * @param {InputEvent} e 
+     * @param {bool} isDesc 
+     * @returns void
+     */
+    _sortClickCallback(e, isDesc) {
+        if (this.endpoint) {
+            this._requestRows(this.replaceBody);
+            return;
+        }
+
+        let $sort = e.currentTarget;
+        const colIdx = Array.prototype.indexOf.call(
+            $sort.parentElement.parentElement.parentElement.parentElement.parentElement.children,
+            $sort.parentElement.parentElement.parentElement.parentElement
+        );
+
+        let values = [];
+        for (const row of this.$body.children) {
+            values.push([row.children[colIdx].getAttribute('data'), row]);
+        }
+
+        let newOrder = isDesc
+            ? Array.from(values).sort((a, b) => b[0].localeCompare(a[0]))
+            : Array.from(values).sort((a, b) => a[0].localeCompare(b[0]));
+
+
+        for (const row of newOrder) {
+            this.$body.append(row[1]);
+        }
+    }
+
 
     /**
      * 

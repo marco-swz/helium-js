@@ -4,6 +4,7 @@
     --he-table-borderRadius: 4px;
     --he-table-header-color: black;
     --he-table-header-backgroundColor: white;
+    --he-table-header-borderBottom: 1px solid black;
     --he-table-tableLayout: auto;
     --he-table-width: fit-content;
     --he-table-row-borderBottomColor: hsl(from var(--he-table-row-backgroundColor) h s calc(l - 20));
@@ -36,11 +37,15 @@ thead {
     z-index: 2;
 }
 
+thead tr:last-child {
+    display: none;
+}
+
 thead th {
     background-color: var(--he-table-header-backgroundColor);
     color: var(--he-table-header-color);
     font-weight: 500;
-    padding: 7px 12px;
+    padding: 5px 0px 5px 15px;
     text-align: center;
     vertical-align: middle;
     text-wrap: nowrap;
@@ -69,10 +74,10 @@ thead td {
     width: 0;
 }
 
-thead td:first-child:has(#check-all) {
+thead td:has(#check-all) {
     display: flex;
     align-items: center;
-    padding: 5px 15px;
+    padding: 6px 15px;
     width: fit-content;
 }
 
@@ -102,6 +107,26 @@ thead .cont-filter {
 
 .span-colname {
     font-weight: 600;
+}
+
+:host([filter=below]) {
+    & thead tr:last-child {
+        display: table-row;
+
+        & td {
+            border-bottom: var(--he-table-header-borderBottom);
+        }
+    }
+}
+
+:host(:not([filter])), :host([filter=behind]) {
+    & thead tr:last-child {
+        display: none;
+    }
+
+    & thead tr:first-child th {
+        border-bottom: var(--he-table-header-borderBottom);
+    }
 }
 
 :host([filter=behind]) {
@@ -141,7 +166,6 @@ thead .inp-filter {
     outline: none;
     border: 0;
     color: black;
-    width: 100%;
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
@@ -162,11 +186,7 @@ thead tr:first-child th:last-child {
 }
 
 thead th[type="check"] {
-    padding-top: 14px;
-}
-
-thead tr:last-child > * {
-    border-bottom: 1px solid black;
+    padding: 14px 0 6px 0;
 }
 
 thead tr.row-filter {
@@ -174,18 +194,16 @@ thead tr.row-filter {
         background-color: whitesmoke;
         border-bottom: 1px solid grey;
         font-size: 14px;
-        margin: 0px 10px 5px 10px;
         padding: 2px 5px;
         font-weight: 700;
+        width: 100%;
     }
 
     & td {
         overflow: hidden;
+        padding: 2px 7px;
+        padding-top: 0;
     }
-}
-
-tbody {
-    min-height: 15px;
 }
 
 tbody tr {
@@ -195,6 +213,10 @@ tbody tr {
 tbody tr:hover {
     background-color: hsl(from var(--he-table-row-backgroundColor) h s calc(l - 5));
 }
+
+/*tbody tr[selected] {*/
+    /*background-color: hsl(from var(--he-table-row-backgroundColor) h s calc(l - 7));*/
+/*}*/
 
 tbody td {
     text-wrap: nowrap;
@@ -206,6 +228,7 @@ tbody td {
     width: 0;
     border-bottom: 1px solid black;
     border-bottom-color: var(--he-table-row-borderBottomColor);
+    height: 20px;
 }
 
 tbody td > * {
@@ -246,6 +269,16 @@ tbody #row-btn-more td {
     padding: 0.4rem;
     border: 1px solid darkgrey;
     display: table-cell;
+}
+
+tbody #row-empty {
+    &:hover {
+        background-color: white;
+    }
+
+    & td {
+        border-bottom: 0;
+    }
 }
 
 .cont-sorters {
