@@ -954,6 +954,9 @@ export class HeliumTable extends HTMLElement {
                     $cell.addEventListener('click', () => this._showDialogEdit.bind(this)($row))
                     $cell.innerHTML = 'E';
                     break;
+                case 'callback':
+                    $cell.innerHTML = window[$column.getAttribute('onrender')](data) ?? '';
+                    break;
                 case 'hidden':
                     $cell.style.display = 'none';
                 // no break
@@ -1198,6 +1201,14 @@ export class HeliumTable extends HTMLElement {
                     let $cell = document.createElement('th');
                     $cell.setAttribute('type', colType);
                     $rowColNames.append($cell);
+                    continue;
+                case 'callback':
+                    let $cont = document.createElement('span');
+                    $cont.innerHTML = $column.innerHTML.trim();
+                    $cont.classList.add('span-colname');
+                    $column.innerHTML = '';
+                    $column.append($cont);
+                    $rowColNames.append($column);
                     continue;
             }
 
