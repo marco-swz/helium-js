@@ -1,32 +1,10 @@
-export function scss(text) {
-    return text;
-}
-
-export function html(text) {
-    return text;
-}
-
-export function preventDefault(e) {
-    e.preventDefault();
-}
-
-export function preventDefaultForScrollKeys(e) {
-    // left: 37, up: 38, right: 39, down: 40,
-    // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
-    var keys = { 37: 1, 38: 1, 39: 1, 40: 1 };
-    if (keys[e.keyCode]) {
-        preventDefault(e);
-        return false;
-    }
-}
-
 /**
  * Returns the amount of pixels between the element and
  * the bottom of the screen.
  * @param {HTMLElement} element
  * @returns number
  */
-export function heSpaceBelow(element) {
+function heSpaceBelow(element) {
     const elementRect = element.getBoundingClientRect();
     const spaceBelow = window.innerHeight - elementRect.bottom;
     return spaceBelow;
@@ -40,7 +18,7 @@ export function heSpaceBelow(element) {
  * @param {number} offset
  * @returns void
  */
-export function hePositionRelative(elem, target, position, offset=0) {
+function hePositionRelative(elem, target, position, offset=0) {
     const rect = target.getBoundingClientRect();
 
     switch (position) {
@@ -67,29 +45,14 @@ export function hePositionRelative(elem, target, position, offset=0) {
     }
 }
 
-export function heDisableBodyScroll() {
-    //const isScrollYVisible = document.body.scrollHeight > document.body.clientHeight;
-    //if (isScrollYVisible) {
-    //    document.body.style.position = 'fixed';
-    //    document.body.style.overflowY = 'scroll';
-    //}
-
-    //const isScrollXVisible = document.body.scrollWidth > document.body.clientWidth;
-    //if (isScrollXVisible) {
-    //    document.body.style.position = 'fixed';
-    //    document.body.style.overflowX = 'scroll';
-    //}
-    //document.body.style.overflowX = 'scroll';
-}
-
-export function heEnableBodyScroll() {
+function heEnableBodyScroll() {
     document.body.style.position = 'static';
     document.body.style.overflowY = 'auto';
     document.body.style.overflowX = 'auto';
 }
 
 
-export function heHash(str, seed=0) {
+function heHash(str, seed=0) {
     let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
     for(let i = 0, ch; i < str.length; i++) {
         ch = str.charCodeAt(i);
@@ -103,3 +66,5 @@ export function heHash(str, seed=0) {
   
     return 4294967296 * (2097151 & h2) + (h1 >>> 0);
 }
+
+export { heSpaceBelow as a, hePositionRelative as b, heEnableBodyScroll as c, heHash as h };
