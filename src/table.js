@@ -223,6 +223,8 @@ export class HeliumTable extends HTMLElement {
     internals;
     /** @type {Object.<string, ?Object.<string, string>>} */
     rowColors = {};
+    /** @type {Object.<string, ?Object.<string, string>>} */
+    rowStyles = {};
 
     constructor() {
         super();
@@ -505,15 +507,7 @@ export class HeliumTable extends HTMLElement {
                 const text = this._renderText($col, newVal);
                 $cell.innerHTML = text;
                 $cell.title = text;
-                let colors = this.rowColors[colName];
-                if (colors) {
-                    let color = colors[newVal];
-                    if (color) {
-                        $row.style.setProperty('--he-table-row-backgroundColor', color);
-                    } else {
-                        $row.style.removeProperty('--he-table-row-backgroundColor');
-                    }
-                }
+                this._applyRowStyles($row, colName, newVal)
             }
             this._applyRowFilter($row, cols);
         }
@@ -695,6 +689,31 @@ export class HeliumTable extends HTMLElement {
 
         if ($rowMore != null && rowData.length === this.pagination) {
             this.$body.append($rowMore);
+        }
+    }
+
+    /**
+    * @param {HTMLTableRowElement} $row 
+    * @param {string} $colName
+    */
+    _applyRowStyles($row, colName, val) {
+        let styles = this.rowStyles[colName];
+        if (styles) {
+            let style = styles[val];
+            if (style) {
+                $row.style.cssText = style;
+            } else {
+                $row.style.cssText = '';
+            }
+        }
+        let colors = this.rowColors[colName];
+        if (colors) {
+            let color = colors[val];
+            if (color) {
+                $row.style.setProperty('--he-table-row-backgroundColor', color);
+            } else {
+                $row.style.removeProperty('--he-table-row-backgroundColor');
+            }
         }
     }
 
@@ -964,14 +983,7 @@ export class HeliumTable extends HTMLElement {
                     $cell.setAttribute('data', val);
                     $cell.innerHTML = this._renderText($column, text);
                     $cell.title = val;
-                    let colors = this.rowColors[colName];
-                    if (colors) {
-                        let color = colors[val];
-                        if (color) {
-                            $row.style.setProperty('--he-table-row-backgroundColor', color);
-                        }
-                    }
-
+                    this._applyRowStyles($row, colName, val);
                     break;
             }
 
@@ -1170,6 +1182,12 @@ export class HeliumTable extends HTMLElement {
                 throw new Error('The provided row-color is not valid JSON!');
             }
 
+            try {
+                this.rowStyles[colName] = JSON.parse($column.getAttribute('row-style'));
+            } catch (error) {
+                throw new Error('The provided row-style is not valid JSON!');
+            }
+
             let $filterCell = document.createElement('td');
             $rowFilters.append($filterCell);
 
@@ -1315,9 +1333,10 @@ export class HeliumTable extends HTMLElement {
         const $row = e.currentTarget;
         let checked = null;
         if (this.$checkAll) {
+            const allowMultiple = this.$checkAll.parentElement.getAttribute('multiple') !== 'false';
             checked = this.$body.querySelectorAll('.check-row:state(checked)');
 
-            if (!e.target.classList.contains('check-row')) {
+            if (!allowMultiple || !e.target.classList.contains('check-row')) {
                 for (let check of checked) {
                     check.checked = false;
                 }
