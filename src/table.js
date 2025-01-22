@@ -595,6 +595,35 @@ export class HeliumTable extends HTMLElement {
     }
 
     /**
+    * @param {Object.<string, string> | Array<Object.<string, string>>} where 
+    */
+    selectRows(where) {
+        if (!Array.isArray(where)) {
+            where = [where];
+        }
+
+        for (const cond of where) {
+            for (let $row of this.$body.children) {
+                const rowData = this._getRowData($row);
+                let isMatch = true;
+                for (const [colName, val] of Object.entries(cond)) {
+                    if (rowData[colName] !== val) {
+                        isMatch = false;
+                        break;
+                    }
+                }
+
+                if (!isMatch) {
+                    continue;
+                }
+
+                let $el = $row.querySelector('.check-row') ?? $row;
+                $el.click();
+            }
+        }
+    }
+
+    /**
      * Changes values of a table row selected by the `where` argument.
      * @param {Object.<string, string>} where A mapping of column name to value, to filter which row is modified.
      * @param {Object.<string, string>} to A mappig from column name to new value.
