@@ -1129,15 +1129,17 @@ class HeliumTable extends HTMLElement {
       */
     _renderText($column, val) {
         let text = val;
-        switch ($column.getAttribute('type')) {
-            case 'date':
-                text = val.split('-').reverse().join('.');
-                break;
-            case 'datetime':
-                val = val.replace('T', ' ');
-                const [date, time] = val.split(' ');
-                text = date.split('-').reverse().join('.') + ' ' + time;
-                break;
+        if ((val ?? '') !== '') {
+            switch ($column.getAttribute('type')) {
+                case 'date':
+                    text = val.split('-').reverse().join('.');
+                    break;
+                case 'datetime':
+                    val = val.replace('T', ' ');
+                    const [date, time] = val.split(' ');
+                    text = date.split('-').reverse().join('.') + ' ' + time;
+                    break;
+            }
         }
 
         const colRemap = this.remap[$column.getAttribute('column')];
@@ -1148,7 +1150,7 @@ class HeliumTable extends HTMLElement {
             }
         }
 
-        return text;
+        return text ?? '';
     }
 
     /**
