@@ -491,9 +491,12 @@ export class HeliumTable extends HTMLElement {
             if ($row == null) {
                 $row = this._renderRow(entry);
                 this.$body.append($row);
+                
                 this._applyRowFilter($row, cols);
                 continue;
             }
+
+            $row.style.removeProperty('--he-table-row-backgroundColor');
 
             for (const $col of cols) {
                 const colName = $col.getAttribute('column');
@@ -740,8 +743,6 @@ export class HeliumTable extends HTMLElement {
             let color = colors[val];
             if (color) {
                 $row.style.setProperty('--he-table-row-backgroundColor', color);
-            } else {
-                $row.style.removeProperty('--he-table-row-backgroundColor');
             }
         }
     }
