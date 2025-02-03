@@ -82,17 +82,6 @@ export class HeliumSelect extends HTMLElement {
         return this.getAttribute('filter') !== null;
     }
 
-    /**
-     * @param {(arg0: InputEvent) => void} val
-     */
-    set onchange(val) {
-        if (val) {
-            this.setAttribute('onchange', val);
-        } else {
-            this.removeAttribute('onchange');
-        }
-    }
-
     /** 
      * Gets or sets the name of the element for form submissions.
      * @type {string} 
@@ -130,7 +119,9 @@ export class HeliumSelect extends HTMLElement {
     set value(val) {
         if (val) {
             const $option = this.$options.querySelector(`[value="${val}"]`);
-            console.assert($option != null, `No select option with value ${val}`);
+            if ($option == null)  {
+                throw new Error('No option found with provided value!');
+            }
             this._select($option);
         }
     }
@@ -401,12 +392,7 @@ export class HeliumSelect extends HTMLElement {
         const target = e.currentTarget;
         this._select(target);
 
-        const evt = new CustomEvent('change', {});
-        this.dispatchEvent(evt);
-        const onchange = eval(this.getAttribute('onchange'));
-        if (typeof onchange === 'function') {
-            onchange.call(this, evt);
-        }
+        this.dispatchEvent(new CustomEvent('change'));
     }
 
 }
