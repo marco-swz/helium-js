@@ -288,7 +288,6 @@ class HeliumInput extends HTMLElement {
         'placeholder',
         'value',
         'oninput',
-        'onchange',
     ];
 
     /** @type {HTMLInputElement} */
@@ -547,9 +546,6 @@ class HeliumInput extends HTMLElement {
             case 'oninput':
                 this.$input.oninput = this.oninput;
                 break;
-            case 'onchange':
-                this.$input.onchange = this.onchange;
-                break;
             default:
                 if (newValue != null) {
                     this.$input.setAttribute(name, newValue);
@@ -665,6 +661,8 @@ class HeliumInput extends HTMLElement {
      * Callback for input changes.
      */
     _inputChangedCallback() {
+        this.dispatchEvent(new CustomEvent('change'));
+
         if (this.disabled) {
             return;
         }
