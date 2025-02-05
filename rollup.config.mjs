@@ -20,11 +20,11 @@ export default {
     ],
     output: [
         {
-            dir: 'dist/0.7.0',
+            dir: 'dist/0.8.0',
             format: 'module',
         },
         {
-            dir: 'dist-min/0.7.0',
+            dir: 'dist-min/0.8.0',
             format: 'module',
             plugins: [terser()]
         },

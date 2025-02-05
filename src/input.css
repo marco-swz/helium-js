@@ -1,16 +1,28 @@
 :host {
+    --he-input-borderColor: lightgrey;
+    --he-input-borderWidth: 1px;
+    --he-input-borderStyle: solid;
+    --he-input-color: black;
+    --he-input-fontSize: 14px;
+    --he-input-backgroundColor: whitesmoke;
+    --he-input-hover-borderColor: grey;
+    --he-input-loading-spinner-color: black;
+
     display: inline-flex;
     position: relative;
     border-radius: 3px;
-    background-color: whitesmoke;
+    background-color: var(--he-input-backgroundColor);
     width: 100%;
     height: 1.6rem;
-    font-size: 14px;
-    border: 0.1rem solid lightgrey;
+    font-size: var(--he-input-fontSize);
+    border-style: var(--he-input-borderStyle);
+    border-color: var(--he-input-borderColor);
+    border-width: var(--he-input-borderWidth);
+    color: var(--he-input-color);
 }
 
-:host(:hover), :host(:focus) {
-    border-color: var(--he-input-clr-border-hover, grey);
+:host(:hover) {
+    border-color: var(--he-input-hover-borderColor);
 }
 
 :host([invalid]) {
@@ -33,7 +45,7 @@
     margin: auto 10px auto auto;
     border: 3px solid darkgrey;
     border-radius: 50%;
-    border-bottom-color: var(--he-input-clr-spinner, black);
+    border-bottom-color: var(--he-input-loading-spinner-color);
     animation: button-loading-spinner 1s ease infinite;
 }
 
@@ -64,14 +76,14 @@
     color: inherit;
 }
 
-:host([readonly]:hover), :host([readonly]:focus),
-:host([disabled]:hover), :host([disabled]:focus) {
-    border-color: var(--he-input-clr-border-hover, lightgrey);
+:host([readonly]:hover),
+:host([disabled]:hover) {
+    border-color: var(--he-input-borderColor);
 }
 
 :host([readonly]), :host([disabled]) {
     cursor: default;
-    color: hsl(from var(--he-input-clr, black) h s calc(l + 50))
+    color: hsl(from var(--he-input-color) h s calc(l + 50))
 }
 
 #cont-options {

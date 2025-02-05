@@ -44,10 +44,14 @@ import { HeliumPopover } from "./popover.js";
  * @attr {on|off} [readonly=off] - Toggles the `readonly` state of the input. Contrary to `disabled`, the value will still be submitted in forms.
  * @attr {on|off} [autocomplete=off] - Shows suggestion from previous inputs (browser native appearance)
  *
- * @cssprop [--he-input-clr-black] - The color of the text
- * @cssprop [--he-input-clr-border-hover=grey] - The border color when hovering
- * @cssprop [--he-input-clr-spinner=black] - The color of the spinner while in `loading` state
- * @cssprop [--he-input-clr-ok=black] - The color of the indicator while in `ok` state
+ * @cssprop [--he-input-borderColor=lightgrey] - The border color of the input
+ * @cssprop [--he-input-borderWidth=1px] - The border width
+ * @cssprop [--he-input-borderStyle=solid] - The border style
+ * @cssprop [--he-input-color=black] - The font color
+ * @cssprop [--he-input-fontSize=14px] - The font size
+ * @cssprop [--he-input-backgroundColor=whitesmoke] - The background color
+ * @cssprop [--he-input-hover-borderColor=grey] - The color of the border when hovering
+ * @cssprop [--he-input-loading-spinner-color=black] - The color of the spinner for the loading animation
  *
  * @extends HTMLElement
  */
@@ -188,19 +192,6 @@ export class HeliumInput extends HTMLElement {
     get ok() {
         return this.getAttribute('ok');
     }
-
-    /**
-     * The `select` event is triggered when a suggestion is clicked.
-     * @param {(arg0: InputEvent) => void} val
-     */
-    set onselect(val) {
-        if (val) {
-            this.setAttribute('onselect', val);
-        } else {
-            this.removeAttribute('onselect');
-        }
-    }
-
 
     /**
      * Gets or sets the placeholder.
@@ -390,8 +381,8 @@ export class HeliumInput extends HTMLElement {
      * @returns {void}
      */
     connectedCallback() {
-        this.$input.onchange = () => this._inputChangedCallback.bind(this)();
-        this.onfocus = () => this._inputFocusCallback.bind(this)();
+        this.$input.addEventListener('change', () => this._inputChangedCallback.bind(this)());
+        this.addEventListener('focus', () => this._inputFocusCallback.bind(this)());
         this.addEventListener('focusout', (e) => setTimeout(() => this._inputBlurCallback.bind(this)(e), 200));
         this.$slot.onslotchange = () => this._slotChangedCallback.bind(this)();
     }
@@ -455,6 +446,14 @@ export class HeliumInput extends HTMLElement {
     _inputBlurCallback(e) {
         if (document.activeElement !== this || document.activeElement !== document.body) {
             this.$popover.open = false;
+            const evt = new CustomEvent('toggle', {
+                detail: {
+                    option: null,
+                },
+                oldState: 'open',
+                newState: 'closed',
+            });
+            this.dispatchEvent(evt);
         }
     }
 
@@ -465,14 +464,14 @@ export class HeliumInput extends HTMLElement {
         this.value = val;
         this.$popover.open = false;
         
-        const evt = new CustomEvent('select', {
-            detail: { target: $option },
+        const evt = new CustomEvent('toggle', {
+            detail: {
+                option: $option,
+            },
+            oldState: 'open',
+            newState: 'closed',
         });
         this.dispatchEvent(evt);
-        const onselect = eval(this.getAttribute('onselect'));
-        if (typeof onselect === 'function') {
-            onselect.call(this, evt);
-        }
     }
 
     _slotChangedCallback() {
