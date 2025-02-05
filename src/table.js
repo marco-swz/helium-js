@@ -246,14 +246,6 @@ export class HeliumTable extends HTMLElement {
         return this.$body.parentElement.getAttribute('loading') != null;
     }
 
-    set oncheck(val) {
-        this.setAttribute('oncheck', val);
-    }
-
-    get oncheck() {
-        return this.getAttribute('oncheck');
-    }
-
     get value() {
         return this.getCheckedData();
     }
@@ -1464,21 +1456,12 @@ export class HeliumTable extends HTMLElement {
             this.internals.setFormValue(JSON.stringify(this.value));
         }
 
-        const evt = new CustomEvent('check', {
+        const evt = new CustomEvent('input', {
             detail: {
                 numRows: checked.length,
             }
         })
         this.dispatchEvent(evt);
-
-        const oncheck = eval(this.oncheck);
-        if (typeof oncheck === 'function') {
-            oncheck.call(this, evt);
-        }
-
-        for (const elem of document.querySelectorAll(`[he-table-notify="#${this.id}"]`)) {
-            elem.setAttribute('he-table-checked', checked.length);
-        }
     }
 }
 
