@@ -159,6 +159,7 @@ import sheet from './table.css';
  * @attr {on|off} submit-all - If set, all rows of the table are passed on to forms, instead of checked one.
  * @attr {on|off} sorter - If set, show a sorting button for all columns.
  * @attr {null|'behind'|'below'} filter - If set, disables the filters for all rows.
+ * @attr {on|off} require-filter - If set, at least one filter value has to be applied, otherwise no data is requested. This can be used to improve performance for time intensive queries.
  *
  * @attr {string} column - [th] The internal name of the column. This name needs to be unique for each column
  * @attr {?string} filter - [th] The filter value for a given column
@@ -1041,12 +1042,28 @@ export class HeliumTable extends HTMLElement {
 
         let formData = new FormData(this.$form);
 
+        let params = new URLSearchParams();
+        for (const [key, value] of formData.entries()) {
+            if (value.length === 0) {
+                continue;
+            }
+            params.append(key, value);
+        }
+
+        const isNoFilter = params.size === 0 || (params.size === 1 && params.get('sort') != null);
+
+        if (this.getAttribute('require-filter') && isNoFilter) {
+            this.loading = false;
+            callback.bind(this)([]);
+            return;
+        }
+
         if (this.pagination != null) {
             formData.append('offset', this.offset)
             formData.append('count', this.pagination + 1);
         }
 
-        fetch(this.endpoint + '/?' + new URLSearchParams(formData).toString(), {
+        fetch(this.endpoint + '/?' + params.toString(), {
             method: 'GET',
         })
             .then(resp => resp.json())

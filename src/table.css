@@ -12,6 +12,7 @@
     overflow: auto;
     display: inline-block;
     scrollbar-gutter: stable both-edges;
+    outline: none;
 }
 
 :host::-webkit-scrollbar {
