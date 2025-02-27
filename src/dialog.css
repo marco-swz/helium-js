@@ -1,9 +1,20 @@
 #he-diag-outer {
     outline: none;
     padding: 0;
-    border-radius: 3px;
+    border-radius: 4px;
     border: 0;
     box-shadow:0 5px 10px 0 #80808054;
+    animation: fadeout 0.1s ease-in forwards;
+}
+
+#he-diag-outer[open] {
+  animation: fadein 0.1s ease-in forwards;
+}
+
+#he-diag-outer[open]::backdrop {
+    transition: opacity 0.2s;
+    background-color: black;
+    opacity: 0.2;
 }
 
 #he-icon-close {
@@ -88,5 +99,23 @@
 
     &:hover:enabled{
         background-color: #0082b40d;
+    }
+}
+
+@keyframes fadein{
+    0%{
+        opacity:0;
+    }
+    100%{
+        opacity:1;
+    }
+}
+
+@keyframes fadeout{
+    0%{
+        opacity:1;
+    }
+    100%{
+        opacity:0;
     }
 }
