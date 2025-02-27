@@ -19,6 +19,7 @@
     border-color: var(--he-input-borderColor);
     border-width: var(--he-input-borderWidth);
     color: var(--he-input-color);
+    cursor: text;
 }
 
 :host(:hover) {
