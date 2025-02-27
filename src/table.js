@@ -297,6 +297,10 @@ export class HeliumTable extends HTMLElement {
         if (this.getAttribute('submit-all')) {
             this.internals.setFormValue(JSON.stringify(this.getTableData()));
         }
+
+        // All internal input events are not allowed to propagate outwards.
+        // Only custom input events are triggered to the outside
+        this.$form.addEventListener('input', (e) => e.stopPropagation());
     }
 
     deleteChecked(confirm = true) {
