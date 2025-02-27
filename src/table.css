@@ -78,7 +78,7 @@ thead td {
 thead td:has(#check-all) {
     display: flex;
     align-items: center;
-    padding: 6px 15px;
+    padding: 6px 16px;
     width: fit-content;
 }
 

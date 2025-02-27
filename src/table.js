@@ -226,6 +226,8 @@ export class HeliumTable extends HTMLElement {
     rowColors = {};
     /** @type {Object.<string, ?Object.<string, string>>} */
     rowStyles = {};
+    /** @type {Object.<string, Object.<string, ?Object.<string, string>>>} */
+    cellStyles = {};
 
     constructor() {
         super();
@@ -720,6 +722,34 @@ export class HeliumTable extends HTMLElement {
     /**
     * @param {HTMLTableRowElement} $row 
     * @param {string} $colName
+    * @param {string} val
+    * @returns {void}
+    */
+    _applyCellStyles($cell, colName, val) {
+        let styles = this.cellStyles[colName]
+        if (styles === null) {
+            return;
+        }
+
+        styles = styles[val];
+        if (styles === null) {
+            $cell.style.cssText = '';
+            return;
+        }
+        
+        let style = styles[val];
+        if (style) {
+            $cell.style.cssText = style;
+        } else {
+            $cell.style.cssText = '';
+        }
+    }
+
+    /**
+    * @param {HTMLTableRowElement} $row 
+    * @param {string} $colName
+    * @param {string} val
+    * @returns {void}
     */
     _applyRowStyles($row, colName, val) {
         let styles = this.rowStyles[colName];
@@ -1006,6 +1036,7 @@ export class HeliumTable extends HTMLElement {
                     $cell.setAttribute('data', val);
                     $cell.innerHTML = this._renderText($column, text);
                     $cell.title = val;
+                    this._applyCellStyles($cell, colName, val);
                     this._applyRowStyles($row, colName, val);
                     break;
             }
@@ -1227,6 +1258,12 @@ export class HeliumTable extends HTMLElement {
                 this.rowStyles[colName] = JSON.parse($column.getAttribute('row-style'));
             } catch (error) {
                 throw new Error('The provided row-style is not valid JSON!');
+            }
+
+            try {
+                this.cellStyles[colName] = JSON.parse($column.getAttribute('cell-style'));
+            } catch (error) {
+                throw new Error('The provided cell-style is not valid JSON!');
             }
 
             let $filterCell = document.createElement('td');
