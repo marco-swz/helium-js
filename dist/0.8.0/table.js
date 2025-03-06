@@ -1100,8 +1100,8 @@ class HeliumTable extends HTMLElement {
         }
 
         if (this.pagination != null) {
-            formData.append('offset', this.offset);
-            formData.append('count', this.pagination + 1);
+            params.append('offset', this.offset);
+            params.append('count', this.pagination + 1);
         }
 
         fetch(this.endpoint + '/?' + params.toString(), {
