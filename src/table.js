@@ -442,7 +442,7 @@ export class HeliumTable extends HTMLElement {
             if (colName == null) {
                 continue;
             }
-            colNames[colName] = $col.innerText;
+            colNames[colName] = $col.querySelector('.span-colname').innerText;
         }
 
         return colNames;
@@ -927,6 +927,10 @@ export class HeliumTable extends HTMLElement {
         let columns = this._getColumns(true);
         for (let i = 0; i < columns.length; ++i) {
             let $column = columns[i];
+            if (returnDisplayValues && ['hidden', 'check'].includes($column.getAttribute('type'))) {
+                continue;
+            }
+
             let $cell = $row.children[$column.cellIndex];
 
             const colName = $column.getAttribute('column');
