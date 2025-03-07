@@ -110,6 +110,7 @@ export class HeliumInput extends HTMLElement {
         shadow.append(this.$popover);
         shadow.adoptedStyleSheets = [sheet];
         this.internals = this.attachInternals();
+        this.internals.setFormValue('');
     }
 
     /**
