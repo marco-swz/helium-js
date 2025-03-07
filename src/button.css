@@ -13,7 +13,7 @@
     --he-button-borderColor: hsl(240 4.9% 83.9%);
     --he-button-hover-borderColor: var(--he-button-borderColor);
 
-    --he-theme-color: var(--he-accent-color, black);
+    --he-theme-color: var(--he-accent-color, steelblue);
     --he-theme-bright1-color: hsl(from var(--he-theme-color) h s calc(l + 10));
     --he-theme-contrast: white;
 
