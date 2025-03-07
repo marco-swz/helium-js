@@ -431,6 +431,24 @@ export class HeliumTable extends HTMLElement {
     }
 
     /**
+     * Returns a mapping of column name to display name
+     * @returns {<Object.<string, string>}
+     */
+    getColumnNames() {
+        const cols = this._getColumns(true);
+        const colNames = []
+        for (const $col of cols) {
+            const colName = $col.getAttribute('column');
+            if (colName == null) {
+                continue;
+            }
+            colNames[colName] = $col.innerText;
+        }
+
+        return colNames;
+    }
+
+    /**
      * Returns the data for all checked rows.
      * @param {boolean} [returnDisplayValues=false] - If true, returns the displayed values, if false, the values of the `data` attribute
      * @returns {Array<Object.<string, string>>}
