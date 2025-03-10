@@ -203,6 +203,10 @@ class HeliumDialog extends HTMLElement {
         this.setAttribute('title-text', newTitle);
         return this;
     }
+
+    static showDialog(content, type) {
+        heShowDialogTemp(content, type);
+    }
 }
 
 function heShowDialogTemp(content, type) {
@@ -243,6 +247,7 @@ function heShowDialogTemp(content, type) {
 
 if (!customElements.get('he-dialog')) {
     window.heShowDialogTemp = heShowDialogTemp;
+    window.HeliumDialog = HeliumDialog;
 
     customElements.define("he-dialog", HeliumDialog);
 
