@@ -5,7 +5,7 @@
     --he-button-borderWidth: 0.1rem;
     --he-button-font-size: 14px;
     --he-button-height: 35px;
-    --he-button-width: auto;
+    --he-button-width: fit-content;
 
     --he-button-color: black;
     --he-button-backgroundColor: white;
