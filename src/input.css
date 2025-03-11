@@ -23,10 +23,14 @@
 }
 
 :host(:hover) {
+    transition:
+        border-color 0.2s;
     border-color: var(--he-input-hover-borderColor);
 }
 
 :host([invalid]) {
+    transition:
+        border-color 0.2s;
     border-color: indianred;
 }
 
