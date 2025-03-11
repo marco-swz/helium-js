@@ -27,7 +27,9 @@
     color: inherit;
 }
 
-#inp:hover, #inp:focus {
+#inp:hover {
+    transition:
+        border-color 0.2s;
     cursor: pointer;
     border-color: var(--he-select-clr-border-hover, grey);
 }
