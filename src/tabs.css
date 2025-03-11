@@ -1,25 +1,88 @@
+ :host {
+     --he-tabs-backgroundColor: white;
+     --he-tabs-color: black;
+     --he-tabs-hover-backgroundColor: hsl(from var(--he-tabs-backgroundColor) h s calc(l - 6));
+     --he-tabs-unselected-backgroundColor: whitesmoke;
+     --he-tabs-unselected-color: gray;
+ }
+
+ :host([variant=pebble]) {
+    & #he-tabs-nav {
+        padding: 10px 0;
+        gap: 5px;
+    }
+
+    & #he-tabs-nav label {
+        color: hsl(240 3.8% 46.1%);
+    }
+
+    & #he-tabs-nav label:has(:checked) {
+        background-color: rgb(228 228 231);
+        border-radius: 4px;
+        color: black;
+    }
+ }
+
+ :host([variant=pebble-inverted]) {
+    & #he-tabs-nav {
+        padding: 4px;
+        gap: 5px;
+        background-color: whitesmoke;
+        width: fit-content;
+        border-radius: 8px;
+    }
+
+    & #he-tabs-nav label {
+        color: hsl(240 3.8% 46.1%);
+        border-radius: 4px;
+    }
+
+    & #he-tabs-nav label:has(:checked) {
+        background-color: rgb(228 228 231);
+        background-color: white;
+        color: black;
+    }
+     
+ }
+
 #he-tabs-nav {
     display: flex;
+}
+
+:host(:not([variant])) {
+    #he-tabs-nav label {
+        color: var(--he-tabs-unselected-color);
+        border: 1px solid lightgray;
+        border-bottom: 0;
+        border-top-right-radius: 3px;
+        border-top-left-radius: 3px;
+        background-color: var(--he-tabs-unselected-backgroundColor);
+    }
+
+    #he-tabs-nav label:has(:checked) {
+        color: var(--he-tabs-color);
+        background-color: var(--he-tabs-backgroundColor);
+        border-bottom: 1px solid var(--he-tabs-backgroundColor);
+        margin-bottom: -1px;
+    }
+
+    #he-tabs-nav label:hover {
+        background-color: var(--he-tabs-hover-backgroundColor);
+    }
+
+    #he-tabs-nav label:has(:checked):hover {
+        margin-bottom: -1px;
+    }
 }
 
 #he-tabs-nav label {
     padding: 0.5rem 1rem;
     cursor: pointer;
-    color: gray;
-    border: 1px solid lightgray;
-    border-bottom: 0;
-    border-top-right-radius: 3px;
-    border-top-left-radius: 3px;
-    background-color: whitesmoke;
-}
-
-#he-tabs-nav label:has(:checked) {
-    color: black;
-    background-color: white;
-    border-bottom: 1px solid white;
-    margin-bottom: -1px;
 }
 
 #he-tabs-nav label:hover {
-    background-color: #0082b40d;
+    transition:
+        background-color 0.2s,
+        color 0.2s;
+    background-color: var(--he-tabs-hover-backgroundColor);
 }
