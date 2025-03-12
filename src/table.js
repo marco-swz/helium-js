@@ -687,6 +687,7 @@ export class HeliumTable extends HTMLElement {
     }
 
     showDialogEdit() {
+        this.$diagEdit.reset();
         let $check = this.shadowRoot.querySelector('.check-row:state(checked)');
         if ($check == null) {
             throw new Error('No row selected');
@@ -697,6 +698,7 @@ export class HeliumTable extends HTMLElement {
     }
 
     showDialogDuplicate() {
+        this.$diagEdit.reset();
         let $check = this.shadowRoot.querySelector('.check-row:state(checked)');
         if ($check == null) {
             throw new Error('No row selected');
@@ -990,16 +992,17 @@ export class HeliumTable extends HTMLElement {
             let optionMap = {};
             if (options != null) {
                 const remap = this.remap[colName];
-                if (remap == null) {
-                    continue;
-                }
                 for (const val of options) {
-                    const mapped = remap[val];
-                    if (mapped) {
-                        optionMap[val] = mapped;
-                    } else {
-                        optionMap[val] = val;
+                    optionMap[val] = val;
+                    if (remap == null) {
+                        continue;
                     }
+
+                    const mapped = remap[val];
+                    if (mapped == null) {
+                        continue;
+                    }
+                    optionMap[val] = mapped;
                 }
             }
 
