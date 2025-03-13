@@ -1,13 +1,13 @@
 :host {
     --he-toggle-color: black;
     --he-toggle-backgroundColor: white;
-    --he-toggle-hover-backgroundColor: hsl(240 4.8% 95.9%);
     --he-toggle-outline-borderColor: lightgrey;
     --he-toggle-checked-color: black;
     --he-toggle-checked-backgroundColor: hsl(from var(--he-toggle-backgroundColor) h s calc(l - 10));
     --he-toggle-height: 35px;
     --he-toggle-minWidth: var(--he-toggle-height);
     --he-toggle-cursor: pointer;
+    --bg-color: var(--he-toggle-backgroundColor);
 
     background-color: var(--he-toggle-backgroundColor);
     color: var(--he-toggle-color);
@@ -23,10 +23,16 @@
 }
 
 :host(:not(:disabled):hover) {
-    background-color: var(--he-toggle-hover-backgroundColor);
+    transition:
+        background-color 0.2s;
+    background-color: hsl(from var(--bg-color) h s calc(l - 5));
 }
 
 :host([checked]) {
+    --bg-color: var(--he-toggle-checked-backgroundColor);
+    transition:
+        color 0.2s,
+        background-color 0.2s;
     color: var(--he-toggle-checked-color);
     background-color: var(--he-toggle-checked-backgroundColor);
 }

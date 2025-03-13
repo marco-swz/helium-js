@@ -32,6 +32,8 @@
 }
 
 #he-icon-close:hover {
+    transition:
+        background-color 0.2s;
     background-color: whitesmoke;
 }
 

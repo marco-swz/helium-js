@@ -17,14 +17,15 @@ export default {
         'src/combo_button.js',
         'src/toggle.js',
         'src/breadcrumb.js',
+        'src/tree.js',
     ],
     output: [
         {
-            dir: 'dist/0.8.0',
+            dir: 'dist/0.9.0',
             format: 'module',
         },
         {
-            dir: 'dist-min/0.8.0',
+            dir: 'dist-min/0.9.0',
             format: 'module',
             plugins: [terser()]
         },

@@ -52,9 +52,11 @@
         border-left-style: solid;
         cursor: pointer;
         font-size: 10px;
-        padding: 5px;
+        padding: 0 10px;
 
         &:hover {
+            transition:
+                background-color 0.2s;
             background-color: hsl(240 4.8% 95.9%);
         }
     }

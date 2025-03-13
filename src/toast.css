@@ -95,7 +95,14 @@
     font-size: inherit;
 }
 
+@property --circle-fill {
+    syntax: '<percentage>';
+    inherits: false;
+    initial-value: 0%;
+}
+
 #btnClose {
+    --circle-fill: 0%;
     border-radius: 50%;
     font-size: 20px;
     font-weight: 500;
@@ -106,8 +113,10 @@
     text-align: center;
     vertical-align: middle;
     cursor: pointer;
+    /* background: conic-gradient(lightgrey var(--circle-fill), white 0); */
 }
 
 #btnClose:hover {
+    /* --circle-fill: 100%; */
     background-color: whitesmoke;
 }

@@ -1,4 +1,4 @@
-import sheet from "./toast.css";
+const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\r\n    position: fixed;\r\n    top: unset;\r\n    right: unset;\r\n    left: 50%;\r\n    bottom: 10px;\r\n    transform: translateX(-50%);\r\n    width: 300px;\r\n    font-size: 16px;\r\n    font-weight: 500;\r\n    z-index: 500;\r\n    background-color: white;\r\n}\r\n\r\n:host([position=bottom-right]) {\r\n    top: unset;\r\n    left: unset;\r\n    bottom: 10px;\r\n    right: 10px;\r\n    transform: unset;\r\n}\r\n\r\n:host([position=bottom-left]) {\r\n    top: unset;\r\n    right: unset;\r\n    bottom: 10px;\r\n    left: 10px;\r\n    transform: unset;\r\n}\r\n\r\n:host([position=top-left]) {\r\n    bottom: unset;\r\n    right: unset;\r\n    top: 10px;\r\n    left: 10px;\r\n    transform: unset;\r\n}\r\n\r\n:host([position=top-right]) {\r\n    bottom: unset;\r\n    left: unset;\r\n    top: 10px;\r\n    right: 10px;\r\n    transform: unset;\r\n}\r\n\r\n:host([position=top]) {\r\n    bottom: unset;\r\n    right: unset;\r\n    top: 10px;\r\n    left: 50%;\r\n    transform: translateX(-50%);\r\n}\r\n\r\n#contToasts {\r\n    display: flex;\r\n    flex-direction: column;\r\n    gap: 10px;\r\n}\r\n\r\n#toast {\r\n    border: 1px solid grey;\r\n    border-radius: var(--he-toast-radius, 3px);\r\n    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);\r\n    border-left: 5px solid steelblue;\r\n}\r\n\r\n#toast[type=warn] {\r\n    border-left-color: var(--he-toast-clr-warn, orange);\r\n}\r\n\r\n#toast[type=error] {\r\n    border-left-color: var(--he-toast-clr-error, indianred);\r\n}\r\n\r\n#toast[type=success] {\r\n    border-left-color: var(--he-toast-clr-success, seagreen);\r\n}\r\n\r\n#bar {\r\n    width: 100%;\r\n    height: 3px;\r\n    background-color: lightgrey;\r\n    margin-right: auto;\r\n}\r\n\r\n#contMain {\r\n    display: flex;\r\n    justify-content: space-between;\r\n    align-items: center;\r\n}\r\n\r\n#contText {\r\n    padding: 1rem 2rem;\r\n    font-size: inherit;\r\n}\r\n\r\n@property --circle-fill {\r\n    syntax: '<percentage>';\r\n    inherits: false;\r\n    initial-value: 0%;\r\n}\r\n\r\n#btnClose {\r\n    --circle-fill: 0%;\r\n    border-radius: 50%;\r\n    font-size: 20px;\r\n    font-weight: 500;\r\n    margin-right: 10px;\r\n    border-radius: 50%;\r\n    width: 35px;\r\n    height: 35px;\r\n    text-align: center;\r\n    vertical-align: middle;\r\n    cursor: pointer;\r\n    /* background: conic-gradient(lightgrey var(--circle-fill), white 0); */\r\n}\r\n\r\n#btnClose:hover {\r\n    /* --circle-fill: 100%; */\r\n    background-color: whitesmoke;\r\n}\r\n");
 
 /**
  * A toast element for quick notification.
@@ -17,7 +17,7 @@ import sheet from "./toast.css";
  *
  * @todo Support for mobile devices and small screens
  */
-export class HeliumToast extends HTMLElement {
+class HeliumToast extends HTMLElement {
     static observedAttributes = [
         'position',
     ];
@@ -44,10 +44,6 @@ export class HeliumToast extends HTMLElement {
      * @param {string} newValue The new attribute value
      */
     attributeChangedCallback(name, _oldValue, newValue) {
-        switch (name) {
-            default:
-                break;
-        }
     }
 
     connectedCallback() {
@@ -66,7 +62,7 @@ export class HeliumToast extends HTMLElement {
             ], {
                 duration: 200,
             }
-        )
+        );
         animation.onfinish = () => $toast.remove();
     }
 
@@ -114,7 +110,7 @@ export class HeliumToast extends HTMLElement {
             ], {
                 duration: Number(duration),
             }
-        )
+        );
         animation.onfinish = () => this.hideToast($toast);
         $toast.append($bar);
 
@@ -167,17 +163,19 @@ if (!customElements.get('he-toast')) {
 
     document.addEventListener("he-toast", function(e) {
         HeliumToast.showToast(e.detail.value);
-    })
+    });
 
     document.addEventListener("he-toast-error", function(e) {
         HeliumToast.showToast(e.detail.value, 'error');
-    })
+    });
 
     document.addEventListener("he-toast-warn", function(e) {
         HeliumToast.showToast(e.detail.value, 'warn');
-    })
+    });
 
     document.addEventListener("he-toast-success", function(e) {
         HeliumToast.showToast(e.detail.value, 'success');
-    })
+    });
 }
+
+export { HeliumToast };

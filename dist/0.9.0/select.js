@@ -1,7 +1,8 @@
-import sheet from './select.css';
-import { heSpaceBelow, hePositionRelative, heEnableBodyScroll, heDisableBodyScroll } from "./utils.js";
+import { h as heSpaceBelow, a as hePositionRelative, b as heEnableBodyScroll } from './utils-BGzlNXdX.js';
 
-export class HeliumSelect extends HTMLElement {
+const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\n    height: 1.8rem;\n    width: fit-content;\n    font-size: 14px;\n    min-width: 60px;\n    display: inline-block;\n}\n\n:host([disabled]) {\n    pointer-events: none;\n    color: hsl(from var(--he-select-clr, black) h s calc(l + 50))\n}\n\n#inp {\n    position: relative;\n    background-color: var(--he-select-clr-bg, whitesmoke);\n    border: 1px solid lightgrey;\n    width: 100%;\n    height: inherit;\n    min-width: inherit;\n    padding: 0.3rem 0.4rem;\n    border-radius: 3px;\n    outline: none;\n    text-align: left;\n    padding-right: 25px;\n    text-wrap: nowrap;\n    color: inherit;\n}\n\n#inp:hover {\n    transition:\n        border-color 0.2s;\n    cursor: pointer;\n    border-color: var(--he-select-clr-border-hover, grey);\n}\n\n#inp::after {\n    content: \"▼\";\n    position: absolute;\n    font-size: 10px;\n    width: fit-content;\n    height: fit-content;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    margin: auto 4px auto auto;\n}\n\n#popover {\n    inset: unset;\n    outline: none;\n    border: 1px solid grey;\n    border-radius: var(--he-select-border-radius, 3px);\n    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);\n    width: min-content;\n}\n\n#cont-options {\n    display: flex;\n    flex-direction: column;\n    background-color: var(--he-select-clr-bg, white);\n    max-height: 300px;\n    overflow: auto;\n    overscroll-behavior: contain;\n}\n\n#cont-options option {\n    padding: 5px 4px;\n    border-radius: 3px;\n}\n\n#cont-options option[selected] {\n    background-color: var(--he-select-clr-bg-hover, whitesmoke);\n}\n\n#cont-options option:hover:not(:disabled) {\n    background-color: var(--he-select-clr-bg-hover, whitesmoke);\n    cursor: pointer;\n}\n\n#filter {\n    --he-input-border-radius: 2px;\n    width: 100%;\n}\n\n");
+
+class HeliumSelect extends HTMLElement {
     static formAssociated = true;
     static observedAttributes = [
         'open',
@@ -88,7 +89,7 @@ export class HeliumSelect extends HTMLElement {
      */
     set name(val) {
         if (val) {
-            this.setAttribute('name', val)
+            this.setAttribute('name', val);
         } else {
             this.removeAttribute('name');
         }
@@ -161,8 +162,6 @@ export class HeliumSelect extends HTMLElement {
                 } else {
                     this.internals.setFormValue(this.value);
                 }
-                break;
-            default:
                 break;
         }
     }
@@ -374,7 +373,6 @@ export class HeliumSelect extends HTMLElement {
             if (this.$popover.offsetWidth < this.$input.offsetWidth - compensation) {
                 this.$popover.style.width = this.$input.offsetWidth - 7 + 'px';
             }
-            heDisableBodyScroll();
             this.$popover.style.visibility = '';
             this.$filter.focus();
         } else {
@@ -402,3 +400,5 @@ export class HeliumSelect extends HTMLElement {
 if (!customElements.get('he-select')) {
     customElements.define("he-select", HeliumSelect);
 }
+
+export { HeliumSelect };
