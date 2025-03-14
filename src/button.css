@@ -10,6 +10,7 @@
     --he-button-color: black;
     --he-button-backgroundColor: white;
     --he-button-hover-backgroundColor: hsl(240 4.8% 95.9%);
+    --he-button-hover-color: black;
     --he-button-borderColor: hsl(240 4.9% 83.9%);
     --he-button-hover-borderColor: var(--he-button-borderColor);
 
@@ -74,6 +75,17 @@
     --he-button-hover-backgroundColor: var(--he-theme-color);
     --he-button-borderColor: var(--he-theme-contrast);
     --he-button-hover-borderColor: var(--he-theme-color);
+}
+
+a {
+    width: inherit;
+    cursor: inherit;
+    padding: inherit;
+    border-radius: inherit;
+    outline-style: inherit;
+    box-shadow: inherit;
+    text-shadow: inherit;
+    min-width: inherit;
 }
 
 #he-button {

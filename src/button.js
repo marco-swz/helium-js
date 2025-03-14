@@ -34,9 +34,13 @@ export class HeliumButton extends HTMLElement {
         'submit',
         'he-input-invalid',
         'disabled',
+        'link',
+        'href',
     ];
-    /** @type {HTMLInputElement} */
+    /** @type {HTMLButtonElement} */
     $button;
+    /** @type {HTMLAnchorElement} */
+    $anchor;
     /** @type {?EventListener} */
     listenerClick = null;
     /** @type {ElementInternals} */
@@ -48,14 +52,17 @@ export class HeliumButton extends HTMLElement {
         super();
         let shadow = this.attachShadow({ mode: "open" });
 
+        this.$anchor = document.createElement('a');
+
         this.$button = document.createElement('button');
-        this.$button.id = 'he-button'
+        this.$button.id = 'he-button';
 
         this.$slot = document.createElement('slot');
         this.$slot.name = "inner";
         this.$button.append(this.$slot);
 
-        shadow.append(this.$button);
+        this.$anchor.append(this.$button);
+        shadow.append(this.$anchor);
         shadow.adoptedStyleSheets = [sheet];
         this.internals = this.attachInternals();
     }
@@ -179,6 +186,14 @@ export class HeliumButton extends HTMLElement {
                 } else {
                     this.internals.states.delete('disabled');
                     this.$button.removeAttribute('disabled');
+                }
+                break;
+            case 'link':
+            case 'href':
+                if (newValue) {
+                    this.$anchor.setAttribute(name, newValue);
+                } else {
+                    this.$anchor.removeAttribute(name);
                 }
                 break;
             default:
