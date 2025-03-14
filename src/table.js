@@ -966,9 +966,7 @@ export class HeliumTable extends HTMLElement {
         throw new Error(`No column found with name ${colName}`);
     }
 
-
     _filterChangeCallback(e) {
-        const $col = e.currentTarget.closest('th');
         this.offset = 0;
 
         if (this.endpoint != null) {
@@ -976,7 +974,8 @@ export class HeliumTable extends HTMLElement {
             return;
         }
 
-
+        const idx = e.currentTarget.closest('td').cellIndex;
+        const $col = this._getColumns(false)[idx];
         this._applyFilters([$col]);
     }
 
