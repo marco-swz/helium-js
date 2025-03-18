@@ -52,6 +52,14 @@ const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\n    --he-table-row
  * ```
  * TODO: Document notification attribute
  *
+ * ## Column Types
+ * ### Callback
+ *
+ * If the column type is set to `callback`, a callback function needs to be provided on the `th` element via a `onrender` attribute.
+ * ```html
+ * <th column="mycol" type="callback" onrender"(data) => mycallback(data)">Column Name</th>
+ * ```
+ *
  * ## Backend API
  *
  * If the attribute `endpoint` is set, all table operations are expected to be handled by the defined endpoint.
@@ -171,7 +179,7 @@ const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\n    --he-table-row
  * @attr {string} column - [th] The internal name of the column. This name needs to be unique for each column
  * @attr {?string} filter - [th] The filter value for a given column
  * @attr {?string} pattern - [th] The regex pattern to determine if the input for a given column is valid
- * @attr {'hidden'|'check'|'edit'|'number'|'date'|'datetime'|'text'|null} type - [th] The type of the column
+ * @attr {'hidden'|'check'|'edit'|'number'|'date'|'datetime'|'text'|'callback'|null} type - [th] The type of the column
  * @attr {?string} remap - [th] A mapping of old value to new value, in JSON format
  * @attr {?string} options - [th] A JSON list of allowed values. The selection is enforced via `select` elements
  * @attr {on|off} no-edit - [th] If set, the input field is hidden when editing a row
@@ -1201,7 +1209,8 @@ class HeliumTable extends HTMLElement {
                     $cell.innerHTML = 'E';
                     break;
                 case 'callback':
-                    $cell.innerHTML = window[$column.getAttribute('onrender')](data) ?? '';
+                    $cell.setAttribute('data', val);
+                    $cell.innerHTML = window[$column.getAttribute('onrender')](data, colName) ?? '';
                     break;
                 case 'hidden':
                     $cell.style.display = 'none';
