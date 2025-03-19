@@ -138,7 +138,7 @@ class HeliumDialog extends HTMLElement {
                 let rect = this.$dialog.getBoundingClientRect();
                 let isInDialog = (rect.top <= e.clientY && e.clientY <= rect.top + rect.height &&
                     rect.left <= e.clientX && e.clientX <= rect.left + rect.width);
-                if (!isInDialog) {
+                if (!isInDialog && e.target.tagName === 'HE-DIALOG') {
                     this.close();
                 }
             });
