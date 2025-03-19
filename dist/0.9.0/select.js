@@ -244,17 +244,19 @@ class HeliumSelect extends HTMLElement {
     /**
      * Replaces all options with the ones provided.
      * If the same value exists in the old and new options, the value is selected.
-     * @param {Object.<string, string>} newOptions A mapping from value to text
+     * @param {Array<string>} newOptions A list of options
+     * @param {?Object.<string, string>} displayMapping A mapping from value to text
      * @returns {Self}
      */
-    replaceOptions(newOptions) {
+    replaceOptions(newOptions, displayMapping = null) {
+        displayMapping = displayMapping ?? {};
         this.$options.innerHTML = '';
         const valOld = this.value;
         let $optSelect = null;
-        for (const [val, txt] of Object.entries(newOptions)) {
+        for (const val of newOptions) {
             let $opt = document.createElement('option');
             $opt.value = val;
-            $opt.innerHTML = txt;
+            $opt.innerHTML = displayMapping[val] ?? val;
             $opt.onclick = (e) => this._clickedOptionCallback.bind(this)(e);
             this.$options.append($opt);
 
