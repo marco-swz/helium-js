@@ -21,6 +21,7 @@ const sheet = new CSSStyleSheet();sheet.replaceSync("#he-diag-outer {\n    outli
  * @attr title-text - The text in the title of the dialog
  * @attr {on|off} hide-close-icon - If set, hides the close icon in the top-right corner
  * @attr {on|off} show-close-button - If set, shows a button in the footer to close the dialog
+ * @attr {on|off} outside-close - If set, allows the user to close the dialog by clicking outside (on the backdrop)
  *
  * @slot body - The body of the dialog
  * @slot footer - The foote of the dialog. This is where buttons are commonly placed.
@@ -124,7 +125,6 @@ class HeliumDialog extends HTMLElement {
         return this;
     }
 
-
     connectedCallback() {
         this.addEventListener("he-dialog-show", function() {
             this.show();
@@ -132,6 +132,17 @@ class HeliumDialog extends HTMLElement {
         this.addEventListener("he-dialog-close", function() {
             this.close();
         });
+
+        if (this.getAttribute('outside-close')) {
+            this.addEventListener('click', e => {
+                let rect = this.$dialog.getBoundingClientRect();
+                let isInDialog = (rect.top <= e.clientY && e.clientY <= rect.top + rect.height &&
+                    rect.left <= e.clientX && e.clientX <= rect.left + rect.width);
+                if (!isInDialog) {
+                    this.close();
+                }
+            });
+        }
     }
 
     /**
