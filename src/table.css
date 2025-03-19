@@ -38,10 +38,6 @@ thead {
     z-index: 2;
 }
 
-thead tr:last-child {
-    display: none;
-}
-
 thead th {
     background-color: var(--he-table-header-backgroundColor);
     color: var(--he-table-header-color);
@@ -56,14 +52,11 @@ thead th {
 :host([filter=below]) {
     & thead th {
         padding-bottom: 0;
+        border-bottom: 0;
     }
 }
 
-:host([filter=button]) {
-    & thead tr:last-child {
-        display: none;
-    }
-
+:host([column-menu]) {
     & thead {
         & tr:first-child th {
             border-bottom: var(--he-table-header-borderBottom);
@@ -93,43 +86,47 @@ thead th {
 
                 &::after {
                     font-family: "Font Awesome 5 Pro";
-                    content: "";
-                    /* position: absolute; */
+                    content: "\f107";
+                    color: grey;
                     width: 10px;
                     height: 15px;
-                    color: steelblue;
                     right: 5px;
                     padding: 0 5px;
                 }
             }
 
-            &.filter-active .span-colname::after {
+            &[filter] .span-colname::after {
                 content: "\f0b0";
                 background-color: inherit;
+                color: steelblue;
             }
 
-            &.desc-active .span-colname::after {
+            &[sort=desc] .span-colname::after {
                 content: "\f354";
                 background-color: inherit;
+                color: steelblue;
             }
 
-            &.asc-active .span-colname::after {
+            &[sort=asc] .span-colname::after {
                 content: "\f357";
                 background-color: inherit;
+                color: steelblue;
             }
 
-            &.asc-active.filter-active .span-colname::after {
+            &[sort=asc][filter] .span-colname::after {
                 content: "\f0b0\f357";
                 background-color: inherit;
                 padding-right: 15px;
                 padding-bottom: 2px;
+                color: steelblue;
             }
 
-            &.desc-active.filter-active .span-colname::after {
+            &[sort=desc][filter] .span-colname::after {
                 content: "\f0b0\f354";
                 background-color: inherit;
                 padding-right: 15px;
                 padding-bottom: 2px;
+                color: steelblue;
             }
         }
 
@@ -219,42 +216,8 @@ thead .cont-filter {
     }
 }
 
-:host(:not([filter])), :host([filter=behind]) {
-    & thead tr:last-child {
-        display: none;
-    }
-
-    & thead tr:first-child th {
-        border-bottom: var(--he-table-header-borderBottom);
-    }
-}
-
-:host([filter=behind]) {
-    & .span-colname {
-        position: absolute;
-        left: 0.3rem;
-        pointer-events: none;
-        transition: 0.1s ease all;
-        top: 0px;
-    }
-
-    & .inp-filter:focus,
-    & .cont-filter input:not(:placeholder-shown),
-    & .cont-filter select:has(option:checked:not([value=""])) {
-        transform: translateY(7px);
-        font-weight: 600;
-        border-bottom: 0.1rem solid darkgrey;
-        padding: 4px 5px;
-        padding-bottom: 1px;
-    }
-
-    & .inp-filter:focus + .span-colname, 
-    & .cont-filter input:not(:placeholder-shown):not([hidden]) + .span-colname,
-    & .cont-filter select:has(option:checked:not([value=""])) + .span-colname {
-        transform: translateY(-5px);
-        font-size: 0.7rem;
-        opacity: 1;
-    }
+thead tr:first-child th {
+    border-bottom: var(--he-table-header-borderBottom);
 }
 
 thead .inp-filter {

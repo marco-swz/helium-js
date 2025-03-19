@@ -168,7 +168,8 @@ import sheet from './table.css';
  * @attr {?string} pagination - The amount rows for each pagination step
  * @attr {on|off} submit-all - If set, all rows of the table are passed on to forms, instead of checked one.
  * @attr {on|off} sorter - If set, show a sorting button for all columns.
- * @attr {null|'behind'|'below'} filter - If set, disables the filters for all rows.
+ * @attr {null|'below'|'true'} filter - If set, disables the filters for all rows.
+ * @attr {on|off} column-menu - Shows a menu when a column name is clicked. This menu controls the filter and sorting.
  * @attr {on|off} require-filter - If set, at least one filter value has to be applied, otherwise no data is requested. This can be used to improve performance for time intensive queries.
  *
  * @attr {string} column - [th] The internal name of the column. This name needs to be unique for each column
@@ -784,7 +785,7 @@ export class HeliumTable extends HTMLElement {
         this.disableRequest = true;
         let $col = this._columnFromName(data['column']);
         const filterVal = data['filter'] ?? data['filter-sel'];
-        this._filterColumn($col, filterVal, true);
+        this._filterColumn($col, filterVal);
         this.disableRequest = false;
         this._sortColumn($col, data['sort']);
         this.$diagColumn.close();
@@ -920,31 +921,52 @@ export class HeliumTable extends HTMLElement {
         this.$diagColumn.reset();
         const colName = $column.getAttribute('column');
         const dispName = $column.querySelector('.span-colname').innerHTML;
-        const filterVal = this.$form.querySelector('#filter-' + colName).value;
-        const checkedDesc = this.$form.querySelector(`#${colName}-desc`).checked;
-        const checkedAsc = this.$form.querySelector(`#${colName}-asc`).checked;
+        const filterVal = $column.getAttribute('filter');
+        const description = $column.getAttribute('description');
+
+        if (description != null) {
+            this.$diagColumn.querySelector('#lbl-desc').style.display = '';
+            let $desc = this.$diagColumn.querySelector('#desc-column');
+            $desc.style.display = '';
+            $desc.innerHTML = description;
+        } else {
+            this.$diagColumn.querySelector('#lbl-desc').style.display = 'none';
+            this.$diagColumn.querySelector('#desc-column').style.display = 'none';
+        }
+
+        let checkedDesc = false;
+        let checkedAsc = false;
+        switch ($column.getAttribute('sort')) {
+            case 'desc':
+                checkedDesc = true;
+                break;
+            case 'asc':
+                checkedAsc = true;
+                break;
+        }
+
         let $inpFilter = this.$diagColumn.querySelector('#inp-filter-column');
         let $selFilter = this.$diagColumn.querySelector('#sel-filter-column');
         let valMap = this.remap[colName] ?? {};
 
         let options = this.options[colName];
         if (options != null) {
+            options = [...options];
             options.sort(function(a, b) {
                 return a.localeCompare(b);
             });
 
-            options = Object.fromEntries(options.map(x => [x, valMap[x] ?? x]));
-            options = { '': '', ...options };
+            options.unshift('');
             $selFilter.disabled = false;
-            $selFilter.replaceOptions(options);
-            $selFilter.value = filterVal;
+            $selFilter.replaceOptions(options, valMap);
+            $selFilter.value = filterVal ?? '';
             $selFilter.style.display = '';
             $inpFilter.style.display = 'none';
             $inpFilter.disabled = true;
             
         } else {
             $inpFilter.disabled = false;
-            $inpFilter.value = filterVal;
+            $inpFilter.value = filterVal ?? '';
             $inpFilter.select();
             $selFilter.disabled = true;
             $selFilter.style.display = 'none';
@@ -977,38 +999,41 @@ export class HeliumTable extends HTMLElement {
     _filterChangeCallback(e) {
         this.offset = 0;
 
-        if (this.endpoint != null) {
-            this._requestRows(this.replaceBody);
-            return;
-        }
-
+        const filterValue = e.currentTarget.value;
         const idx = e.currentTarget.closest('td').cellIndex;
         const $col = this._getColumns(false)[idx];
-        this._applyFilters([$col]);
+        this._filterColumn($col, filterValue);
     }
 
     /**
      * Filters a column based on the provided value.
      * @param {HTMLTableCellElement} $column The column element
      * @param {string} filterValue The filter value
-     * @param {boolean} [partial=false] Does not filter partial matches if set to `true`
+     * @param {?boolean} [partial=null] Does not filter partial matches if set to `true`
      * @returns {Self}
      */
-    _filterColumn($column, filterValue, partial) {
+    _filterColumn($column, filterValue, partial=null) {
         const colName = $column.getAttribute('column');
         let $filter = this.$form.querySelector(`.inp-filter[name="${colName}"]`);
-        $filter.value = filterValue;
+        if ($filter != null) {
+            $filter.value = filterValue;
+        }
 
-        if (partial) {
+        if (partial === false) {
             $column.removeAttribute('strict-filter');
-        } else {
+        } else if (partial === true) {
             $column.setAttribute('strict-filter', '');
         }
 
         if (filterValue === '') {
-            $column.classList.remove('filter-active');
+            $column.removeAttribute('filter');
         } else {
-            $column.classList.add('filter-active');
+            $column.setAttribute('filter', filterValue);
+        }
+
+        if (this.endpoint != null) {
+            this._requestRows(this.replaceBody);
+            return;
         }
 
         this._applyFilters([$column]);
@@ -1088,19 +1113,22 @@ export class HeliumTable extends HTMLElement {
         let $dialog = document.createElement('he-dialog');
         $dialog.id = 'diag-column';
         $dialog.setAttribute('title-text', 'Spalte');
+        $dialog.setAttribute('outside-close', 'true');
 
         let $body = document.createElement('form');
         $body.slot = 'body';
         $body.id = 'form-column';
         $body.innerHTML = `
+            <label id="lbl-desc" style="display: none">Beschreibung</label>
+            <span id="desc-column" style="display: none"></span>
             <label>Sortierung</label>
             <div id="cont-sort-diag-col">
-                <he-toggle id="toggle-asc" variant="outline" name="sort" value="asc">Aufsteigend</he-toggle>
-                <he-toggle id="toggle-desc" variant="outline" name="sort" value="desc">Absteigend</he-toggle>
+                <he-toggle id="toggle-asc" variant="outline" name="sort" value="asc">A - Z</he-toggle>
+                <he-toggle id="toggle-desc" variant="outline" name="sort" value="desc">Z - A</he-toggle>
             </div>
             <label>Filter</label>
             <he-input id="inp-filter-column" name="filter"></he-input>
-            <he-select id="sel-filter-column" name="filter-sel"></he-select>
+            <he-select id="sel-filter-column" name="filter-sel" filter="true"></he-select>
             <he-input id="inp-colname-column" type="hidden" name="column"></he-input>
         `;
         $dialog.append($body);
@@ -1248,20 +1276,24 @@ export class HeliumTable extends HTMLElement {
         }
 
         this.loading = true;
-
-        let formData = new FormData(this.$form);
-
+        
         let params = new URLSearchParams();
-        for (const [key, value] of formData.entries()) {
-            if (value.length === 0) {
-                continue;
+        let hasFilter = false;
+        for (const $col of this._getColumns(true)) {
+            const filterVal = $col.getAttribute('filter');
+            const colName = $col.getAttribute('column');
+            if (filterVal != null && filterVal !== '') {
+                params.append(colName, filterVal);
             }
-            params.append(key, value);
+
+            const sortDir = $col.getAttribute('sort');
+            if (sortDir != null) {
+                params.append('sort', colName + '-' + sortDir);
+                hasFilter = true;
+            }
         }
 
-        const isNoFilter = params.size === 0 || (params.size === 1 && params.get('sort') != null);
-
-        if (this.getAttribute('require-filter') && isNoFilter) {
+        if (this.getAttribute('require-filter') && !hasFilter) {
             this.loading = false;
             callback.bind(this)([]);
             return;
@@ -1372,16 +1404,8 @@ export class HeliumTable extends HTMLElement {
      * @returns {HTMLElement}
      */
     _renderFilter($column, colName) {
-        const options = $column.getAttribute('options');
-
         let $filter = null;
-        if (options) {
-            try {
-                this.options[colName] = JSON.parse(options);
-            } catch (error) {
-                throw new Error('The provided options are not valid JSON!');
-            }
-
+        if (this.options[colName]) {
             $filter = document.createElement('select');
             let $optionEmpty = document.createElement('option');
             $optionEmpty.value = '';
@@ -1416,9 +1440,18 @@ export class HeliumTable extends HTMLElement {
         $rowFilters.classList.add('row-filter');
         let $rowColNames = document.createElement('tr');
         $rowColNames.classList.add('row-colName');
+        const useColumnMenu = this.getAttribute('column-menu') != null;
+        const attrFilter = this.getAttribute('filter');
 
         for (let $column of columns) {
             let colName = $column.getAttribute('column') ?? $column.innerText;
+
+            try {
+                // Numbers are converted to strings to simplify sorting later on
+                this.options[colName] = JSON.parse($column.getAttribute('options'),  (_key, value, data) => typeof value === 'number' ? data.source : value);
+            } catch (error) {
+                throw new Error('The provided options are not valid JSON!');
+            }
 
             try {
                 this.remap[colName] = JSON.parse($column.getAttribute('remap'));
@@ -1446,8 +1479,6 @@ export class HeliumTable extends HTMLElement {
 
             let $filterCell = document.createElement('td');
             $rowFilters.append($filterCell);
-
-            const attrFilter = this.getAttribute('filter');
 
             const isHidden = $column.getAttribute('type') === 'hidden';
             if (isHidden) {
@@ -1492,44 +1523,35 @@ export class HeliumTable extends HTMLElement {
             $column.innerHTML = '';
             $spanName.classList.add('span-colname');
 
-            let $filter = this._renderFilter($column, colName);
-            if (attrFilter === 'behind') {
-                let $contFilter = document.createElement('div');
-                $contFilter.classList.add('cont-filter')
-                $contHeaderCell.append($contFilter);
-                $contFilter.prepend($filter);
-                $contFilter.append($spanName);
+            if (useColumnMenu) {
+                $contHeaderCell.append($spanName);
+                $contHeaderCell.classList.add('cont-colname');
+                $contHeaderCell.addEventListener('click', () => this._colClickCallback.bind(this)($column));
 
             } else if (attrFilter === 'below') {
-                $contHeaderCell.append($spanName);
-                $filterCell.append($filter);
+                let $filter = this._renderFilter($column, colName);
 
-            } else if (attrFilter === 'button') {
                 $contHeaderCell.append($spanName);
-                $contHeaderCell.classList.add('cont-colname')
                 $filterCell.append($filter);
-                $contHeaderCell.addEventListener('click', () => this._colClickCallback.bind(this)($column));
+                const sort = $column.getAttribute('sort');
+                let $contSorters = this._renderSorters(colName, sort);
+                $column.setAttribute('column', colName);
+                $contHeaderCell.append($contSorters);
 
             } else {
                 $contHeaderCell.append($spanName);
-                $filterCell.append($filter);
                 $spanName.style.position = 'unset';
             }
 
-            const sort = $column.getAttribute('sort');
-            let $contSorters = this._renderSorters(colName, sort);
-            $column.setAttribute('column', colName);
-            $contHeaderCell.append($contSorters);
-
             $column.append($contHeaderCell);
             $rowColNames.append($column);
-
-            //const options = this._getColumnOptions($column);
         }
 
         let $tHead = document.createElement('thead');
         $tHead.append($rowColNames);
-        $tHead.append($rowFilters);
+        if (!useColumnMenu) {
+            $tHead.append($rowFilters);
+        }
 
         return $tHead;
     }
@@ -1585,7 +1607,7 @@ export class HeliumTable extends HTMLElement {
         shadow.append(this.$diagEdit);
         this.innerHTML = '';
 
-        if (this.getAttribute('filter') === 'button') {
+        if (this.getAttribute('column-menu')) {
             this.$diagColumn = this._renderDialogColumn();
             shadow.append(this.$diagColumn);
         }
@@ -1643,31 +1665,28 @@ export class HeliumTable extends HTMLElement {
             throw new Error(`Invalid sort direction: ${dir}`);
         }
 
-        if (dir != null) {
-            let $elem = this.$form.querySelector('.asc-active');
-            if ($elem != null) {
-                $elem.classList.remove('asc-active');
-            }
-            $elem = this.$form.querySelector('.desc-active');
-            if ($elem != null) {
-                $elem.classList.remove('desc-active');
+        if (dir == null) {
+            $column.removeAttribute('sort');
+        } else {
+            for (let $col of this._getColumns(true)) {
+                $col.removeAttribute('sort');
             }
         }
 
-        if (dir === 'desc') {
-            $column.classList.add('desc-active');
-        } else if (dir === 'asc') {
-            $column.classList.add('asc-active');
-        }
-
-        let $btnSort = this.$form.querySelector('input[name=sort]:checked');
-        if ($btnSort != null) {
-            $btnSort.checked = false;
-        }
-
         if (dir != null) {
-            const colName = $column.getAttribute('column');
-            $column.querySelector(`#${colName}-${dir}`).checked = true;
+            $column.setAttribute('sort', dir);
+        }
+
+        if (this.getAttribute('filter') === 'below') {
+            let $btnSort = this.$form.querySelector('input[name=sort]:checked');
+            if ($btnSort != null) {
+                $btnSort.checked = false;
+            }
+
+            if (dir != null) {
+                const colName = $column.getAttribute('column');
+                $column.querySelector(`#${colName}-${dir}`).checked = true;
+            }
         }
 
         if (this.endpoint) {
