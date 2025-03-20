@@ -82,5 +82,6 @@
 #filter {
     --he-input-border-radius: 2px;
     width: 100%;
+    min-width: 50px;
 }
 
