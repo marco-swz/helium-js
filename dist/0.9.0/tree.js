@@ -1,4 +1,4 @@
-const sheet = new CSSStyleSheet();sheet.replaceSync("\n.cont-children {\n    padding-left: 20px;\n    position: relative;\n    display: block;\n\n    &::before {\n        content: '';\n        width: 0;\n        height: 100%;\n        position: absolute;\n        border: 1px solid lightgrey;\n        top: 0;\n        left: 11px;\n    }\n\n    /* & .list-elem::before { */\n        /* content: \"|\"; */\n        /* padding-right: 5px; */\n    /* } */\n}\n\n.list-elem {\n    padding: 8px 10px;\n    cursor: pointer;\n\n    &:hover {\n        background-color: whitesmoke;\n    }\n}\n\ndiv[type=\"root\"] {\n    & > .list-elem::before {\n        transition: transform 0.1s;\n        font-family: \"Font Awesome 5 Pro\";\n        content: \"\\f105\";\n        color: grey;\n        padding-right: 5px;\n        display: inline-block;\n        transform: rotate(90deg) translate(3px, 3px);\n    }\n}\n\ndiv[closed] {\n    & > .cont-children {\n        display: none;\n    }\n\n    & > .list-elem::before {\n        transition: transform 0.1s;\n        transform: rotate(0deg) translate(0, 0);\n    }\n}\n");
+const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\n    display: block;\n    overflow: auto;\n    height: 100%;\n}\n\n.cont-children {\n    padding-left: 20px;\n    position: relative;\n    overflow: hidden;\n    display: block;\n\n    &::before {\n        content: '';\n        width: 0;\n        height: 100%;\n        position: absolute;\n        border: 1px solid lightgrey;\n        top: 0;\n        left: 11px;\n    }\n\n    &:hover {\n        &::before {\n            transition: border-color 0.2s;\n            border-color: black;\n        }\n    }\n}\n\n.list-elem {\n    padding: 8px 10px;\n    cursor: pointer;\n    display: inline-block;\n    width: 100%;\n    width: -moz-available;          /* WebKit-based browsers will ignore this. */\n    width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */\n    width: fill-available;\n    color: black;\n    text-decoration: none;\n    border-radius: 5px;\n    \n    &:hover {\n        background-color: whitesmoke;\n    }\n}\n\ndiv[type=\"root\"] {\n    font-weight: 500;\n\n    & > .list-elem::before {\n        transition: transform 0.1s;\n        font-family: \"Font Awesome 5 Pro\";\n        content: \"\\f105\";\n        color: grey;\n        padding-right: 5px;\n        display: inline-block;\n        transform: rotate(90deg) translate(3px, 3px);\n    }\n}\n\ndiv[type=\"leaf\"] {\n    font-weight: 400;\n}\n\ndiv[closed] {\n    & > .cont-children {\n        display: none;\n    }\n\n    & > .list-elem::before {\n        transition: transform 0.1s;\n        transform: rotate(0deg) translate(0, 0);\n    }\n}\n");
 
 class HeliumTree extends HTMLElement {
     static observedAttributes = [
@@ -59,29 +59,44 @@ class HeliumTree extends HTMLElement {
 
     filter(filterText) {
         for(const $elem of this.$contItems.children) {
-            this._filterRecursive($elem, filterText);
+            this._filterRecursive($elem, filterText, false);
         }
     }
 
-    // TODO(marco): Filter based on node type
-    // TODO(marco): Show decendants when root is shown
-    _filterRecursive($item, filterText) {
-        let show = filterText == null;
-        if ($item.getAttribute('type') === 'root') {
-            for(const $elem of $item.children[1].children) {
-                show ||= this._filterRecursive($elem, filterText);
+    _filterRecursive($item, filterText, showParent) {
+        let showSelf = filterText == null;
+
+        showSelf ||= $item.children[0].innerHTML.toLowerCase()
+            .includes(filterText.toLowerCase());
+
+        let showChild = false;
+
+        const isRoot = $item.getAttribute('type') === 'root';
+        if (isRoot) {
+            let $contChildren = $item.children[1];
+            for(const $elem of $contChildren.children) {
+                let ret = this._filterRecursive($elem, filterText, showSelf || showParent);
+                showChild = showChild || ret;
             }
         }
 
-        show ||= $item.children[0].innerHTML.includes(filterText);
-        if (show) {
+        if (showChild) {
             $item.style.display = '';
+            $item.removeAttribute('closed');
+
+        } else if (showSelf) {
+            $item.style.display = '';
+            $item.setAttribute('closed', 'true');
+
+        } else if (showParent) {
+            $item.style.display = '';
+
         } else {
             $item.style.display = 'none';
             $item.setAttribute('closed', 'true');
         }
 
-        return show;
+        return showSelf || showChild;
     }
 
     _clickRootCallback($elem) {

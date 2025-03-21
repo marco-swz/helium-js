@@ -63,29 +63,44 @@ export class HeliumTree extends HTMLElement {
 
     filter(filterText) {
         for(const $elem of this.$contItems.children) {
-            this._filterRecursive($elem, filterText);
+            this._filterRecursive($elem, filterText, false);
         }
     }
 
-    // TODO(marco): Filter based on node type
-    // TODO(marco): Show decendants when root is shown
-    _filterRecursive($item, filterText) {
-        let show = filterText == null;
-        if ($item.getAttribute('type') === 'root') {
-            for(const $elem of $item.children[1].children) {
-                show ||= this._filterRecursive($elem, filterText);
+    _filterRecursive($item, filterText, showParent) {
+        let showSelf = filterText == null;
+
+        showSelf ||= $item.children[0].innerHTML.toLowerCase()
+            .includes(filterText.toLowerCase());
+
+        let showChild = false;
+
+        const isRoot = $item.getAttribute('type') === 'root';
+        if (isRoot) {
+            let $contChildren = $item.children[1]
+            for(const $elem of $contChildren.children) {
+                let ret = this._filterRecursive($elem, filterText, showSelf || showParent);
+                showChild = showChild || ret;
             }
         }
 
-        show ||= $item.children[0].innerHTML.includes(filterText);
-        if (show) {
+        if (showChild) {
             $item.style.display = '';
+            $item.removeAttribute('closed');
+
+        } else if (showSelf) {
+            $item.style.display = '';
+            $item.setAttribute('closed', 'true');
+
+        } else if (showParent) {
+            $item.style.display = '';
+
         } else {
             $item.style.display = 'none';
             $item.setAttribute('closed', 'true');
         }
 
-        return show;
+        return showSelf || showChild;
     }
 
     _clickRootCallback($elem) {

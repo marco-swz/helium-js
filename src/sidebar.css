@@ -1,0 +1,206 @@
+#cont-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 300px;
+    display: flex;
+}
+
+#cont-pagetree {
+    display: none;
+    height: 100%;
+    padding: 20px;
+    padding-top: 0;
+}
+
+#pagetree {
+    overflow: auto;
+    margin-top: 10px;
+    height: 90%;
+}
+
+#sidebar {
+    border-right: 1px solid grey;
+    background-color: white;
+    width: 100%;
+}
+
+#header {
+    padding: 10px 20px;
+    display: flex;
+    gap: 10px;
+    border-bottom: 1px solid lightgrey;
+    margin-bottom: 20px;
+
+    & #btn-hide {
+        margin-left: auto;
+    }
+}
+
+
+#cont-user {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    padding-top: 0;
+    font-weight: 500;
+
+    & > * {
+        color: black;
+        padding: 8px 10px;
+        text-decoration: none;
+        border-radius: 4px;
+        cursor: pointer;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-wrap: nowrap;
+
+        &:hover {
+            transition: background-color 0.2s;
+            background-color: whitesmoke;
+        }
+    }
+}
+
+.main,
+.navCont {
+    margin-left: 300px;
+}
+
+#resizer {
+  z-index: 2;
+  cursor: col-resize;
+  height: 100%;
+  width: 4px;
+  margin-left: -2px;
+}
+
+#opener {
+    display: block;
+    position: fixed;
+    z-index: 100;
+    cursor: pointer;
+    height: 100%;
+    left: 0;
+    width: 10px;
+    background-color: lightgrey;
+}
+
+:host([open]) #opener {
+    display: none;
+}
+
+#tabs {
+    --bg-color: #e6e6e6;
+    display: flex;
+    gap: 5px;
+    padding: 5px;
+    font-size: 15px;
+    font-weight: 500;
+    background-color: var(--bg-color);
+    border-radius: 8px;
+    height: 30px;
+    color: grey;
+    width: fit-content;
+
+    & > div {
+        padding: 5px 10px;
+        cursor: pointer;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+
+        &:hover {
+            transition: color 0.2s;
+            color: black;
+        }
+    }
+}
+
+#btn-user::before {
+    font-family: 'Font Awesome 5 Pro';
+    content: "\f007";
+    padding-right: 6px;
+}
+
+#btn-pages::before {
+    font-family: 'Font Awesome 5 Pro';
+    content: "\f550";
+    padding-right: 6px;
+}
+
+#btn-hide {
+    height: 40px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    &:hover {
+        transition: background-color 0.2s;
+        background-color: #e6e6e6;
+    }
+    
+    &::before {
+        font-family: 'Font Awesome 5 Pro';
+        content: "\f053";
+        font-style: normal;
+    }
+}
+
+#btn-logout {
+    position: relative;
+
+    &::after {
+        font-family: 'Font Awesome 5 Pro';
+        content: "\f08b";
+        font-style: normal;
+        position: absolute;
+        right: 10px;
+    }
+}
+
+#btn-reload-rights {
+    position: relative;
+
+    &::after {
+        font-family: 'Font Awesome 5 Pro';
+        content: "\f2f1";
+        font-style: normal;
+        position: absolute;
+        right: 10px;
+    }
+}
+
+:host([tab=pages]) {
+    & #btn-pages {
+        transition:
+            color 0.2s,
+            background-color 0.2s;
+        background-color: white;
+        color: black;
+    }
+
+    & #cont-pagetree {
+        display: block;
+    }
+}
+
+:host([tab=user]) {
+    & #btn-user {
+        transition:
+            color 0.2s,
+            background-color 0.2s;
+        background-color: white;
+        color: black;
+    }
+
+    & #cont-user {
+        display: flex;
+    }
+}
+
+

@@ -18,6 +18,7 @@ export default {
         'src/toggle.js',
         'src/breadcrumb.js',
         'src/tree.js',
+        'src/sidebar.js',
     ],
     output: [
         {
