@@ -26,7 +26,6 @@ export class HeliumSidebar extends HTMLElement {
         const width = localStorage.getItem('he-sidebar_width') ?? '300px';
         this.$contSidebar.style.width = width;
         let $main = document.querySelector('main');
-        console.log($main);
         if ($main != null) {
             $main.style.marginLeft = width;
         }
@@ -41,7 +40,6 @@ export class HeliumSidebar extends HTMLElement {
         this.$resizer.addEventListener('mousedown', (e) => {
             e.preventDefault();
             document.addEventListener("mousemove", callback, false);
-            const width = e.x;
 
             let handler = () => {
                 document.removeEventListener("mousemove", callback, false);
@@ -196,7 +194,7 @@ export class HeliumSidebar extends HTMLElement {
             if ($main != null) {
                 $main.animate(
                     [
-                        { marginLeft: left },
+                        { marginLeft: 0 },
                     ],
                     { duration: 100, fill: 'forwards', easing: 'ease-in-out' }
                 );
@@ -210,7 +208,7 @@ export class HeliumSidebar extends HTMLElement {
         } else {
             this.$contSidebar.style.left = left;
             if ($main != null) {
-                $main.style.marginLeft = '0';
+                $main.style.marginLeft = 0;
             }
         }
     }
@@ -222,7 +220,7 @@ export class HeliumSidebar extends HTMLElement {
             if ($main != null) {
                 $main.animate(
                     [
-                        { marginLeft: 0 },
+                        { marginLeft: this.$contSidebar.style.width },
                     ],
                     { duration: 100, fill: 'forwards', easing: 'ease-in-out' }
                 );
@@ -234,10 +232,10 @@ export class HeliumSidebar extends HTMLElement {
                 { duration: 100, fill: 'forwards', easing: 'ease-in-out' }
             );
         } else {
-            this.$contSidebar.style.left = 0;
+            this.$contSidebar.style.left =  0;
             let $main = document.querySelector('main');
             if ($main != null) {
-                $main.style.marginLeft = '0';
+                $main.style.marginLeft = this.$contSidebar.style.width;
             }
         }
     }
