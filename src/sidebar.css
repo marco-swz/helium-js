@@ -1,8 +1,8 @@
 #cont-sidebar {
     position: fixed;
     left: 0;
-    top: 0;
-    height: 100vh;
+    top: 51px;
+    height: calc(100vh - 51px);
     width: 300px;
     display: flex;
 }
@@ -27,7 +27,7 @@
 }
 
 #header {
-    padding: 10px 20px;
+    padding: 8px 20px;
     display: flex;
     gap: 10px;
     border-bottom: 1px solid lightgrey;
@@ -37,7 +37,6 @@
         margin-left: auto;
     }
 }
-
 
 #cont-user {
     display: flex;
@@ -95,12 +94,12 @@
     --bg-color: #e6e6e6;
     display: flex;
     gap: 5px;
-    padding: 5px;
+    padding: 4px;
     font-size: 15px;
     font-weight: 500;
     background-color: var(--bg-color);
     border-radius: 8px;
-    height: 30px;
+    height: 28px;
     color: grey;
     width: fit-content;
 
@@ -131,7 +130,7 @@
 }
 
 #btn-hide {
-    height: 40px;
+    height: 36px;
     aspect-ratio: 1;
     border-radius: 50%;
     display: flex;
@@ -152,27 +151,73 @@
 }
 
 #btn-logout {
-    position: relative;
 
-    &::after {
+    &::before {
         font-family: 'Font Awesome 5 Pro';
         content: "\f08b";
         font-style: normal;
-        position: absolute;
-        right: 10px;
+        padding-right: 10px;
     }
 }
 
 #btn-reload-rights {
-    position: relative;
 
-    &::after {
+    &::before {
         font-family: 'Font Awesome 5 Pro';
         content: "\f2f1";
         font-style: normal;
-        position: absolute;
-        right: 10px;
+        padding-right: 10px;
     }
+}
+
+
+#cont-page-search {
+    display: flex;
+}
+
+#inp-search {
+    width: 100%;
+    outline: none;
+    border: 1px solid lightgrey;
+    padding: 3px 7px;
+    font-size: 15px;
+    background-color: whitesmoke;
+    border-radius: 3px;
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+
+    &:hover {
+        transition: border-color 0.2s;
+        border-color: grey;
+    }
+}
+
+#btn-page-search {
+    cursor: pointer;
+    background-color: white;
+    border-radius: 0;
+    border-bottom-right-radius: 3px;
+    border-top-right-radius: 3px;
+    width: 35px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid lightgrey;
+    border-left: 0;
+
+    &::before {
+        font-family: 'Font Awesome 5 Pro';
+        content: "\f002";
+        font-style: normal;
+    }
+
+    &:hover {
+        transition:
+            background-color 0.2s;
+        background-color: hsl(from white h s calc(l - 5));
+    }
+    
 }
 
 :host([tab=pages]) {

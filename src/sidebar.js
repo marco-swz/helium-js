@@ -1,7 +1,5 @@
 import sheet from './sidebar.css';
-import { HeliumInput } from './input.js';
 import { HeliumTree } from './tree.js';
-import { HeliumButton } from './button.js';
 
 export class HeliumSidebar extends HTMLElement {
     static observedAttributes = [
@@ -27,7 +25,8 @@ export class HeliumSidebar extends HTMLElement {
         this.$contSidebar.id = 'cont-sidebar';
         const width = localStorage.getItem('he-sidebar_width') ?? '300px';
         this.$contSidebar.style.width = width;
-        let $main = document.querySelector('main > .main');
+        let $main = document.querySelector('main');
+        console.log($main);
         if ($main != null) {
             $main.style.marginLeft = width;
         }
@@ -42,17 +41,15 @@ export class HeliumSidebar extends HTMLElement {
         this.$resizer.addEventListener('mousedown', (e) => {
             e.preventDefault();
             document.addEventListener("mousemove", callback, false);
+            const width = e.x;
 
-            document.addEventListener('mouseup', () => {
-                // TODO(marco): Fix event removal
+            let handler = () => {
                 document.removeEventListener("mousemove", callback, false);
-                let $main = document.querySelector('main > .main');
-                if ($main != null) {
-                    console.log($main);
-                    $main.style.marginLeft = `${e.x}px`;
-                }
                 localStorage.setItem('he-sidebar_width', this.$contSidebar.style.width);
-            });
+                document.removeEventListener('mouseup', handler);
+            };
+
+            document.addEventListener('mouseup', handler);
         }, false);
         this.$contSidebar.append(this.$resizer);
 
@@ -106,11 +103,20 @@ export class HeliumSidebar extends HTMLElement {
         $btnReloadRights.href = '/reacl';
         this.$contUser.append($btnReloadRights);
 
-        let $inpSearch = document.createElement('he-input');
+        let $contPageSearch = document.createElement('div');
+        $contPageSearch.id = 'cont-page-search';
+        this.$contPagetree.append($contPageSearch);
+
+        let $inpSearch = document.createElement('input');
         $inpSearch.id = 'inp-search';
         $inpSearch.value = localStorage.getItem('he-sidebar_page_filter') ?? '';
         $inpSearch.onchange = () => this._searchChangeCallback.bind(this)($inpSearch);
-        this.$contPagetree.append($inpSearch);
+        $contPageSearch.append($inpSearch);
+
+        let $btnPageSearch = document.createElement('div');
+        $btnPageSearch.id = 'btn-page-search';
+        $inpSearch.onclick = () => this._searchChangeCallback.bind(this)($inpSearch);
+        $contPageSearch.append($btnPageSearch);
 
         shadow.append(this.$contSidebar);
         shadow.adoptedStyleSheets = [sheet];
@@ -161,7 +167,6 @@ export class HeliumSidebar extends HTMLElement {
         this.$pagetree.id = 'pagetree';
         this.$pagetree.innerHTML = $contPages.innerHTML;
         this.$contPagetree.append(this.$pagetree);
-
     }
 
     hide() {
@@ -175,10 +180,27 @@ export class HeliumSidebar extends HTMLElement {
         
     }
 
+    toggle() {
+        if (this.getAttribute('open') != null) {
+            this.hide();
+        } else {
+            this.show();
+        }
+    }
+
     _hide(animate=true) {
         localStorage.setItem('he-sidebar_open', false);
+        let $main = document.querySelector('main');
         const left = `-${this.$contSidebar.style.width}`;
         if (animate) {
+            if ($main != null) {
+                $main.animate(
+                    [
+                        { marginLeft: left },
+                    ],
+                    { duration: 100, fill: 'forwards', easing: 'ease-in-out' }
+                );
+            }
             this.$contSidebar.animate(
                 [
                     { left: left },
@@ -187,12 +209,24 @@ export class HeliumSidebar extends HTMLElement {
             );
         } else {
             this.$contSidebar.style.left = left;
+            if ($main != null) {
+                $main.style.marginLeft = '0';
+            }
         }
     }
 
     _show(animate=true) {
         localStorage.setItem('he-sidebar_open', true);
+        let $main = document.querySelector('main');
         if (animate) {
+            if ($main != null) {
+                $main.animate(
+                    [
+                        { marginLeft: 0 },
+                    ],
+                    { duration: 100, fill: 'forwards', easing: 'ease-in-out' }
+                );
+            }
             this.$contSidebar.animate(
                 [
                     { left: 0 },
@@ -201,6 +235,10 @@ export class HeliumSidebar extends HTMLElement {
             );
         } else {
             this.$contSidebar.style.left = 0;
+            let $main = document.querySelector('main');
+            if ($main != null) {
+                $main.style.marginLeft = '0';
+            }
         }
     }
 
@@ -227,7 +265,12 @@ export class HeliumSidebar extends HTMLElement {
     }
 
     _resizeKeydownCallback(evt) {
-        this.$contSidebar.style.width = `${evt.x}px`;
+        const width = evt.x
+        this.$contSidebar.style.width = `${width}px`;
+        let $main = document.querySelector('main');
+        if ($main != null) {
+            $main.style.marginLeft = `${width}px`;
+        }
     }
 }
 
