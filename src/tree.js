@@ -132,6 +132,12 @@ export class HeliumTree extends HTMLElement {
         if (parent != null) {
             $cont.setAttribute('parent', parent);
         }
+        if ($elem.getAttribute('selected') != null) {
+            $cont.setAttribute('selected', '');
+        }
+        if ($elem.getAttribute('closed') != null) {
+            $cont.setAttribute('closed', true);
+        }
         $cont.id = $elem.id;
         $cont.classList.add('cont-elem');
         $elem.id = '';

@@ -45,6 +45,17 @@
     }
 }
 
+.cont-elem[selected] {
+    .list-elem {
+
+        &::before {
+            font-family: "Font Awesome 5 Pro";
+            content: "\f06e";
+            padding-right: 5px;
+        }
+    }
+}
+
 div[type="root"] {
     font-weight: 500;
 
