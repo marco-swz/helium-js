@@ -19,6 +19,7 @@ export default {
         'src/breadcrumb.js',
         'src/tree.js',
         'src/sidebar.js',
+        'src/menubar.js',
     ],
     output: [
         {
