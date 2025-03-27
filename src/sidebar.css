@@ -173,18 +173,8 @@
 
 #cont-page-search {
     display: flex;
-}
-
-#inp-search {
-    width: 100%;
-    outline: none;
     border: 1px solid lightgrey;
-    padding: 3px 7px;
-    font-size: 15px;
-    background-color: whitesmoke;
-    border-radius: 3px;
-    border-bottom-right-radius: 0;
-    border-top-right-radius: 0;
+    border-radius: 4px;
 
     &:hover {
         transition: border-color 0.2s;
@@ -192,19 +182,31 @@
     }
 }
 
+#inp-search {
+    width: 100%;
+    outline: none;
+    border-left: 1px solid lightgrey;
+    padding: 3px 7px;
+    font-size: 15px;
+    background-color: whitesmoke;
+    border: 0;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-left: 1px solid lightgrey;
+}
+
 #btn-page-search {
     cursor: pointer;
     background-color: white;
     border-radius: 0;
-    border-bottom-right-radius: 3px;
-    border-top-right-radius: 3px;
     width: 35px;
     height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid lightgrey;
-    border-left: 0;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+    border: 0;
 
     &::before {
         font-family: 'Font Awesome 5 Pro';
@@ -214,8 +216,8 @@
 
     &:hover {
         transition:
-            background-color 0.2s;
-        background-color: hsl(from white h s calc(l - 5));
+            font-weight 0.2s;
+        font-weight: 500;
     }
     
 }

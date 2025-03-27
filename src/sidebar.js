@@ -105,16 +105,16 @@ export class HeliumSidebar extends HTMLElement {
         $contPageSearch.id = 'cont-page-search';
         this.$contPagetree.append($contPageSearch);
 
+        let $btnPageSearch = document.createElement('div');
+        $btnPageSearch.id = 'btn-page-search';
+        $contPageSearch.append($btnPageSearch);
+
         let $inpSearch = document.createElement('input');
         $inpSearch.id = 'inp-search';
         $inpSearch.value = localStorage.getItem('he-sidebar_page_filter') ?? '';
         $inpSearch.onchange = () => this._searchChangeCallback.bind(this)($inpSearch);
+        $btnPageSearch.onclick = () => this._searchChangeCallback.bind(this)($inpSearch);
         $contPageSearch.append($inpSearch);
-
-        let $btnPageSearch = document.createElement('div');
-        $btnPageSearch.id = 'btn-page-search';
-        $inpSearch.onclick = () => this._searchChangeCallback.bind(this)($inpSearch);
-        $contPageSearch.append($btnPageSearch);
 
         shadow.append(this.$contSidebar);
         shadow.adoptedStyleSheets = [sheet];
