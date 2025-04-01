@@ -23,7 +23,7 @@
     &:hover {
         &::before {
             transition: border-color 0.2s;
-            border-color: black;
+            border-color: grey;
         }
     }
 }
@@ -39,6 +39,9 @@
     color: black;
     text-decoration: none;
     border-radius: 5px;
+    text-wrap: nowrap;
+    /* overflow: hidden; */
+    text-overflow: ellipsis;
     
     &:hover {
         background-color: whitesmoke;
@@ -47,26 +50,25 @@
 
 .cont-elem[selected] {
     .list-elem {
-
-        &::before {
-            font-family: "Font Awesome 5 Pro";
-            content: "\f06e";
-            padding-right: 5px;
-        }
+        background-color: whitesmoke;
     }
 }
 
 div[type="root"] {
     font-weight: 500;
 
-    & > .list-elem::before {
-        transition: transform 0.1s;
-        font-family: "Font Awesome 5 Pro";
-        content: "\f105";
-        color: grey;
-        padding-right: 5px;
-        display: inline-block;
-        transform: rotate(90deg) translate(3px, 3px);
+    & > .list-elem {
+        text-transform: uppercase;
+        
+        &::before {
+            transition: transform 0.1s;
+            font-family: "Font Awesome 5 Pro";
+            content: "\f105";
+            color: grey;
+            padding-right: 5px;
+            display: inline-block;
+            transform: rotate(90deg) translate(3px, 3px);
+        }
     }
 }
 
