@@ -91,7 +91,7 @@ export class HeliumSidebar extends HTMLElement {
 
         let $btnLogout = document.createElement('a');
         $btnLogout.id = 'btn-logout';
-        $btnLogout.innerHTML = 'Ausloggen';
+        $btnLogout.innerHTML = 'Abmelden';
         $btnLogout.href = '/logout';
         this.$contUser.append($btnLogout);
 
@@ -111,6 +111,7 @@ export class HeliumSidebar extends HTMLElement {
 
         let $inpSearch = document.createElement('input');
         $inpSearch.id = 'inp-search';
+        $inpSearch.type = 'search';
         $inpSearch.value = localStorage.getItem('he-sidebar_page_filter') ?? '';
         $inpSearch.onchange = () => this._searchChangeCallback.bind(this)($inpSearch);
         $btnPageSearch.onclick = () => this._searchChangeCallback.bind(this)($inpSearch);
@@ -264,6 +265,9 @@ export class HeliumSidebar extends HTMLElement {
 
     _resizeKeydownCallback(evt) {
         const width = evt.x
+        if (width < 270) {
+            return;
+        }
         this.$contSidebar.style.width = `${width}px`;
         let $main = document.querySelector('main');
         if ($main != null) {
