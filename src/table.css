@@ -30,6 +30,7 @@ table {
     border-spacing: 0;
     border-collapse: separate;
     border-radius: var(--he-table-borderRadius);
+    font-size: 14px;
 }
 
 thead {
