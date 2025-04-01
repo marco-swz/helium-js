@@ -5,6 +5,7 @@
     height: calc(100vh - 51px);
     width: 300px;
     display: flex;
+    z-index: 10;
 }
 
 #cont-pagetree {
@@ -121,12 +122,14 @@
     font-family: 'Font Awesome 5 Pro';
     content: "\f007";
     padding-right: 6px;
+    font-weight: 800;
 }
 
 #btn-pages::before {
     font-family: 'Font Awesome 5 Pro';
     content: "\f550";
     padding-right: 6px;
+    font-weight: 800;
 }
 
 #btn-hide {
@@ -157,6 +160,7 @@
         content: "\f08b";
         font-style: normal;
         padding-right: 10px;
+        font-weight: 800;
     }
 }
 
@@ -167,6 +171,7 @@
         content: "\f2f1";
         font-style: normal;
         padding-right: 10px;
+        font-weight: 800;
     }
 }
 
