@@ -1,6 +1,8 @@
 export class HeliumSwitch extends HTMLElement {
 
-    static observedAttributes = ["checked"];
+    static get observedAttributes() {
+        return ["checked"];
+    }
 
     constructor() {
         super();
@@ -16,7 +18,6 @@ export class HeliumSwitch extends HTMLElement {
     attributeChangedCallback(name, oldValue, newValue) {
         // if an observerd attribute is to be added
         if (name == "checked") {
-
             const toggle = this.shadowRoot.querySelector(".switch");
 
             if (this.hasAttribute("checked")) {
@@ -26,8 +27,6 @@ export class HeliumSwitch extends HTMLElement {
             }
         }
     }
-
-
 }
 
 if (!customElements.get('he-switch')) {
