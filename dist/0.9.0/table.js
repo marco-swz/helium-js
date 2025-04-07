@@ -584,6 +584,14 @@ class HeliumTable extends HTMLElement {
         }
     }
 
+    reset() {
+        this.$body.querySelectorAll('.check-row').forEach(x => x.checked = false);
+        if (this.$checkAll != null) {
+            this.$checkAll.checked = false;
+            this.$checkAll.indeterminate = false;
+        }
+    }
+
     /**
      * Replaces the row with the provided ID with new data.
      * @param {string} rowId The HTML id of the row to update
@@ -618,6 +626,7 @@ class HeliumTable extends HTMLElement {
     reportValidity() {
         return this.internals.reportValidity();
     }
+
 
     /**
     * @param {Object.<string, string> | Array<Object.<string, string>>} where 
