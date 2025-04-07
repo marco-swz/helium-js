@@ -27,7 +27,7 @@
     & #he-tabs-nav {
         padding: 4px;
         gap: 5px;
-        background-color: whitesmoke;
+        background-color: #e6e6e6;
         width: fit-content;
         border-radius: 8px;
     }
@@ -35,14 +35,21 @@
     & #he-tabs-nav label {
         color: hsl(240 3.8% 46.1%);
         border-radius: 4px;
+        font-weight: 500;
+
+        &:hover {
+            transition: color 0.2s;
+            color: black;
+        }
     }
 
     & #he-tabs-nav label:has(:checked) {
-        background-color: rgb(228 228 231);
+        transition:
+            background-color 0.2s,
+            color 0.2s;
         background-color: white;
         color: black;
     }
-     
  }
 
 #he-tabs-nav {
@@ -67,6 +74,9 @@
     }
 
     #he-tabs-nav label:hover {
+        transition:
+            background-color 0.2s,
+            color 0.2s;
         background-color: var(--he-tabs-hover-backgroundColor);
     }
 
@@ -80,9 +90,3 @@
     cursor: pointer;
 }
 
-#he-tabs-nav label:hover {
-    transition:
-        background-color 0.2s,
-        color 0.2s;
-    background-color: var(--he-tabs-hover-backgroundColor);
-}
