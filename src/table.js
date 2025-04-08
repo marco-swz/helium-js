@@ -1535,6 +1535,7 @@ export class HeliumTable extends HTMLElement {
             if (useColumnMenu) {
                 $contHeaderCell.append($spanName);
                 $contHeaderCell.classList.add('cont-colname');
+                $contHeaderCell.append(this._renderColumnMenu());
                 $contHeaderCell.addEventListener('click', () => this._colClickCallback.bind(this)($column));
 
             } else if (attrFilter === 'below') {
@@ -1563,6 +1564,27 @@ export class HeliumTable extends HTMLElement {
         }
 
         return $tHead;
+    }
+
+    _renderColumnMenu() {
+        let $menu = document.createElement('div');
+        $menu.classList.add('column-menu');
+
+        $menu.innerHTML = `
+            <label id="lbl-desc" style="display: none">Beschreibung</label>
+            <span id="desc-column" style="display: none"></span>
+            <label>Sortierung</label>
+            <div id="cont-sort-diag-col">
+                <he-toggle id="toggle-asc" variant="outline" name="sort" value="asc">A - Z</he-toggle>
+                <he-toggle id="toggle-desc" variant="outline" name="sort" value="desc">Z - A</he-toggle>
+            </div>
+            <label>Filter</label>
+            <he-input id="inp-filter-column" name="filter"></he-input>
+            <he-select id="sel-filter-column" name="filter-sel" filter="true"></he-select>
+            <he-input id="inp-colname-column" type="hidden" name="column"></he-input>
+        `;
+
+        return $menu;
     }
 
     _renderTable() {
@@ -1616,10 +1638,10 @@ export class HeliumTable extends HTMLElement {
         shadow.append(this.$diagEdit);
         this.innerHTML = '';
 
-        if (this.getAttribute('column-menu')) {
-            this.$diagColumn = this._renderDialogColumn();
-            shadow.append(this.$diagColumn);
-        }
+        // if (this.getAttribute('column-menu')) {
+        //     this.$diagColumn = this._renderDialogColumn();
+        //     shadow.append(this.$diagColumn);
+        // }
     }
 
     /**

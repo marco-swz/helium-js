@@ -134,6 +134,10 @@ thead th {
     }
 }
 
+.column-menu {
+    display: none;
+}
+
 #diag-column {
     & #form-column {
         display: flex;
