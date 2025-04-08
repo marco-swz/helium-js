@@ -86,6 +86,7 @@
 }
 
 #he-tabs-nav label {
+    user-select: none;
     padding: 0.5rem 1rem;
     cursor: pointer;
 }
