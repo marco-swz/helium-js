@@ -52,39 +52,47 @@ export class HeliumTabs extends HTMLElement {
     slotChangeCallback(event, self) {
         /** @type {HTMLSlotElement} */
         const slot = event.target;
-        self.navBar.innerHTML = '';
         let tabNr = 0;
 
-        for (const elem of slot.assignedElements()) {
-            const tabTitle = elem.getAttribute('title-text') ?? `Tab ${tabNr}`;
+        for (const $elem of slot.assignedElements()) {
+            if ($elem.slot === 'tab') {
+                /** @type {HTMLSpanElement} */
+                let $span = document.createElement('span');
 
-            const checkId = 'he-tabs-check' + tabNr;
-            /** @type {HTMLLabelElement} */
-            let label = document.createElement('label');
-            label.for = checkId;
+                let tabSlotName = $elem.getAttribute('title-slot');
+                if (tabSlotName == null) {
+                    const tabTitle = $elem.getAttribute('title-text') ?? `Tab ${tabNr}`;
+                    $span.innerHTML = tabTitle;
+                } else {
+                    let $tabSlot = document.createElement('slot');
+                    $tabSlot.name = tabSlotName;
+                    $span.append($tabSlot);
+                }
 
-            /** @type {HTMLInputElement} */
-            let check = document.createElement('input');
-            check.id = checkId;
-            check.type = 'radio';
-            check.name = 'he-tabs-idx';
-            check.value = tabNr;
-            check.setAttribute('hidden', 'true');
-            check.onchange = e => self.tabChangeCallback(e);
+                const checkId = 'he-tabs-check' + tabNr;
+                /** @type {HTMLLabelElement} */
+                let $label = document.createElement('label');
+                $label.for = checkId;
 
-            if (tabNr > 0) {
-                elem.style.display = 'none';
+                /** @type {HTMLInputElement} */
+                let $check = document.createElement('input');
+                $check.id = checkId;
+                $check.type = 'radio';
+                $check.name = 'he-tabs-idx';
+                $check.value = tabNr;
+                $check.setAttribute('hidden', 'true');
+                $check.onchange = e => self.tabChangeCallback(e);
+
+                if (tabNr > 0) {
+                    $elem.style.display = 'none';
+                }
+
+                $label.append($check);
+                $label.append($span);
+                self.navBar.append($label);
+
+                tabNr++;
             }
-
-            /** @type {HTMLSpanElement} */
-            let span = document.createElement('span');
-            span.innerHTML = tabTitle;
-
-            label.append(check);
-            label.append(span);
-            self.navBar.append(label);
-
-            tabNr++;
         }
 
         self.showTab(self.getAttribute('tab') ?? 0);
