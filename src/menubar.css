@@ -11,7 +11,7 @@
     background-color: white;
     border-bottom: 1px solid grey;
     padding: 0 15px;
-    z-index: 100;
+    z-index: 10000;
 }
 
 #breadcrumb {
