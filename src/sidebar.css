@@ -1,3 +1,7 @@
+a {
+    outline: none;
+}
+
 #cont-sidebar {
     position: fixed;
     left: 0;
