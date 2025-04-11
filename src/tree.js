@@ -67,6 +67,66 @@ export class HeliumTree extends HTMLElement {
         }
     }
 
+    /**
+     * @returns Array.<string>
+     */
+    getOpen() {
+        return Array.from(this.$contItems.querySelectorAll('[type=root]:not([closed])'))
+            .map($el => $el.id);
+    }
+
+    /**
+     * @returns Array.<string>
+     */
+    getClosed() {
+        return Array.from(this.$contItems.querySelectorAll('[type=root][closed]'))
+            .map($el => $el.id);
+    }
+
+    /**
+     * @param {?Array.<string>} ids
+     */
+    setClosed(ids=null) {
+        if (ids == null) {
+            for (let $el of this.$contItems.querySelectorAll('[type=root]')) {
+                $el.setAttribute('closed', 'true');
+            }
+            return;
+        }
+
+        for (let id of ids) {
+            let $el = this.$contItems.querySelector('#' + id);
+            if ($el == null) {
+                throw new Error('No tree node with ID ' + id);
+            }
+
+            $el.setAttribute('closed', 'true');
+        }
+    }
+
+
+    /**
+     * @param {?Array.<string>} ids
+     */
+    setOpen(ids) {
+        if (ids == null) {
+            for (let $el of this.$contItems.querySelectorAll('[type=root]')) {
+                $el.removeAttribute('closed');
+            }
+            return;
+        }
+
+        console.log(ids);
+        for (let id of ids) {
+            let $el = this.$contItems.querySelector('#' + id);
+            if ($el == null) {
+                throw new Error('No tree node with ID ' + id);
+            }
+
+            $el.removeAttribute('closed');
+        }
+    }
+
     _filterRecursive($item, filterText, showParent) {
         let showSelf = filterText == null;
 

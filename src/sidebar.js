@@ -17,6 +17,11 @@ export class HeliumSidebar extends HTMLElement {
     $resizer;
     /** @type {HeliumTree} */
     $pagetree;
+    /** @type {Array.<string>}
+     * The list of pagetree nodes, which where closed before the last search.
+     * This is used to restore the pagetree to the state before the search.
+     */
+    pagetreeClosed = [];
 
     constructor() {
         super();
@@ -258,8 +263,13 @@ export class HeliumSidebar extends HTMLElement {
         let searchText = $inpSearch.value;
         localStorage.setItem('he-sidebar_page_filter', searchText);
         if (searchText === '') {
-            searchText = null;
+            this.$pagetree.filter(null);
+            this.$pagetree.setClosed(this.pagetreeClosed);
+            return;
+        } else {
+            this.pagetreeClosed = this.$pagetree.getClosed();
         }
+
         this.$pagetree.filter(searchText);
     }
 
