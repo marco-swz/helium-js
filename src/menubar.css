@@ -11,7 +11,7 @@
     background-color: white;
     border-bottom: 1px solid grey;
     padding: 0 15px;
-    z-index: 10000;
+    z-index: 500;
 }
 
 #breadcrumb {
@@ -52,6 +52,10 @@
             color: steelblue;
         }
     }
+}
+
+a {
+    outline: none;
 }
 
 #btn-home {
