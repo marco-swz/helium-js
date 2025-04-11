@@ -66,8 +66,13 @@
 }
 
 #cont-options option {
-    padding: 5px 4px;
+    padding: 5px 10px;
     border-radius: 3px;
+    text-align: left;
+    width: 100%;
+    width: -moz-available;          /* WebKit-based browsers will ignore this. */
+    width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
+    width: fill-available;
 }
 
 #cont-options option[selected] {

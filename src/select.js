@@ -44,6 +44,11 @@ export class HeliumSelect extends HTMLElement {
         this.$popover.addEventListener("beforetoggle", (e) => this._beforetoggledPopoverCallback.bind(this)(e));
         this.$popover.addEventListener("toggle", (e) => this._toggledPopoverCallback.bind(this)(e));
 
+        this.$options = document.createElement('div');
+        this.$options.id = 'cont-options';
+        this.$options.slot = 'content';
+        this.$popover.append(this.$options);
+
         shadow.append(this.$popover);
         shadow.append(this.$input);
         shadow.adoptedStyleSheets = [sheet];
@@ -177,16 +182,11 @@ export class HeliumSelect extends HTMLElement {
     }
 
     connectedCallback() {
-        this.$options = document.createElement('div');
-        this.$options.id = 'cont-options';
-        this.$options.slot = 'content';
-
         for (const $opt of this.querySelectorAll('option')) {
             $opt.onclick = (e) => this._clickedOptionCallback.bind(this)(e);
             this.$options.append($opt);
         }
 
-        this.$popover.append(this.$options);
         this.select(0);
     }
 
