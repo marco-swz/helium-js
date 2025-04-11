@@ -9,7 +9,7 @@
     --he-table-width: fit-content;
     --he-table-row-borderBottomColor: hsl(from var(--he-table-row-backgroundColor) h s calc(l - 20));
 
-    overflow: auto;
+    /* overflow: auto; */
     display: inline-block;
     scrollbar-gutter: stable both-edges;
     outline: none;
@@ -68,22 +68,19 @@ thead th {
 
             & .cont-colname {
                 width: 100%;
-                background-color: var(--he-table-header-backgroundColor);
-                cursor: pointer;
                 border-radius: 4px;
+                position: relative;
 
-                &:hover {
-                    transition:
-                        background-color 0.2s;
-                    background-color: hsl(from var(--he-table-header-backgroundColor) h s calc(l - 7));
-                }
             }
 
             & .span-colname {
+                background-color: var(--he-table-header-backgroundColor);
+                cursor: pointer;
                 padding: 7px 10px;
+                border-radius: 4px;
                 width: fit-content;
                 text-align: left;
-                position: relative;
+                width: 100%;
 
                 &::after {
                     font-family: "Font Awesome 5 Pro";
@@ -93,6 +90,12 @@ thead th {
                     height: 15px;
                     right: 5px;
                     padding: 0 5px;
+                }
+
+                &:hover {
+                    transition:
+                        background-color 0.2s;
+                    background-color: hsl(from var(--he-table-header-backgroundColor) h s calc(l - 7));
                 }
             }
 
@@ -136,6 +139,100 @@ thead th {
 
 .column-menu {
     display: none;
+    flex-direction: column;
+    background-color: white;
+    width: 200px;
+    position: absolute;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    top: 115%;
+    left: 0;
+    gap: 0;
+    border-radius: 4px;
+    padding: 5px 5px;
+    border: 1px solid lightgrey;
+    align-items: flex-start;
+
+    & > div {
+        width: 100%;
+        width: -moz-available;          /* WebKit-based browsers will ignore this. */
+        width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
+        width: fill-available;
+        padding: 7px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        gap: 5px;
+        justify-content: flex-start;
+
+        &[selected]::after {
+            font-family: "Font Awesome 5 Pro";
+            content: "\f00c";
+            font-weight: 600;
+            color: steelblue;
+            margin-left: auto;
+        }
+
+        &:hover {
+            transition: background-color 0.2s;
+            background-color: whitesmoke;
+        }
+    }
+
+    & .btn-sort-asc::before {
+        font-family: "Font Awesome 5 Pro";
+        content: "\f357";
+        font-weight: 600;
+    }
+
+    & .btn-sort-desc::before {
+        font-family: "Font Awesome 5 Pro";
+        content: "\f354";
+        font-weight: 600;
+    }
+
+    & he-input, & he-select {
+        margin-bottom: 5px;
+        width: 100%;
+    }
+
+    & .btn-apply-filter {
+        background-color: steelblue;
+        color: white;
+        justify-content: center;
+        margin-top: 5px;
+
+        &:hover {
+            transition: background-color 0.2s;
+            background-color: hsl(from steelblue h s calc(l + 7));
+        }
+    }
+
+    .column-filter {
+        display: flex;
+        align-items: center;
+        width: 95%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .column-filter::before {
+        font-family: "Font Awesome 5 Pro";
+        content: "\f0b0";
+        padding-left: 5px;
+        font-weight: 600;
+    }
+
+    he-select.column-filter::before {
+        padding-left: 0;
+        padding-right: 7px;
+    }
+}
+
+.column-menu[open] {
+    display: flex;
+}
+
+th[filter] .column-filter::before {
+    color: steelblue;
 }
 
 #diag-column {

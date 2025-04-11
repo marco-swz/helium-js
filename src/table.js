@@ -213,6 +213,8 @@ export class HeliumTable extends HTMLElement {
     $formDialogEdit;
     /** @type {HTMLTableSectionElement} */
     $body;
+    /** @type {HTMLDivElement} */
+    $menuOpen;
     /** @type {HeliumFormDialog} */
     $diagEdit;
     /** @type {?HeliumDialog} */
@@ -789,15 +791,22 @@ export class HeliumTable extends HTMLElement {
         }
     }
 
-    _applyColumnClickCallback() {
-        const data = Object.fromEntries(new FormData(this.$diagColumn.querySelector('#form-column')).entries());
+    _applyColumnClickCallback(e, $col) {
+        e.preventDefault();
+        const filterVal = $col.querySelector('.column-filter').value;
         this.disableRequest = true;
-        let $col = this._columnFromName(data['column']);
-        const filterVal = data['filter'] ?? data['filter-sel'];
         this._filterColumn($col, filterVal);
         this.disableRequest = false;
-        this._sortColumn($col, data['sort']);
-        this.$diagColumn.close();
+        const asc = $col.querySelector('.btn-sort-asc').hasAttribute('selected');
+        const desc = $col.querySelector('.btn-sort-desc').hasAttribute('selected');
+        let sort = null;
+        if (asc) {
+            sort = 'asc';
+        } else if (desc) {
+            sort = 'desc';
+        }
+        this._sortColumn($col, sort);
+        $col.querySelector('.column-menu').removeAttribute('open');
     }
 
     /**
@@ -924,69 +933,43 @@ export class HeliumTable extends HTMLElement {
     }
 
     /**
+     * @param {HTMLDivElement} $menu
+     * @returns void
+     */
+    _closeColumnMenu() {
+        if (this.$menuOpen) {
+            this.$menuOpen.removeAttribute('open');
+            this.$menuOpen = null;
+        }
+    }
+
+    /**
      * @param {HTMLTableCellElement} $column 
      */
-    _colClickCallback($column) {
-        this.$diagColumn.reset();
-        const colName = $column.getAttribute('column');
-        const dispName = $column.querySelector('.span-colname').innerHTML;
-        const filterVal = $column.getAttribute('filter');
-        const description = $column.getAttribute('description');
-
-        if (description != null) {
-            this.$diagColumn.querySelector('#lbl-desc').style.display = '';
-            let $desc = this.$diagColumn.querySelector('#desc-column');
-            $desc.style.display = '';
-            $desc.innerHTML = description;
-        } else {
-            this.$diagColumn.querySelector('#lbl-desc').style.display = 'none';
-            this.$diagColumn.querySelector('#desc-column').style.display = 'none';
-        }
-
-        let checkedDesc = false;
-        let checkedAsc = false;
+    _colClickCallback(e, $column) {
+        e.stopPropagation();
+        this._closeColumnMenu();
         switch ($column.getAttribute('sort')) {
             case 'desc':
-                checkedDesc = true;
+                $column.querySelector('.btn-sort-desc').setAttribute('selected', '');
+                $column.querySelector('.btn-sort-asc').removeAttribute('selected');
                 break;
             case 'asc':
-                checkedAsc = true;
+                $column.querySelector('.btn-sort-asc').setAttribute('selected', '');
+                $column.querySelector('.btn-sort-desc').removeAttribute('selected');
                 break;
+            default:
+                $column.querySelector('.btn-sort-desc').removeAttribute('selected');
+                $column.querySelector('.btn-sort-asc').removeAttribute('selected');
         }
-
-        let $inpFilter = this.$diagColumn.querySelector('#inp-filter-column');
-        let $selFilter = this.$diagColumn.querySelector('#sel-filter-column');
-        let valMap = this.remap[colName] ?? {};
-
-        let options = this.options[colName];
-        if (options != null) {
-            options = [...options];
-            options.sort(function(a, b) {
-                return a.localeCompare(b);
-            });
-
-            options.unshift('');
-            $selFilter.disabled = false;
-            $selFilter.replaceOptions(options, valMap);
-            $selFilter.value = filterVal ?? '';
-            $selFilter.style.display = '';
-            $inpFilter.style.display = 'none';
-            $inpFilter.disabled = true;
-            
-        } else {
-            $inpFilter.disabled = false;
-            $inpFilter.value = filterVal ?? '';
-            $inpFilter.select();
-            $selFilter.disabled = true;
-            $selFilter.style.display = 'none';
-            $inpFilter.style.display = '';
+        let $menu = $column.querySelector('.column-menu');
+        $menu.setAttribute('open', '');
+        let $filter = $column.querySelector('.column-filter');
+        $filter.value = $column.getAttribute('filter') ?? '';
+        if ($filter.nodeName === 'HE-INPUT') {
+            $filter.select();
         }
-
-        this.$diagColumn.querySelector('#inp-colname-column').value = colName;
-        this.$diagColumn.querySelector('#toggle-asc').checked = checkedAsc;
-        this.$diagColumn.querySelector('#toggle-desc').checked = checkedDesc;
-        this.$diagColumn.setAttribute('title-text', dispName);
-        this.$diagColumn.show();
+        this.$menuOpen = $menu;
     }
 
     /**
@@ -1116,48 +1099,6 @@ export class HeliumTable extends HTMLElement {
 
         $row.append($cell);
         return $row;
-    }
-
-    _renderDialogColumn() {
-        let $dialog = document.createElement('he-dialog');
-        $dialog.id = 'diag-column';
-        $dialog.setAttribute('title-text', 'Spalte');
-        $dialog.setAttribute('outside-close', 'true');
-
-        let $body = document.createElement('form');
-        $body.slot = 'body';
-        $body.id = 'form-column';
-        $body.innerHTML = `
-            <label id="lbl-desc" style="display: none">Beschreibung</label>
-            <span id="desc-column" style="display: none"></span>
-            <label>Sortierung</label>
-            <div id="cont-sort-diag-col">
-                <he-toggle id="toggle-asc" variant="outline" name="sort" value="asc">A - Z</he-toggle>
-                <he-toggle id="toggle-desc" variant="outline" name="sort" value="desc">Z - A</he-toggle>
-            </div>
-            <label>Filter</label>
-            <he-input id="inp-filter-column" name="filter"></he-input>
-            <he-select id="sel-filter-column" name="filter-sel" filter="true"></he-select>
-            <he-input id="inp-colname-column" type="hidden" name="column"></he-input>
-        `;
-        $dialog.append($body);
-
-        let $footer = document.createElement('div');
-        $footer.slot = 'footer';
-
-        let $btnApply = document.createElement('he-button');
-        $btnApply.innerHTML = 'Anwenden';
-        $btnApply.setAttribute('variant', 'primary');
-        $btnApply.onclick = () => this._applyColumnClickCallback.bind(this)();
-        $footer.append($btnApply);
-        $dialog.append($footer)
-
-        $dialog.addEventListener('keyup', (event) => {
-            if (event.key === 'Enter') {
-                $btnApply.click();
-            }
-        });
-        return $dialog;
     }
 
     _renderDialogEdit() {
@@ -1535,8 +1476,9 @@ export class HeliumTable extends HTMLElement {
             if (useColumnMenu) {
                 $contHeaderCell.append($spanName);
                 $contHeaderCell.classList.add('cont-colname');
-                $contHeaderCell.append(this._renderColumnMenu());
-                $contHeaderCell.addEventListener('click', () => this._colClickCallback.bind(this)($column));
+                $contHeaderCell.append(this._renderColumnMenu($column));
+                $spanName.addEventListener('click', (e) => this._colClickCallback.bind(this)(e, $column));
+                window.addEventListener('click', () => this._windowClickCallback.bind(this)());
 
             } else if (attrFilter === 'below') {
                 let $filter = this._renderFilter($column, colName);
@@ -1566,23 +1508,87 @@ export class HeliumTable extends HTMLElement {
         return $tHead;
     }
 
-    _renderColumnMenu() {
+    _renderColumnMenu($column) {
+        const colName = $column.getAttribute('column');
+
         let $menu = document.createElement('div');
         $menu.classList.add('column-menu');
+        $menu.addEventListener('click', (e) => e.stopPropagation());
 
-        $menu.innerHTML = `
-            <label id="lbl-desc" style="display: none">Beschreibung</label>
-            <span id="desc-column" style="display: none"></span>
-            <label>Sortierung</label>
-            <div id="cont-sort-diag-col">
-                <he-toggle id="toggle-asc" variant="outline" name="sort" value="asc">A - Z</he-toggle>
-                <he-toggle id="toggle-desc" variant="outline" name="sort" value="desc">Z - A</he-toggle>
-            </div>
-            <label>Filter</label>
-            <he-input id="inp-filter-column" name="filter"></he-input>
-            <he-select id="sel-filter-column" name="filter-sel" filter="true"></he-select>
-            <he-input id="inp-colname-column" type="hidden" name="column"></he-input>
-        `;
+        const description = $column.getAttribute('description');
+        if (description != null) {
+            let $btnDescr = document.createElement('div');
+            $btnDescr.classList.add('btn-description');
+            $btnDescr.innerHTML = 'Beschreibung';
+            $menu.append($btnDescr);
+        }
+
+        const filterVal = $column.getAttribute('filter');
+        let valMap = this.remap[colName] ?? {};
+        let options = this.options[colName];
+        if (options != null) {
+            options = [...options];
+            options.sort(function(a, b) {
+                return a.localeCompare(b);
+            });
+            options.unshift('');
+
+            let $selFilter = document.createElement('he-select');
+            $selFilter.setAttribute('filter', 'true');
+            $selFilter.classList.add("column-filter");
+            $selFilter.name = "filter";
+            $selFilter.replaceOptions(options, valMap);
+            $selFilter.value = filterVal ?? '';
+            $menu.append($selFilter);
+            
+        } else {
+            let $inpFilter = document.createElement('he-input');
+            $inpFilter.setAttribute('filter', 'true');
+            $inpFilter.classList.add("column-filter");
+            $inpFilter.name = "filter";
+            $inpFilter.value = filterVal ?? '';
+            $inpFilter.select();
+            $menu.append($inpFilter);
+        }
+
+        let $btnAsc = document.createElement('div');
+        $btnAsc.classList.add('btn-sort-asc');
+        $btnAsc.innerHTML = 'Aufsteigend sortieren'
+        $menu.append($btnAsc);
+
+        let $btnDesc = document.createElement('div');
+        $btnDesc .classList.add('btn-sort-desc');
+        $btnDesc.innerHTML = 'Absteigend sortieren'
+        $menu.append($btnDesc);
+
+        $btnAsc.onclick = () => {
+            if ($btnAsc.hasAttribute('selected')) {
+                $btnAsc.removeAttribute('selected');
+            } else {
+                $btnAsc.setAttribute('selected', '');
+            }
+            $btnDesc.removeAttribute('selected');
+        };
+        $btnDesc.onclick = () => {
+            if ($btnDesc.hasAttribute('selected')) {
+                $btnDesc.removeAttribute('selected');
+            } else {
+                $btnDesc.setAttribute('selected', '');
+            }
+            $btnAsc.removeAttribute('selected');
+        };
+
+        let $btnApply = document.createElement('div');
+        $btnApply.classList.add('btn-apply-filter');
+        $btnApply.innerHTML = 'Anwenden';
+        $btnApply.onclick = (e) => this._applyColumnClickCallback.bind(this)(e, $column);
+        $menu.append($btnApply);
+
+        $menu.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                $btnApply.click();
+            }
+        });
 
         return $menu;
     }
@@ -1796,6 +1802,10 @@ export class HeliumTable extends HTMLElement {
             }
         })
         this.dispatchEvent(evt);
+    }
+
+    _windowClickCallback() {
+        this._closeColumnMenu();
     }
 }
 
