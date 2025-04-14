@@ -214,8 +214,6 @@ class HeliumTable extends HTMLElement {
     $checkAll;
     /** @type {HTMLFormElement} */
     $form;
-    /** @type {HTMLFormElement} */
-    $formDialogEdit;
     /** @type {HTMLTableSectionElement} */
     $body;
     /** @type {HTMLDivElement} */
@@ -396,9 +394,23 @@ class HeliumTable extends HTMLElement {
     /**
      * 
      * @param {HeliumFormDialogSubmitEvent} evt
+     * @param {HeliumFormDialog} $dialog
      * @returns void
      */
     formEditBeforeSubmitCallback(evt) {
+        if (this.endpoint == null) {
+            switch (this.editRequestType) {
+                case 'POST':
+                    this._appendRows([this.$diagEdit.getValues()]);
+                    break;
+                case 'PATCH':
+                    this.replaceRowData(this.idsEdit[0], this.$diagEdit.getValues());
+                    break;
+            }
+            this.$diagEdit.close();
+            return;
+        }
+
         evt.fetchArgs.body = {
             data: [JSON.parse(evt.fetchArgs.body)],
         };
@@ -878,11 +890,7 @@ class HeliumTable extends HTMLElement {
 
         for (const $col of cols) {
             const strict = $col.getAttribute('strict-filter') != null;
-            const $filter = this.$form.querySelector(`.inp-filter[name="${$col.getAttribute('column')}"]`);
-            if ($filter == null) {
-                continue;
-            }
-            let filterValue = $filter.value;
+            let filterValue = $col.getAttribute('filter') ?? '';
 
             const data = $row.children[$col.cellIndex].getAttribute('data');
 
@@ -1140,7 +1148,7 @@ class HeliumTable extends HTMLElement {
             data.push({
                 name: $column.getAttribute('column'),
                 required: required,
-                label: $column.querySelector('span').innerHTML,
+                label: $column.querySelector('.span-colname').innerHTML,
                 placeholder: $column.getAttribute('default'),
                 pattern: $column.getAttribute('pattern'),
                 hidden: hidden,
@@ -1152,7 +1160,7 @@ class HeliumTable extends HTMLElement {
         let $dialog = document.createElement('he-form-dialog');
         $dialog.renderRows(data);
 
-        $dialog.setAttribute('endpoint', this.endpoint);
+        $dialog.setAttribute('endpoint', this.endpoint ?? '');
         $dialog.onsubmit = (evt) => this.formEditBeforeSubmitCallback.bind(this)(evt);
         $dialog.onresponse = (evt) => this.formEditAfterSubmitCallback.bind(this)(evt);
         return $dialog;
@@ -1399,7 +1407,13 @@ class HeliumTable extends HTMLElement {
         const attrFilter = this.getAttribute('filter');
 
         for (let $column of columns) {
-            let colName = $column.getAttribute('column') ?? $column.innerText;
+            let colName = $column.getAttribute('column');
+            if (colName == null) {
+                colName = $column.innerText;  
+                if (!['check', 'edit', 'duplicate', 'delete'].includes($column.getAttribute('type'))) {
+                    $column.setAttribute('column', colName);
+                }
+            }
 
             try {
                 // Numbers are converted to strings to simplify sorting later on
