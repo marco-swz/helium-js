@@ -11,6 +11,15 @@
     color: hsl(from var(--he-select-clr, black) h s calc(l + 50))
 }
 
+:host([variant="underline"]) {
+    #inp {
+        border-top: 0;
+        border-left: 0;
+        border-right: 0;
+        border-radius: 0;
+    }
+}
+
 #inp {
     position: relative;
     background-color: var(--he-select-clr-bg, whitesmoke);
