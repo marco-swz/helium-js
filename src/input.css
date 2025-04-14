@@ -22,10 +22,19 @@
     cursor: text;
 }
 
-:host(:hover) {
+:host(:hover), :host([variant="underline"]:hover) {
     transition:
         border-color 0.2s;
     border-color: var(--he-input-hover-borderColor);
+}
+
+:host([variant="underline"]) {
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+    border-radius: 0;
+    border-bottom-color: var(--he-input-borderColor);
+
 }
 
 :host([invalid]) {
