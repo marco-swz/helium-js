@@ -185,6 +185,7 @@ export class HeliumTree extends HTMLElement {
 
     /**
      * @param {HTMLElement} $elem 
+     * @param {boolean} useSlot
      */
     _renderLeaf($elem) {
         let $cont = document.createElement('div');
@@ -199,11 +200,19 @@ export class HeliumTree extends HTMLElement {
             $cont.setAttribute('closed', true);
         }
         $cont.id = $elem.id;
+        $elem.slot = $elem.id;
         $cont.classList.add('cont-elem');
         $elem.id = '';
         $elem.classList.add('list-elem');
         $cont.setAttribute('type', 'leaf');
-        $cont.append($elem);
+        const useSlot = $elem.hasAttribute('slotted');
+        if (useSlot) {
+            let $slot = document.createElement('slot');
+            $slot.name = $cont.id;
+            $cont.append($slot);
+        } else {
+            $cont.append($elem);
+        }
         return $cont;
     }
 
