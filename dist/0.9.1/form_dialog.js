@@ -145,8 +145,11 @@ class HeliumFormDialog extends HTMLElement {
             this.onsubmit(evt);
         }
 
-        this.$dialog.querySelector('#btn-save').loading = true;
-        fetch(endpoint, fetchArgs)
+        if (endpoint == null || endpoint === '') {
+            return;
+        }
+
+        this.$dialog.querySelector('#btn-save').loading = true;        fetch(endpoint, fetchArgs)
             .then(resp => {
                 this.$dialog.querySelector('#btn-save').loading = false;
 
