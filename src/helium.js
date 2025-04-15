@@ -8,3 +8,7 @@ import { HeliumTabs } from "./tabs.js";
 import { HeliumSelect } from "./select.js";
 import { HeliumCheck } from "./check.js";
 import { HeliumToast } from "./toast.js";
+import { HeliumTree } from "./tree.js";
+import { HeliumSidebar } from "./sidebar.js";
+import { HeliumMenubar } from "./menubar.js";
+import { HeliumToggle } from "./toggle.js";
