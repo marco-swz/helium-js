@@ -57,10 +57,19 @@ class HeliumTree extends HTMLElement {
         }
     }
 
+    /**
+     * @param {string} filterText
+     * @returns {Self}
+     */
     filter(filterText) {
+        if (filterText != null) {
+            filterText = filterText.toLowerCase();
+        }
         for(const $elem of this.$contItems.children) {
             this._filterRecursive($elem, filterText, false);
         }
+
+        return this;
     }
 
     /**
@@ -112,7 +121,6 @@ class HeliumTree extends HTMLElement {
             return;
         }
 
-        console.log(ids);
         for (let id of ids) {
             let $el = this.$contItems.querySelector('#' + id);
             if ($el == null) {
@@ -126,9 +134,14 @@ class HeliumTree extends HTMLElement {
     _filterRecursive($item, filterText, showParent) {
         let showSelf = filterText == null;
 
-        showSelf ||= $item.children[0].innerHTML.toLowerCase()
-            .includes(filterText.toLowerCase());
-
+        let textContent = $item.getAttribute('filter-text');
+        let isMatch = false;
+        if (textContent != null && textContent !== '') {
+            isMatch = textContent.toLowerCase().includes(filterText);
+        } else {
+            isMatch = $item.children[0].innerHTML.toLowerCase().includes(filterText);
+        }
+        showSelf ||= isMatch;
         let showChild = false;
 
         const isRoot = $item.getAttribute('type') === 'root';
@@ -191,6 +204,11 @@ class HeliumTree extends HTMLElement {
         }
         if ($elem.getAttribute('selected') != null) {
             $cont.setAttribute('selected', '');
+        }
+
+        let filterText = $elem.getAttribute('filter-text');
+        if (filterText != null) {
+            $cont.setAttribute('filter-text', filterText);
         }
         if ($elem.getAttribute('closed') != null) {
             $cont.setAttribute('closed', true);
