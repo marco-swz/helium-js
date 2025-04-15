@@ -9,7 +9,7 @@
     --he-table-width: fit-content;
     --he-table-row-borderBottomColor: hsl(from var(--he-table-row-backgroundColor) h s calc(l - 20));
 
-    /* overflow: auto; */
+    overflow: auto;
     display: inline-block;
     scrollbar-gutter: stable both-edges;
     outline: none;
