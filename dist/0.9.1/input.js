@@ -488,12 +488,12 @@ class HeliumInput extends HTMLElement {
      * @param {string} _oldValue The previous attribute value
      * @param {string} newValue The new attribute value
      */
-    attributeChangedCallback(name, _oldValue, newValue) {
+    attributeChangedCallback(name, oldValue, newValue) {
         switch (name) {
             case 'type':
                 if (newValue === 'hidden') {
                     this.style.display = 'none';
-                } else {
+                } else if (oldValue === 'hidden') {
                     this.style.display = '';
                 }
 
