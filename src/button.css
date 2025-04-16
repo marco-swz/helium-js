@@ -55,7 +55,7 @@
     --he-button-hover-borderColor: var(--he-theme-color);
 }
 
-:host([variant=primary]) {
+:host([variant=primary]), :host([variant=primary][theme]) {
     --he-button-color: var(--he-theme-contrast);
     --he-button-hover-color: var(--he-theme-contrast);
     --he-button-backgroundColor: var(--he-theme-color);
