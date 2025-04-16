@@ -10,7 +10,7 @@ export class HeliumSidebar extends HTMLElement {
     /** @type {HTMLDivElement} */
     $contPagetree;
     /** @type {HTMLDivElement} */
-    $contUser;
+    $contAction;
     /** @type {HTMLDivElement} */
     $contSidebar;
     /** @type {HTMLDivElement} */
@@ -75,11 +75,11 @@ export class HeliumSidebar extends HTMLElement {
         $btnPages.onclick = () => this.showPages();
         $tabs.append($btnPages);
 
-        let $btnUser = document.createElement('div');
-        $btnUser.id = 'btn-user';
-        $btnUser.innerHTML = '<span>Benutzer</span>';
-        $btnUser.onclick = () => this.showUser();
-        $tabs.append($btnUser);
+        let $btnAction = document.createElement('div');
+        $btnAction.id = 'btn-action';
+        $btnAction.innerHTML = '<span>Aktion</span>';
+        $btnAction.onclick = () => this.showAction();
+        $tabs.append($btnAction);
 
         let $btnHide = document.createElement('div');
         $btnHide.id = 'btn-hide';
@@ -90,21 +90,21 @@ export class HeliumSidebar extends HTMLElement {
         this.$contPagetree.id = 'cont-pagetree';
         this.$sidebar.append(this.$contPagetree);
 
-        this.$contUser = document.createElement('div');
-        this.$contUser.id = 'cont-user';
-        this.$sidebar.append(this.$contUser);
+        this.$contAction = document.createElement('div');
+        this.$contAction.id = 'cont-action';
+        this.$sidebar.append(this.$contAction);
 
         let $btnLogout = document.createElement('a');
         $btnLogout.id = 'btn-logout';
         $btnLogout.innerHTML = 'Abmelden';
         $btnLogout.href = '/logout';
-        this.$contUser.append($btnLogout);
+        this.$contAction.append($btnLogout);
 
         let $btnReloadRights = document.createElement('a');
         $btnReloadRights.id = 'btn-reload-rights';
         $btnReloadRights.innerHTML = 'Benutzerrechte aktualisieren';
         $btnReloadRights.href = '/reacl';
-        this.$contUser.append($btnReloadRights);
+        this.$contAction.append($btnReloadRights);
 
         let $contPageSearch = document.createElement('div');
         $contPageSearch.id = 'cont-page-search';
@@ -251,9 +251,9 @@ export class HeliumSidebar extends HTMLElement {
         localStorage.setItem('he-sidebar_tab', 'pages');
     }
 
-    showUser() {
-        this.setAttribute('tab', 'user');
-        localStorage.setItem('he-sidebar_tab', 'user');
+    showAction() {
+        this.setAttribute('tab', 'action');
+        localStorage.setItem('he-sidebar_tab', 'action');
     }
     
     /**

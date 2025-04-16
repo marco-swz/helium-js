@@ -43,7 +43,7 @@ a {
     }
 }
 
-#cont-user {
+#cont-action {
     display: flex;
     flex-direction: column;
     padding: 20px;
@@ -122,9 +122,9 @@ a {
     }
 }
 
-#btn-user::before {
+#btn-action::before {
     font-family: 'Font Awesome 5 Pro';
-    content: "\f007";
+    content: "\f0e7";
     padding-right: 6px;
     font-weight: 800;
 }
@@ -289,8 +289,8 @@ a {
     }
 }
 
-:host([tab=user]) {
-    & #btn-user {
+:host([tab=action]) {
+    & #btn-action {
         transition:
             color 0.2s,
             background-color 0.2s;
@@ -298,7 +298,7 @@ a {
         color: black;
     }
 
-    & #cont-user {
+    & #cont-action {
         display: flex;
     }
 }

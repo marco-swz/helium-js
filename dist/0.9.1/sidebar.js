@@ -1,6 +1,6 @@
 import './tree.js';
 
-const sheet = new CSSStyleSheet();sheet.replaceSync("a {\n    outline: none;\n}\n\n#cont-sidebar {\n    position: fixed;\n    left: 0;\n    top: 51px;\n    height: calc(100vh - 51px);\n    width: 300px;\n    display: flex;\n    z-index: 10;\n}\n\n#cont-pagetree {\n    display: none;\n    height: 100%;\n    padding: 20px;\n    padding-top: 0;\n}\n\n#pagetree {\n    overflow: auto;\n    margin-top: 10px;\n    height: 90%;\n}\n\n#sidebar {\n    border-right: 1px solid grey;\n    background-color: white;\n    width: 100%;\n}\n\n#header {\n    padding: 8px 20px;\n    display: flex;\n    gap: 10px;\n    border-bottom: 1px solid lightgrey;\n    margin-bottom: 20px;\n\n    & #btn-hide {\n        margin-left: auto;\n    }\n}\n\n#cont-user {\n    display: flex;\n    flex-direction: column;\n    padding: 20px;\n    padding-top: 0;\n    font-weight: 500;\n\n    & > * {\n        color: black;\n        padding: 8px 10px;\n        text-decoration: none;\n        border-radius: 4px;\n        cursor: pointer;\n        overflow: hidden;\n        text-overflow: ellipsis;\n        text-wrap: nowrap;\n\n        &:hover {\n            transition: background-color 0.2s;\n            background-color: whitesmoke;\n        }\n    }\n}\n\n.main,\n.navCont {\n    margin-left: 300px;\n}\n\n#resizer {\n  z-index: 2;\n  cursor: col-resize;\n  height: 100%;\n  width: 4px;\n  margin-left: -2px;\n}\n\n#opener {\n    display: block;\n    position: fixed;\n    z-index: 100;\n    cursor: pointer;\n    height: 100%;\n    left: 0;\n    width: 10px;\n    background-color: lightgrey;\n}\n\n:host([open]) #opener {\n    display: none;\n}\n\n#tabs {\n    --bg-color: #e6e6e6;\n    display: flex;\n    gap: 5px;\n    padding: 4px;\n    font-size: 15px;\n    font-weight: 500;\n    background-color: var(--bg-color);\n    border-radius: 8px;\n    height: 28px;\n    color: grey;\n    width: fit-content;\n\n    & > div {\n        padding: 5px 10px;\n        cursor: pointer;\n        border-radius: 5px;\n        display: flex;\n        align-items: center;\n\n        &:hover {\n            transition: color 0.2s;\n            color: black;\n        }\n    }\n}\n\n#btn-user::before {\n    font-family: 'Font Awesome 5 Pro';\n    content: \"\\f007\";\n    padding-right: 6px;\n    font-weight: 800;\n}\n\n#btn-pages::before {\n    font-family: 'Font Awesome 5 Pro';\n    content: \"\\f550\";\n    padding-right: 6px;\n    font-weight: 800;\n}\n\n#btn-hide {\n    height: 36px;\n    aspect-ratio: 1;\n    border-radius: 50%;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    cursor: pointer;\n\n    &:hover {\n        transition: background-color 0.2s;\n        background-color: #e6e6e6;\n    }\n    \n    &::before {\n        font-family: 'Font Awesome 5 Pro';\n        content: \"\\f053\";\n        font-style: normal;\n    }\n}\n\n#btn-logout {\n\n    &::before {\n        font-family: 'Font Awesome 5 Pro';\n        content: \"\\f08b\";\n        font-style: normal;\n        padding-right: 10px;\n        font-weight: 800;\n    }\n}\n\n#btn-reload-rights {\n\n    &::before {\n        font-family: 'Font Awesome 5 Pro';\n        content: \"\\f2f1\";\n        font-style: normal;\n        padding-right: 10px;\n        font-weight: 800;\n    }\n}\n\n\n#cont-page-search {\n    display: flex;\n    border: 1px solid lightgrey;\n    border-radius: 4px;\n\n    &:hover {\n        transition: border-color 0.2s;\n        border-color: grey;\n    }\n}\n\n#inp-search {\n    width: 100%;\n    outline: none;\n    padding: 3px 7px;\n    padding-left: 0;\n    font-size: 15px;\n    background-color: whitesmoke;\n    border: 0;\n    border-top-right-radius: 4px;\n    border-bottom-right-radius: 4px;\n}\n\n#btn-page-search {\n    cursor: pointer;\n    background-color: whitesmoke;\n    border-radius: 0;\n    width: 35px;\n    height: 30px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    border-top-left-radius: 4px;\n    border-bottom-left-radius: 4px;\n    border: 0;\n\n    &::before {\n        font-family: 'Font Awesome 5 Pro';\n        content: \"\\f002\";\n        font-style: normal;\n    }\n\n    &:hover {\n        transition:\n            font-weight 0.2s;\n        font-weight: 500;\n    }\n    \n}\n\n#pagetree {\n    & a {\n        padding: 8px 10px;\n        cursor: pointer;\n        display: inline-block;\n        width: 100%;\n        width: -moz-available;          /* WebKit-based browsers will ignore this. */\n        width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */\n        width: fill-available;\n        color: black;\n        text-decoration: none;\n        border-radius: 5px;\n        text-wrap: nowrap;\n        overflow: hidden;\n        text-overflow: ellipsis;\n    \n        &[selected] {\n            transition: background-color 0.2s;\n            background-color: whitesmoke;\n        }\n\n        &:hover {\n            background-color: whitesmoke;\n        }\n    }\n}\n\n[data-title] {\n    position: relative;\n}\n\n[data-title]:hover::after {\n  content: attr(data-title);\n  position: absolute;\n  bottom: -26px;\n  display: inline-block;\n  padding: 3px 6px;\n  border-radius: 2px;\n  background: #000;\n  color: #fff;\n  font-size: 12px;\n  font-family: sans-serif;\n  white-space: nowrap;\n}\n\n:host([tab=pages]) {\n    & #btn-pages {\n        transition:\n            color 0.2s,\n            background-color 0.2s;\n        background-color: white;\n        color: black;\n    }\n\n    & #cont-pagetree {\n        display: block;\n    }\n}\n\n:host([tab=user]) {\n    & #btn-user {\n        transition:\n            color 0.2s,\n            background-color 0.2s;\n        background-color: white;\n        color: black;\n    }\n\n    & #cont-user {\n        display: flex;\n    }\n}\n\n\n");
+const sheet = new CSSStyleSheet();sheet.replaceSync("a {\n    outline: none;\n}\n\n#cont-sidebar {\n    position: fixed;\n    left: 0;\n    top: 51px;\n    height: calc(100vh - 51px);\n    width: 300px;\n    display: flex;\n    z-index: 10;\n}\n\n#cont-pagetree {\n    display: none;\n    height: 100%;\n    padding: 20px;\n    padding-top: 0;\n}\n\n#pagetree {\n    overflow: auto;\n    margin-top: 10px;\n    height: 90%;\n}\n\n#sidebar {\n    border-right: 1px solid grey;\n    background-color: white;\n    width: 100%;\n}\n\n#header {\n    padding: 8px 20px;\n    display: flex;\n    gap: 10px;\n    border-bottom: 1px solid lightgrey;\n    margin-bottom: 20px;\n\n    & #btn-hide {\n        margin-left: auto;\n    }\n}\n\n#cont-action {\n    display: flex;\n    flex-direction: column;\n    padding: 20px;\n    padding-top: 0;\n    font-weight: 500;\n\n    & > * {\n        color: black;\n        padding: 8px 10px;\n        text-decoration: none;\n        border-radius: 4px;\n        cursor: pointer;\n        overflow: hidden;\n        text-overflow: ellipsis;\n        text-wrap: nowrap;\n\n        &:hover {\n            transition: background-color 0.2s;\n            background-color: whitesmoke;\n        }\n    }\n}\n\n.main,\n.navCont {\n    margin-left: 300px;\n}\n\n#resizer {\n  z-index: 2;\n  cursor: col-resize;\n  height: 100%;\n  width: 4px;\n  margin-left: -2px;\n}\n\n#opener {\n    display: block;\n    position: fixed;\n    z-index: 100;\n    cursor: pointer;\n    height: 100%;\n    left: 0;\n    width: 10px;\n    background-color: lightgrey;\n}\n\n:host([open]) #opener {\n    display: none;\n}\n\n#tabs {\n    --bg-color: #e6e6e6;\n    display: flex;\n    gap: 5px;\n    padding: 4px;\n    font-size: 15px;\n    font-weight: 500;\n    background-color: var(--bg-color);\n    border-radius: 8px;\n    height: 28px;\n    color: grey;\n    width: fit-content;\n\n    & > div {\n        padding: 5px 10px;\n        cursor: pointer;\n        border-radius: 5px;\n        display: flex;\n        align-items: center;\n\n        &:hover {\n            transition: color 0.2s;\n            color: black;\n        }\n    }\n}\n\n#btn-action::before {\n    font-family: 'Font Awesome 5 Pro';\n    content: \"\\f0e7\";\n    padding-right: 6px;\n    font-weight: 800;\n}\n\n#btn-pages::before {\n    font-family: 'Font Awesome 5 Pro';\n    content: \"\\f550\";\n    padding-right: 6px;\n    font-weight: 800;\n}\n\n#btn-hide {\n    height: 36px;\n    aspect-ratio: 1;\n    border-radius: 50%;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    cursor: pointer;\n\n    &:hover {\n        transition: background-color 0.2s;\n        background-color: #e6e6e6;\n    }\n    \n    &::before {\n        font-family: 'Font Awesome 5 Pro';\n        content: \"\\f053\";\n        font-style: normal;\n    }\n}\n\n#btn-logout {\n\n    &::before {\n        font-family: 'Font Awesome 5 Pro';\n        content: \"\\f08b\";\n        font-style: normal;\n        padding-right: 10px;\n        font-weight: 800;\n    }\n}\n\n#btn-reload-rights {\n\n    &::before {\n        font-family: 'Font Awesome 5 Pro';\n        content: \"\\f2f1\";\n        font-style: normal;\n        padding-right: 10px;\n        font-weight: 800;\n    }\n}\n\n\n#cont-page-search {\n    display: flex;\n    border: 1px solid lightgrey;\n    border-radius: 4px;\n\n    &:hover {\n        transition: border-color 0.2s;\n        border-color: grey;\n    }\n}\n\n#inp-search {\n    width: 100%;\n    outline: none;\n    padding: 3px 7px;\n    padding-left: 0;\n    font-size: 15px;\n    background-color: whitesmoke;\n    border: 0;\n    border-top-right-radius: 4px;\n    border-bottom-right-radius: 4px;\n}\n\n#btn-page-search {\n    cursor: pointer;\n    background-color: whitesmoke;\n    border-radius: 0;\n    width: 35px;\n    height: 30px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    border-top-left-radius: 4px;\n    border-bottom-left-radius: 4px;\n    border: 0;\n\n    &::before {\n        font-family: 'Font Awesome 5 Pro';\n        content: \"\\f002\";\n        font-style: normal;\n    }\n\n    &:hover {\n        transition:\n            font-weight 0.2s;\n        font-weight: 500;\n    }\n    \n}\n\n#pagetree {\n    & a {\n        padding: 8px 10px;\n        cursor: pointer;\n        display: inline-block;\n        width: 100%;\n        width: -moz-available;          /* WebKit-based browsers will ignore this. */\n        width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */\n        width: fill-available;\n        color: black;\n        text-decoration: none;\n        border-radius: 5px;\n        text-wrap: nowrap;\n        overflow: hidden;\n        text-overflow: ellipsis;\n    \n        &[selected] {\n            transition: background-color 0.2s;\n            background-color: whitesmoke;\n        }\n\n        &:hover {\n            background-color: whitesmoke;\n        }\n    }\n}\n\n[data-title] {\n    position: relative;\n}\n\n[data-title]:hover::after {\n  content: attr(data-title);\n  position: absolute;\n  bottom: -26px;\n  display: inline-block;\n  padding: 3px 6px;\n  border-radius: 2px;\n  background: #000;\n  color: #fff;\n  font-size: 12px;\n  font-family: sans-serif;\n  white-space: nowrap;\n}\n\n:host([tab=pages]) {\n    & #btn-pages {\n        transition:\n            color 0.2s,\n            background-color 0.2s;\n        background-color: white;\n        color: black;\n    }\n\n    & #cont-pagetree {\n        display: block;\n    }\n}\n\n:host([tab=action]) {\n    & #btn-action {\n        transition:\n            color 0.2s,\n            background-color 0.2s;\n        background-color: white;\n        color: black;\n    }\n\n    & #cont-action {\n        display: flex;\n    }\n}\n\n\n");
 
 class HeliumSidebar extends HTMLElement {
     static observedAttributes = [
@@ -11,7 +11,7 @@ class HeliumSidebar extends HTMLElement {
     /** @type {HTMLDivElement} */
     $contPagetree;
     /** @type {HTMLDivElement} */
-    $contUser;
+    $contAction;
     /** @type {HTMLDivElement} */
     $contSidebar;
     /** @type {HTMLDivElement} */
@@ -76,11 +76,11 @@ class HeliumSidebar extends HTMLElement {
         $btnPages.onclick = () => this.showPages();
         $tabs.append($btnPages);
 
-        let $btnUser = document.createElement('div');
-        $btnUser.id = 'btn-user';
-        $btnUser.innerHTML = '<span>Benutzer</span>';
-        $btnUser.onclick = () => this.showUser();
-        $tabs.append($btnUser);
+        let $btnAction = document.createElement('div');
+        $btnAction.id = 'btn-action';
+        $btnAction.innerHTML = '<span>Aktion</span>';
+        $btnAction.onclick = () => this.showAction();
+        $tabs.append($btnAction);
 
         let $btnHide = document.createElement('div');
         $btnHide.id = 'btn-hide';
@@ -91,21 +91,21 @@ class HeliumSidebar extends HTMLElement {
         this.$contPagetree.id = 'cont-pagetree';
         this.$sidebar.append(this.$contPagetree);
 
-        this.$contUser = document.createElement('div');
-        this.$contUser.id = 'cont-user';
-        this.$sidebar.append(this.$contUser);
+        this.$contAction = document.createElement('div');
+        this.$contAction.id = 'cont-action';
+        this.$sidebar.append(this.$contAction);
 
         let $btnLogout = document.createElement('a');
         $btnLogout.id = 'btn-logout';
         $btnLogout.innerHTML = 'Abmelden';
         $btnLogout.href = '/logout';
-        this.$contUser.append($btnLogout);
+        this.$contAction.append($btnLogout);
 
         let $btnReloadRights = document.createElement('a');
         $btnReloadRights.id = 'btn-reload-rights';
         $btnReloadRights.innerHTML = 'Benutzerrechte aktualisieren';
         $btnReloadRights.href = '/reacl';
-        this.$contUser.append($btnReloadRights);
+        this.$contAction.append($btnReloadRights);
 
         let $contPageSearch = document.createElement('div');
         $contPageSearch.id = 'cont-page-search';
@@ -250,9 +250,9 @@ class HeliumSidebar extends HTMLElement {
         localStorage.setItem('he-sidebar_tab', 'pages');
     }
 
-    showUser() {
-        this.setAttribute('tab', 'user');
-        localStorage.setItem('he-sidebar_tab', 'user');
+    showAction() {
+        this.setAttribute('tab', 'action');
+        localStorage.setItem('he-sidebar_tab', 'action');
     }
     
     /**
