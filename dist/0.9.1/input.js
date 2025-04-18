@@ -653,8 +653,6 @@ class HeliumInput extends HTMLElement {
      * Callback for input changes.
      */
     _inputChangedCallback() {
-        this.dispatchEvent(new CustomEvent('change'));
-
         if (this.disabled) {
             return;
         }
@@ -662,6 +660,8 @@ class HeliumInput extends HTMLElement {
         if (this.checkValidity()) {
             this.internals.setFormValue(this.$input.value);
         }
+
+        this.dispatchEvent(new CustomEvent('change'));
     }
 
     _inputFocusCallback() {
