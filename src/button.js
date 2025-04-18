@@ -42,8 +42,8 @@ export class HeliumButton extends HTMLElement {
     $anchor;
     /** @type {?EventListener} */
     listenerClick = null;
-    /** @type {HTMLSlotElement} */
-    $slot;
+    /** @type {number} */
+    slotCount = 0;
 
     constructor() {
         super();
@@ -53,10 +53,6 @@ export class HeliumButton extends HTMLElement {
 
         this.$button = document.createElement('button');
         this.$button.id = 'he-button';
-
-        this.$slot = document.createElement('slot');
-        this.$slot.name = "inner";
-        this.$button.append(this.$slot);
 
         this.$anchor.append(this.$button);
         shadow.append(this.$anchor);
@@ -159,20 +155,6 @@ export class HeliumButton extends HTMLElement {
                     this.disabled = false;
                 }
                 break;
-            case 'theme':
-                break;
-            case 'variant': 
-                if (newValue === 'primary') {
-
-
-                } else if (newValue === 'outline') {
-
-                } else if (newValue === 'ghost') {
-
-                } else {
-
-                }
-                break;
             case 'disabled':
                 if (newValue) {
                     this.$button.setAttribute('disabled', true);
@@ -198,17 +180,28 @@ export class HeliumButton extends HTMLElement {
     }
 
     connectedCallback() {
-        let $inner = document.createElement('span');
-        $inner.slot = 'inner';
-        $inner.innerHTML = this.innerHTML;
-        this.innerHTML = '';
+        this.$button.textContent = this.textContent;
+        for (let $elem of this.children) {
+            const useSlot = $elem.hasAttribute('slotted');
+            if (useSlot) {
+                let $slot = document.createElement('slot');
+                const slotName = `slot${this.slotCount++}`;
+                $elem.slot = slotName;
+                $slot.name = slotName;
+                this.button.append($slot);
+            } else {
+                this.$button.append($elem);
+            }
+        }
 
-        this.append($inner);
         this.onload && this.onload();
     }
 
     setText(newText) {
-        this.$slot.assignedElements()[0].innerHTML = newText;
+        if (this.slotCount > 0) {
+            throw Error('The button text cannot be set when using the `slotted` attribute!');
+        }
+        this.$button.innerHTML = newText;
     }
 
     _closeDialog() {

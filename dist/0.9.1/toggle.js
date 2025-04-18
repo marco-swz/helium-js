@@ -25,18 +25,19 @@ class HeliumToggle extends HTMLElement {
         'name',
     ];
 
-    /** @type {HTMLSlotElement} */
-    $slot;
     /** @type {ElementInternals} */
     internals;
+    /** @type {HTMLDivElement} */
+    $inner;
+    /** @type {number} */
+    slotCount = 0;
 
     constructor() {
         super();
         let shadow = this.attachShadow({ mode: "open" });
 
-        this.$slot = document.createElement('slot');
-        this.$slot.name = 'inner';
-        shadow.append(this.$slot);
+        this.$inner = document.createElement('div');
+        shadow.append(this.$inner);
 
         shadow.adoptedStyleSheets = [sheet];
         this.internals = this.attachInternals();
@@ -147,12 +148,18 @@ class HeliumToggle extends HTMLElement {
      * @returns {void}
      */
     connectedCallback() {
-        if (this.innerHTML !== '') {
-            let $cont = document.createElement('span');
-            $cont.slot = 'inner';
-            $cont.innerHTML = this.innerHTML;
-            this.innerHTML = '';
-            this.append($cont);
+        this.$inner.textContent = this.textContent;
+        for (let $elem of this.children) {
+            const useSlot = $elem.hasAttribute('slotted');
+            if (useSlot) {
+                let $slot = document.createElement('slot');
+                const slotName = `slot${this.slotCount++}`;
+                $elem.slot = slotName;
+                $slot.name = slotName;
+                this.$inner.append($slot);
+            } else {
+                this.$inner.append($elem);
+            }
         }
         this.onclick = () => this._clickCallback.bind(this)();
     }
