@@ -187,6 +187,10 @@ class HeliumSelect extends HTMLElement {
         }
 
         this.select(0);
+
+        if (this.hasAttribute('open')) {
+            this.open = true;
+        }
     }
 
     /**
@@ -362,8 +366,6 @@ class HeliumSelect extends HTMLElement {
 
     _toggledPopoverCallback(e) {
         if (e.newState === "open") {
-            this.internals.states.add('open');
-
             let positionDefault = 'bottom-left';
             if (heSpaceBelow(this) < this.$popover.offsetHeight + 20) {
                 positionDefault = 'top-left';
@@ -378,7 +380,6 @@ class HeliumSelect extends HTMLElement {
             this.$popover.style.visibility = '';
             this.$filter.focus();
         } else {
-            this.internals.states.delete('open');
             this.$filter.value = '';
 
             for (const option of this.$options.children) {
