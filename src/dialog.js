@@ -20,7 +20,6 @@ import sheet from './dialog.css';
  * @attr {on|off} open - If set, the dialog is open (will open if not)
  * @attr title-text - The text in the title of the dialog
  * @attr {on|off} hide-close-icon - If set, hides the close icon in the top-right corner
- * @attr {on|off} show-close-button - If set, shows a button in the footer to close the dialog
  * @attr {on|off} outside-close - If set, allows the user to close the dialog by clicking outside (on the backdrop)
  *
  * @slot body - The body of the dialog
@@ -35,8 +34,6 @@ export class HeliumDialog extends HTMLElement {
     static observedAttributes = [
         "open",
         "title-text",
-        "hide-close-icon",
-        "show-close-button",
     ];
     /** 
      * The underlying dialog element.
@@ -96,24 +93,6 @@ export class HeliumDialog extends HTMLElement {
         if (name === "title-text") {
             this.$title.innerText = newValue;
         }
-
-        if (name === "show-close-button") {
-            if (newValue != null) {
-                this.shadowRoot.querySelector('#he-btn-close').style.visibility = 'visible';
-                this.shadowRoot.querySelector('#he-diag-footer').style.visibility = 'visible';
-            } else {
-                this.shadowRoot.querySelector('#he-btn-close').style.visibility = 'collapse';
-                this.shadowRoot.querySelector('#he-diag-footer').style.visibility = 'collapse';
-            }
-        }
-
-        if (name === "hide-close-icon") {
-            if (newValue != null) {
-                this.shadowRoot.querySelector('#he-btn-close').style.visibility = 'collapse';
-            } else {
-                this.shadowRoot.querySelector('#he-btn-close').style.visibility = 'visible';
-            }
-        }
     }
 
     /**
@@ -133,7 +112,7 @@ export class HeliumDialog extends HTMLElement {
             this.close();
         })
 
-        if (this.getAttribute('outside-close')) {
+        if (this.hasAttribute('outside-close')) {
             this.addEventListener('click', e => {
                 let rect = this.$dialog.getBoundingClientRect();
                 let isInDialog = (rect.top <= e.clientY && e.clientY <= rect.top + rect.height &&
