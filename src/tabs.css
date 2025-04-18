@@ -4,6 +4,8 @@
      --he-tabs-hover-backgroundColor: lightgrey;
      --he-tabs-unselected-backgroundColor: whitesmoke;
      --he-tabs-unselected-color: gray;
+
+     display: block;
  }
 
  :host([variant=pebble]) {
