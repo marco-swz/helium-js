@@ -34,7 +34,6 @@ export class HeliumButton extends HTMLElement {
         'submit',
         'he-input-invalid',
         'disabled',
-        'link',
         'href',
     ];
     /** @type {HTMLButtonElement} */
@@ -181,7 +180,6 @@ export class HeliumButton extends HTMLElement {
                     this.$button.removeAttribute('disabled');
                 }
                 break;
-            case 'link':
             case 'href':
                 if (newValue) {
                     this.$anchor.setAttribute(name, newValue);
