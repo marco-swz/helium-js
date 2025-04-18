@@ -480,6 +480,14 @@ export class HeliumTable extends HTMLElement {
     }
 
     /**
+     * Returns all form data inside the table.
+     * @returns {FormData}
+     */
+    getFormData() {
+        return new FormData(this.$form);
+    }
+
+    /**
      * Returns the data of all rows, checked or not
      * @param {boolean} [returnDisplayValues=false] - If true, returns the displayed values, if false, the values of the `data` attribute
      * @returns {Array<Array<Object.<string, string>>>}
@@ -907,13 +915,15 @@ export class HeliumTable extends HTMLElement {
         if (hideMask > 0) {
             $row.style.visibility = 'collapse';
             //$row.hidden = true;
-            $check.checked = false;
+            if ($check) {
+                $check.checked = false;
+            }
         } else {
             //$row.hidden = false;
             $row.style.visibility = null;
         }
 
-        if ($check.checked) {
+        if ($check && $check.checked) {
             return $check;
         }
         return null;
@@ -1393,6 +1403,9 @@ export class HeliumTable extends HTMLElement {
         return $filter;
     }
 
+    /**
+     * @param {Array<HTMLTableCellElement>} columns
+     */
     _renderHead(columns) {
         let $rowFilters = document.createElement('tr');
         $rowFilters.classList.add('row-filter');
