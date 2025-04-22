@@ -77,7 +77,7 @@ export class HeliumSidebar extends HTMLElement {
 
         let $btnAction = document.createElement('div');
         $btnAction.id = 'btn-action';
-        $btnAction.innerHTML = '<span>Aktion</span>';
+        $btnAction.innerHTML = '<span>Aktionen</span>';
         $btnAction.onclick = () => this.showAction();
         $tabs.append($btnAction);
 
@@ -117,7 +117,6 @@ export class HeliumSidebar extends HTMLElement {
         let $inpSearch = document.createElement('input');
         $inpSearch.id = 'inp-search';
         $inpSearch.type = 'search';
-        $inpSearch.value = localStorage.getItem('he-sidebar_page_filter') ?? '';
         $inpSearch.onchange = () => this._searchChangeCallback.bind(this)($inpSearch);
         $btnPageSearch.onclick = () => this._searchChangeCallback.bind(this)($inpSearch);
         $contPageSearch.append($inpSearch);
@@ -261,7 +260,6 @@ export class HeliumSidebar extends HTMLElement {
      */
     _searchChangeCallback($inpSearch) {
         let searchText = $inpSearch.value;
-        localStorage.setItem('he-sidebar_page_filter', searchText);
         if (searchText === '') {
             this.$pagetree.filter(null);
             this.$pagetree.setClosed(this.pagetreeClosed);
