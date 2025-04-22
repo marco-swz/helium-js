@@ -207,19 +207,19 @@ function heShowDialogTemp(content, type) {
         $diag.id = 'he-dialog-temp';
         switch (type) {
             case 'error':
-                $diag.style.setProperty('--he-dialog-clr-title', 'indianred');
+                $diag.style.setProperty('--he-dialog-title-color', 'indianred');
                 $diag.setAttribute('title-text', 'Fehler');
                 break;
             case 'warn':
-                $diag.style.setProperty('--he-dialog-clr-title', 'orange');
+                $diag.style.setProperty('--he-dialog-title-color', 'orange');
                 $diag.setAttribute('title-text', 'Warnung');
                 break;
             case 'success':
-                $diag.style.setProperty('--he-dialog-clr-title', 'seagreen');
+                $diag.style.setProperty('--he-dialog-title-color', 'seagreen');
                 $diag.setAttribute('title-text', 'Erfolg');
                 break;
             default:
-                $diag.style.removeProperty('--he-dialog-clr-title');
+                $diag.style.removeProperty('--he-dialog-title-color');
                 $diag.setAttribute('title-text', 'Info');
                 break;
         }

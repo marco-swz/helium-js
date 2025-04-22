@@ -68,7 +68,7 @@
     font-weight: 500;
     font-size: 1.5rem;
     align-items: center;
-    color: var(--he-dialog-clr-title);
+    color: var(--he-dialog-title-color);
 }
 
 #he-diag-footer input[type=button] {
