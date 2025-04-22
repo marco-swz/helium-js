@@ -30,7 +30,6 @@
 
 .list-elem {
     padding: 8px 10px;
-    cursor: pointer;
     display: inline-block;
     width: 100%;
     width: -moz-available;          /* WebKit-based browsers will ignore this. */
@@ -61,6 +60,7 @@ div[type="root"] {
 
     & > .list-elem {
         text-transform: uppercase;
+        cursor: pointer;
         
         &::before {
             transition: transform 0.1s;
