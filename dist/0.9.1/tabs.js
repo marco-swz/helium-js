@@ -114,6 +114,7 @@ class HeliumTabs extends HTMLElement {
         contentNew.style.display = '';
 
         this.tabNrVisible = tabNrNew;
+        this.dispatchEvent(new CustomEvent('change'));
     }
 
     /**
