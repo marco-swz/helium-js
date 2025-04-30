@@ -1,4 +1,4 @@
-import sheet from './dialog.css';
+const sheet = new CSSStyleSheet();sheet.replaceSync("#he-diag-outer {\n    outline: none;\n    padding: 0;\n    border-radius: 4px;\n    border: 0;\n    box-shadow:0 5px 10px 0 #80808054;\n    animation: fadeout 0.1s ease-in forwards;\n}\n\n#he-diag-outer[open] {\n  animation: fadein 0.1s ease-in forwards;\n}\n\n#he-diag-outer[open]::backdrop {\n    transition: opacity 0.2s;\n    background-color: black;\n    opacity: 0.2;\n}\n\n#he-icon-close {\n    font-weight: 900;\n    width: 35px;\n    aspect-ratio: 1;\n    height: fit-content;\n    text-align: center;\n    cursor: pointer;\n    border-radius: 50%;\n    font-family: cursive;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n}\n\n#he-icon-close:hover {\n    transition:\n        background-color 0.2s;\n    background-color: whitesmoke;\n}\n\n#he-diag-inner {\n    min-height: 100px;\n    min-width: 200px;\n    display: flex;\n    flex-direction: column;\n    justify-content: space-between;\n}\n\n#he-diag-body {\n    padding: 10px 15px;\n}\n\n#he-diag-header {\n    display: flex;\n    justify-content: space-between;\n    gap: 10px;\n    padding: 10px 15px;\n}\n\n#he-diag-footer {\n    display: flex;\n    justify-content: flex-end;\n    padding: 15px;\n    gap: 5px;\n}\n\n#he-title {\n    display: flex;\n    font-weight: 500;\n    font-size: 1.5rem;\n    align-items: center;\n    color: var(--he-dialog-title-color);\n}\n\n#he-diag-footer input[type=button] {\n    border-radius: 3px;\n    color: black;\n    height: 35px;\n    padding: 0px 10px;\n    vertical-align: middle;\n    text-align: center;\n    border: 1px solid rgba(0, 0, 0, 0.2235294118);\n    font-size: 14px;\n    background-color: white;\n    outline-style: none;\n    box-shadow: none !important;\n    width: auto;\n    visibility: collapse;\n\n    &[disabled] {\n        background-color: #d9d9d9;\n        color: #666666;\n        cursor: no-drop;\n        text-shadow: none;\n    }\n\n    &:hover:enabled, &:active:enabled, &:focus:enabled {\n        cursor: pointer;\n        text-shadow: 0px 0px 0.3px #0082b4;\n        border-color: #0082b4;\n        color: #0082b4;\n    }\n\n    &:hover:enabled{\n        background-color: #0082b40d;\n    }\n}\n\n@keyframes fadein{\n    0%{\n        opacity:0;\n    }\n    100%{\n        opacity:1;\n    }\n}\n\n@keyframes fadeout{\n    0%{\n        opacity:1;\n    }\n    100%{\n        opacity:0;\n    }\n}\n");
 
 /**
  * Will open the targeted dialog.
@@ -30,7 +30,7 @@ import sheet from './dialog.css';
  *
  * @extends HTMLElement
  */
-export class HeliumDialog extends HTMLElement {
+class HeliumDialog extends HTMLElement {
     static observedAttributes = [
         "open",
         "title-text",
@@ -112,10 +112,10 @@ export class HeliumDialog extends HTMLElement {
     connectedCallback() {
         this.addEventListener("he-dialog-show", function() {
             this.show();
-        })
+        });
         this.addEventListener("he-dialog-close", function() {
             this.close();
-        })
+        });
 
         this.$dialog.addEventListener('close', () => this._handleCloseDialog.bind(this)());
 
@@ -158,7 +158,7 @@ export class HeliumDialog extends HTMLElement {
             if ($elem.nodeName === "FORM") {
                 $elem.reset();
             }
-        })
+        });
         return this;
     }
 
@@ -171,7 +171,7 @@ export class HeliumDialog extends HTMLElement {
         let promise = new Promise((resolve, reject) => {
             this.resolve = resolve;
             this.reject = reject;
-        })
+        });
         return promise;
     }
 
@@ -365,17 +365,19 @@ if (!customElements.get('he-dialog')) {
 
     document.addEventListener("he-dialog", function(e) {
         heShowDialogTemp(e.detail.value);
-    })
+    });
 
     document.addEventListener("he-dialog-error", function(e) {
         heShowDialogTemp(e.detail.value, 'error');
-    })
+    });
 
     document.addEventListener("he-dialog-warn", function(e) {
         heShowDialogTemp(e.detail.value, 'warn');
-    })
+    });
 
     document.addEventListener("he-dialog-success", function(e) {
         heShowDialogTemp(e.detail.value, 'success');
-    })
+    });
 }
+
+export { HeliumDialog };
