@@ -188,8 +188,6 @@ import sheet from './table.css';
  * @listens HeliumFormDialog#he-dialog-show - Shows the dialog
  * @listens HeliumFormDialog#he-dialog-close - Closes the dialog
  *
- * @fires check - The selection of rows in the table has changed
- *
  * @extends HTMLElement
  *
  * @todo Univeral datetime conversion
