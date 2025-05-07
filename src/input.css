@@ -79,6 +79,7 @@
 }
 
 #inp-main {
+    font-family: inherit;
     outline: none;
     background-color: inherit;
     width: 100%;
