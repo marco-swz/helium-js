@@ -1,11 +1,12 @@
 #popover {
-    --he-popover-border-color: hsl(240 5.9% 90%);
-    --he-popover-border-radius: 3px;
+    --he-popover-borderColor: hsl(240 5.9% 90%);
+    --he-popover-borderRadius: 3px;
 
+    padding: 0;
     inset: unset;
     outline: none;
-    border: 1px solid var(--he-popover-border-color);
-    border-radius: var(--he-popover-border-radius);
+    border: 1px solid var(--he-popover-borderColor);
+    border-radius: var(--he-popover-borderRadius);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
