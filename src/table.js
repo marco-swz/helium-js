@@ -1,5 +1,6 @@
 import { HeliumFormDialog, HeliumFormDialogResponseEvent, HeliumFormDialogSubmitEvent } from './form_dialog.js';
 import { HeliumCheck } from './check.js';
+import { HeliumPopover } from './popover.js';
 import { HeliumDialog } from './dialog.js';
 import { HeliumToggle } from './toggle.js';
 import { HeliumToast } from './toast.js';
@@ -209,7 +210,7 @@ export class HeliumTable extends HTMLElement {
     $form;
     /** @type {HTMLTableSectionElement} */
     $body;
-    /** @type {HTMLDivElement} */
+    /** @type {?HeliumPopover} */
     $menuOpen;
     /** @type {HeliumFormDialog} */
     $diagEdit;
@@ -954,7 +955,7 @@ export class HeliumTable extends HTMLElement {
      */
     _closeColumnMenu() {
         if (this.$menuOpen) {
-            this.$menuOpen.removeAttribute('open');
+            this.$menuOpen.open = false;
             this.$menuOpen = null;
         }
     }
@@ -979,7 +980,7 @@ export class HeliumTable extends HTMLElement {
                 $column.querySelector('.btn-sort-asc').removeAttribute('selected');
         }
         let $menu = $column.querySelector('.column-menu');
-        $menu.setAttribute('open', '');
+        $menu.open = true;
         let $filter = $column.querySelector('.column-filter');
         $filter.value = $column.getAttribute('filter') ?? '';
         if ($filter.nodeName === 'HE-INPUT') {
@@ -1536,16 +1537,21 @@ export class HeliumTable extends HTMLElement {
     _renderColumnMenu($column) {
         const colName = $column.getAttribute('column');
 
-        let $menu = document.createElement('div');
+        let $menu = document.createElement('he-popover');
         $menu.classList.add('column-menu');
         $menu.addEventListener('click', (e) => e.stopPropagation());
+        $menu.$anchor = $column;
+
+        let $content = document.createElement('div');
+        $content.slot = "content";
+        $menu.append($content);
 
         const description = $column.getAttribute('description');
         if (description != null) {
             let $btnDescr = document.createElement('div');
             $btnDescr.classList.add('btn-description');
             $btnDescr.innerHTML = 'Beschreibung';
-            $menu.append($btnDescr);
+            $content.append($btnDescr);
         }
 
         const filterVal = $column.getAttribute('filter');
@@ -1564,7 +1570,7 @@ export class HeliumTable extends HTMLElement {
             $selFilter.name = "filter";
             $selFilter.replaceOptions(options, valMap);
             $selFilter.value = filterVal ?? '';
-            $menu.append($selFilter);
+            $content.append($selFilter);
             
         } else {
             let $inpFilter = document.createElement('he-input');
@@ -1573,18 +1579,18 @@ export class HeliumTable extends HTMLElement {
             $inpFilter.name = "filter";
             $inpFilter.value = filterVal ?? '';
             $inpFilter.select();
-            $menu.append($inpFilter);
+            $content.append($inpFilter);
         }
 
         let $btnAsc = document.createElement('div');
         $btnAsc.classList.add('btn-sort-asc');
         $btnAsc.innerHTML = 'Aufsteigend sortieren'
-        $menu.append($btnAsc);
+        $content.append($btnAsc);
 
         let $btnDesc = document.createElement('div');
         $btnDesc .classList.add('btn-sort-desc');
         $btnDesc.innerHTML = 'Absteigend sortieren'
-        $menu.append($btnDesc);
+        $content.append($btnDesc);
 
         $btnAsc.onclick = () => {
             if ($btnAsc.hasAttribute('selected')) {
@@ -1607,9 +1613,9 @@ export class HeliumTable extends HTMLElement {
         $btnApply.classList.add('btn-apply-filter');
         $btnApply.innerHTML = 'Anwenden';
         $btnApply.onclick = (e) => this._applyColumnClickCallback.bind(this)(e, $column);
-        $menu.append($btnApply);
+        $content.append($btnApply);
 
-        $menu.addEventListener('keyup', (event) => {
+        $content.addEventListener('keyup', (event) => {
             if (event.key === 'Enter') {
                 $btnApply.click();
             }
