@@ -100,16 +100,23 @@
     color: hsl(from var(--he-input-color) h s calc(l + 50))
 }
 
-#cont-options {
+div[slot=content] {
     max-height: 200px;
+}
+
+#cont-options {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+}
+
+he-popover {
+    --he-popover-borderRadius: 5px;
 }
 
 ::slotted(*) {
     cursor: pointer;
-    padding: 0px 10px;
+    padding: 5px 10px;
+    border-radius: 3px;
 }
 
 ::slotted(*:hover) {
