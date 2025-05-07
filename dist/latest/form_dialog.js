@@ -192,6 +192,7 @@ class HeliumFormDialog extends HTMLElement {
      *   placeholder: ?string,
      *   hidden: ?boolean,
      *   value: ?string,
+     *   type: null|'text'|'number'|'date'|'datetime',
      *   options: ?Object<string, string>
      * }>} data
      * @returns void
@@ -241,7 +242,7 @@ class HeliumFormDialog extends HTMLElement {
                 $input.required = entry.required;
                 $input.id = id;
                 $input.name = entry.name;
-                $input.type = 'text';
+                $input.type = entry.type ?? 'text';
                 $input.classList.add('input');
                 // TODO(marco): Immediate validation is not quite nice
                 //input.onblur = (e) => this._formInputBlurCallback.bind(this)(e);
