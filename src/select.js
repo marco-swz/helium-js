@@ -27,22 +27,20 @@ export class HeliumSelect extends HTMLElement {
         let shadow = this.attachShadow({ mode: "open" });
         this.internals = this.attachInternals();
 
-        this.$input = document.createElement('button');
-        this.$input.id = 'inp';
-        this.$input.setAttribute('popovertarget', 'popover');
+        this.$popover = document.createElement('div');
+        this.$popover.id = 'popover';
+        this.$popover.popover = '';
+
+        this.$popover.addEventListener("beforetoggle", (e) => this._beforetoggledPopoverCallback.bind(this)(e));
+        this.$popover.addEventListener("toggle", (e) => this._toggledPopoverCallback.bind(this)(e));
 
         this.$filter = document.createElement('he-input');
         this.$filter.id = 'filter';
         this.$filter.style.display = 'none';
         this.$filter.onkeyup = () => this._changedFilterCallback.bind(this)();
 
-        this.$popover = document.createElement('div');
-        this.$popover.id = 'popover';
-        this.$popover.popover = '';
-        this.$popover.append(this.$filter);
-
-        this.$popover.addEventListener("beforetoggle", (e) => this._beforetoggledPopoverCallback.bind(this)(e));
-        this.$popover.addEventListener("toggle", (e) => this._toggledPopoverCallback.bind(this)(e));
+        this.$input = document.createElement('button');
+        this.$input.id = 'inp';
 
         this.$options = document.createElement('div');
         this.$options.id = 'cont-options';
@@ -50,7 +48,6 @@ export class HeliumSelect extends HTMLElement {
         this.$popover.append(this.$options);
 
         shadow.append(this.$popover);
-        shadow.append(this.$input);
         shadow.adoptedStyleSheets = [sheet];
     }
 
@@ -102,7 +99,6 @@ export class HeliumSelect extends HTMLElement {
     get name() {
         return this.getAttribute('name');
     }
-
 
     /** 
      * Gets or sets the `open` state of the element.
@@ -182,6 +178,18 @@ export class HeliumSelect extends HTMLElement {
     }
 
     connectedCallback() {
+        switch (this.getAttribute('filter')) {
+            case 'inline':
+                this.shadowRoot.append(this.filter);
+                this.$filter.setAttribute('popovertarget', 'popover');
+                break;
+            default:
+                this.$input.setAttribute('popovertarget', 'popover');
+                this.$popover.prepend(this.$filter);
+                this.shadowRoot.append(this.$input);
+                break;
+        }
+
         for (const $opt of this.querySelectorAll('option')) {
             $opt.onclick = (e) => this._clickedOptionCallback.bind(this)(e);
             this.$options.append($opt);

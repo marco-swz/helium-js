@@ -1,6 +1,6 @@
 import { h as heSpaceBelow, a as hePositionRelative, b as heEnableBodyScroll } from './utils-BGzlNXdX.js';
 
-const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\n    height: 1.8rem;\n    width: fit-content;\n    font-size: 14px;\n    min-width: 60px;\n    display: inline-block;\n}\n\n:host([disabled]) {\n    pointer-events: none;\n    color: hsl(from var(--he-select-clr, black) h s calc(l + 50))\n}\n\n:host([variant=\"underline\"]) {\n    #inp {\n        border-top: 0;\n        border-left: 0;\n        border-right: 0;\n        border-radius: 0;\n    }\n}\n\n#inp {\n    position: relative;\n    background-color: var(--he-select-clr-bg, whitesmoke);\n    border: 1px solid lightgrey;\n    width: 100%;\n    height: inherit;\n    min-width: inherit;\n    padding: 0.3rem 0.4rem;\n    border-radius: 3px;\n    outline: none;\n    text-align: left;\n    padding-right: 25px;\n    text-wrap: nowrap;\n    color: inherit;\n}\n\n#inp:hover {\n    transition:\n        border-color 0.2s;\n    cursor: pointer;\n    border-color: var(--he-select-clr-border-hover, grey);\n}\n\n#inp::after {\n    content: \"▼\";\n    position: absolute;\n    font-size: 10px;\n    width: fit-content;\n    height: fit-content;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    margin: auto 4px auto auto;\n}\n\n#popover {\n    inset: unset;\n    outline: none;\n    border: 1px solid grey;\n    border-radius: var(--he-select-border-radius, 3px);\n    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);\n    width: min-content;\n}\n\n#cont-options {\n    display: flex;\n    flex-direction: column;\n    background-color: var(--he-select-clr-bg, white);\n    max-height: 300px;\n    overflow: auto;\n    overscroll-behavior: contain;\n}\n\n#cont-options option {\n    padding: 5px 10px;\n    border-radius: 3px;\n    text-align: left;\n    width: 100%;\n    width: -moz-available;          /* WebKit-based browsers will ignore this. */\n    width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */\n    width: fill-available;\n}\n\n#cont-options option[selected] {\n    background-color: var(--he-select-clr-bg-hover, whitesmoke);\n}\n\n#cont-options option:hover:not(:disabled) {\n    background-color: var(--he-select-clr-bg-hover, whitesmoke);\n    cursor: pointer;\n}\n\n#filter {\n    --he-input-border-radius: 2px;\n    width: 100%;\n    min-width: 50px;\n}\n\n");
+const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\n    --he-select-backgroundColor: whitesmoke;\n    --he-select-borderColor: lightgrey;\n    --he-select-borderWidth: 1px;\n    --he-select-borderRadius: 3px;\n    --he-select-hover-borderColor: grey;\n    --he-select-color: black;\n    --he-select-padding: 0.3rem 0.4rem;\n    --he-select-popover-borderRadius: 4px;\n    --he-select-option-hover-backgroundColor: whitesmoke;\n    --he-select-option-selected-backgroundColor: whitesmoke;\n    --he-select-after-margin: auto 4px auto auto;\n    --he-select-after-content: \"▼\";\n    --he-select-after-fontSize: 10px;\n    --he-select-disabled-color: hsl(from var(--he-select-color) h s calc(l + 50));\n\n    height: 1.8rem;\n    width: fit-content;\n    font-size: 14px;\n    min-width: 60px;\n    display: inline-block;\n}\n\n:host([disabled]) {\n    pointer-events: none;\n    color: var(--he-select-disabled-color);\n}\n\n:host([variant=\"underline\"]) {\n    #inp {\n        border-top: 0;\n        border-left: 0;\n        border-right: 0;\n        border-radius: 0;\n    }\n}\n\n#inp {\n    position: relative;\n    background-color: var(--he-select-backgroundColor);\n    border-width: var(--he-select-borderWidth);\n    border-radius: var(--he-select-borderRadius);\n    border-color: var(--he-select-borderColor);\n    border-style: solid;\n    font-size: inherit;\n    width: 100%;\n    height: inherit;\n    min-width: inherit;\n    padding: var(--he-select-padding);\n    outline: none;\n    text-align: left;\n    padding-right: 25px;\n    text-wrap: nowrap;\n    color: inherit;\n}\n\n#inp:hover {\n    transition:\n        border-color 0.2s;\n    cursor: pointer;\n    border-color: var(--he-select-hover-borderColor);\n}\n\n#inp::after {\n    content: var(--he-select-after-content);\n    position: absolute;\n    font-size: var(--he-select-after-fontSize);\n    width: fit-content;\n    height: fit-content;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    margin: var(--he-select-after-margin);\n}\n\n#popover {\n    inset: unset;\n    outline: none;\n    border: 1px solid grey;\n    border-radius: var(--he-select-popover-borderRadius);\n    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);\n    width: min-content;\n}\n\n#cont-options {\n    display: flex;\n    flex-direction: column;\n    background-color: var(--he-select-clr-bg, white);\n    max-height: 300px;\n    overflow: auto;\n    overscroll-behavior: contain;\n}\n\n#cont-options option {\n    padding: 5px 10px;\n    border-radius: 3px;\n    text-align: left;\n    width: 100%;\n    width: -moz-available;          /* WebKit-based browsers will ignore this. */\n    width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */\n    width: fill-available;\n}\n\n#cont-options option[selected] {\n    background-color: var(--he-select-option-selected-backgroundColor);\n}\n\n#cont-options option:hover:not(:disabled) {\n    background-color: var(--he-select-option-hover-backgroundColor);\n    cursor: pointer;\n}\n\n#filter {\n    width: 100%;\n    min-width: 50px;\n}\n\n");
 
 class HeliumSelect extends HTMLElement {
     static formAssociated = true;
@@ -28,22 +28,20 @@ class HeliumSelect extends HTMLElement {
         let shadow = this.attachShadow({ mode: "open" });
         this.internals = this.attachInternals();
 
-        this.$input = document.createElement('button');
-        this.$input.id = 'inp';
-        this.$input.setAttribute('popovertarget', 'popover');
+        this.$popover = document.createElement('div');
+        this.$popover.id = 'popover';
+        this.$popover.popover = '';
+
+        this.$popover.addEventListener("beforetoggle", (e) => this._beforetoggledPopoverCallback.bind(this)(e));
+        this.$popover.addEventListener("toggle", (e) => this._toggledPopoverCallback.bind(this)(e));
 
         this.$filter = document.createElement('he-input');
         this.$filter.id = 'filter';
         this.$filter.style.display = 'none';
         this.$filter.onkeyup = () => this._changedFilterCallback.bind(this)();
 
-        this.$popover = document.createElement('div');
-        this.$popover.id = 'popover';
-        this.$popover.popover = '';
-        this.$popover.append(this.$filter);
-
-        this.$popover.addEventListener("beforetoggle", (e) => this._beforetoggledPopoverCallback.bind(this)(e));
-        this.$popover.addEventListener("toggle", (e) => this._toggledPopoverCallback.bind(this)(e));
+        this.$input = document.createElement('button');
+        this.$input.id = 'inp';
 
         this.$options = document.createElement('div');
         this.$options.id = 'cont-options';
@@ -51,7 +49,6 @@ class HeliumSelect extends HTMLElement {
         this.$popover.append(this.$options);
 
         shadow.append(this.$popover);
-        shadow.append(this.$input);
         shadow.adoptedStyleSheets = [sheet];
     }
 
@@ -103,7 +100,6 @@ class HeliumSelect extends HTMLElement {
     get name() {
         return this.getAttribute('name');
     }
-
 
     /** 
      * Gets or sets the `open` state of the element.
@@ -181,6 +177,18 @@ class HeliumSelect extends HTMLElement {
     }
 
     connectedCallback() {
+        switch (this.getAttribute('filter')) {
+            case 'inline':
+                this.shadowRoot.append(this.filter);
+                this.$filter.setAttribute('popovertarget', 'popover');
+                break;
+            default:
+                this.$input.setAttribute('popovertarget', 'popover');
+                this.$popover.prepend(this.$filter);
+                this.shadowRoot.append(this.$input);
+                break;
+        }
+
         for (const $opt of this.querySelectorAll('option')) {
             $opt.onclick = (e) => this._clickedOptionCallback.bind(this)(e);
             this.$options.append($opt);

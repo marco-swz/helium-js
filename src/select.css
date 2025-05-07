@@ -1,4 +1,19 @@
 :host {
+    --he-select-backgroundColor: whitesmoke;
+    --he-select-borderColor: lightgrey;
+    --he-select-borderWidth: 1px;
+    --he-select-borderRadius: 3px;
+    --he-select-hover-borderColor: grey;
+    --he-select-color: black;
+    --he-select-padding: 0.3rem 0.4rem;
+    --he-select-popover-borderRadius: 4px;
+    --he-select-option-hover-backgroundColor: whitesmoke;
+    --he-select-option-selected-backgroundColor: whitesmoke;
+    --he-select-after-margin: auto 4px auto auto;
+    --he-select-after-content: "▼";
+    --he-select-after-fontSize: 10px;
+    --he-select-disabled-color: hsl(from var(--he-select-color) h s calc(l + 50));
+
     height: 1.8rem;
     width: fit-content;
     font-size: 14px;
@@ -8,7 +23,7 @@
 
 :host([disabled]) {
     pointer-events: none;
-    color: hsl(from var(--he-select-clr, black) h s calc(l + 50))
+    color: var(--he-select-disabled-color);
 }
 
 :host([variant="underline"]) {
@@ -22,13 +37,16 @@
 
 #inp {
     position: relative;
-    background-color: var(--he-select-clr-bg, whitesmoke);
-    border: 1px solid lightgrey;
+    background-color: var(--he-select-backgroundColor);
+    border-width: var(--he-select-borderWidth);
+    border-radius: var(--he-select-borderRadius);
+    border-color: var(--he-select-borderColor);
+    border-style: solid;
+    font-size: inherit;
     width: 100%;
     height: inherit;
     min-width: inherit;
-    padding: 0.3rem 0.4rem;
-    border-radius: 3px;
+    padding: var(--he-select-padding);
     outline: none;
     text-align: left;
     padding-right: 25px;
@@ -40,27 +58,27 @@
     transition:
         border-color 0.2s;
     cursor: pointer;
-    border-color: var(--he-select-clr-border-hover, grey);
+    border-color: var(--he-select-hover-borderColor);
 }
 
 #inp::after {
-    content: "▼";
+    content: var(--he-select-after-content);
     position: absolute;
-    font-size: 10px;
+    font-size: var(--he-select-after-fontSize);
     width: fit-content;
     height: fit-content;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    margin: auto 4px auto auto;
+    margin: var(--he-select-after-margin);
 }
 
 #popover {
     inset: unset;
     outline: none;
     border: 1px solid grey;
-    border-radius: var(--he-select-border-radius, 3px);
+    border-radius: var(--he-select-popover-borderRadius);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     width: min-content;
 }
@@ -85,16 +103,15 @@
 }
 
 #cont-options option[selected] {
-    background-color: var(--he-select-clr-bg-hover, whitesmoke);
+    background-color: var(--he-select-option-selected-backgroundColor);
 }
 
 #cont-options option:hover:not(:disabled) {
-    background-color: var(--he-select-clr-bg-hover, whitesmoke);
+    background-color: var(--he-select-option-hover-backgroundColor);
     cursor: pointer;
 }
 
 #filter {
-    --he-input-border-radius: 2px;
     width: 100%;
     min-width: 50px;
 }
