@@ -1153,6 +1153,11 @@ class HeliumTable extends HTMLElement {
                 }
             }
 
+            let type = $column.getAttribute('type');
+            if (type === 'datetime') {
+                type = 'datetime-local';
+            }
+
             data.push({
                 name: $column.getAttribute('column'),
                 required: required,
@@ -1161,6 +1166,7 @@ class HeliumTable extends HTMLElement {
                 pattern: $column.getAttribute('pattern'),
                 hidden: hidden,
                 options: optionMap,
+                type: type,
             });
         }
 
