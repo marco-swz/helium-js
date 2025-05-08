@@ -1,7 +1,7 @@
-import './button.js';
-import './input.js';
-import './dialog.js';
-import './select.js';
+import './button-o1PjtLCn.js';
+import './input-Bu8pl8hh.js';
+import './dialog-n93JF9Jz.js';
+import './select-Bg7Yp941.js';
 import './utils-BGzlNXdX.js';
 
 const sheet = new CSSStyleSheet();sheet.replaceSync("\r\n#he-form {\r\n    display: grid;\r\n    grid-template-columns: max-content 1fr;\r\n    gap: 0.5rem;\r\n    padding: 0.5rem;\r\n    margin-bottom: 0.5rem;\r\n    width: var(--he-form-dialog-width, 300px);\r\n    max-height: var(--he-form-dialog-max-height, 500px);\r\n    overflow: auto;\r\n}\r\n\r\n#footer-diag-edit {\r\n    display: flex;\r\n    gap: 0.5rem;\r\n    padding-right: 0.4rem;\r\n    padding-bottom: 0.4rem;\r\n}\r\n\r\n#he-form he-select, #he-form he-input {\r\n    width: 100%;\r\n}\r\n\r\n#he-form label {\r\n    display: flex;\r\n    align-items: center;\r\n}\r\n");
@@ -192,8 +192,9 @@ class HeliumFormDialog extends HTMLElement {
      *   placeholder: ?string,
      *   hidden: ?boolean,
      *   value: ?string,
+     *   attributes: ?Object.<string, any>,
      *   type: null|'text'|'number'|'date'|'datetime',
-     *   options: ?Object<string, string>
+     *   options: ?Object.<string, string>
      * }>} data
      * @returns void
      */
@@ -249,6 +250,7 @@ class HeliumFormDialog extends HTMLElement {
                 if (entry.pattern) {
                     $input.pattern = entry.pattern;
                 }
+                if (entry.attributes) { for (const [attr, val] of Object.entries(entry.attributes)) { $input.setAttribute(attr, val); } }
                 if (entry.placeholder != null) {
                     $input.placeholder = entry.placeholder;
                 }
@@ -296,7 +298,7 @@ class HeliumFormDialog extends HTMLElement {
      * @param {boolean} [reset=false] 
      * @returns Self
      */
-    show(reset=false) {
+    show(reset = false) {
         if (reset) {
             this.reset();
         }

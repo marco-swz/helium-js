@@ -1,5 +1,6 @@
 import terser from '@rollup/plugin-terser';
 import css from "rollup-plugin-import-css";
+import del from 'rollup-plugin-delete'
 
 export default {
     input: [
@@ -25,12 +26,14 @@ export default {
         {
             dir: 'dist/latest',
             format: 'module',
+            entryFileNames: '[name]-[hash].js',
         },
         {
             dir: 'dist-min/latest',
             format: 'module',
+            entryFileNames: '[name]-[hash].js',
             plugins: [terser()]
         },
     ],
-    plugins: [ css({ modules: true, alwaysOutput: true }) ],
+    plugins: [css({ modules: true, alwaysOutput: true }), del({ targets: ['dist/latest', 'dist-min/latest'] })],
 };

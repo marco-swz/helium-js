@@ -191,8 +191,9 @@ export class HeliumFormDialog extends HTMLElement {
      *   placeholder: ?string,
      *   hidden: ?boolean,
      *   value: ?string,
+     *   attributes: ?Object.<string, any>,
      *   type: null|'text'|'number'|'date'|'datetime',
-     *   options: ?Object<string, string>
+     *   options: ?Object.<string, string>
      * }>} data
      * @returns void
      */
@@ -248,6 +249,7 @@ export class HeliumFormDialog extends HTMLElement {
                 if (entry.pattern) {
                     $input.pattern = entry.pattern;
                 }
+                if (entry.attributes) { for (const [attr, val] of Object.entries(entry.attributes)) { $input.setAttribute(attr, val); } }
                 if (entry.placeholder != null) {
                     $input.placeholder = entry.placeholder;
                 }
@@ -295,7 +297,7 @@ export class HeliumFormDialog extends HTMLElement {
      * @param {boolean} [reset=false] 
      * @returns Self
      */
-    show(reset=false) {
+    show(reset = false) {
         if (reset) {
             this.reset();
         }

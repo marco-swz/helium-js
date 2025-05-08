@@ -68,6 +68,7 @@ export class HeliumInput extends HTMLElement {
         'placeholder',
         'value',
         'oninput',
+        'step',
     ];
 
     /** @type {HTMLInputElement} */
