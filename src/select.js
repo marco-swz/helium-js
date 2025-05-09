@@ -1,5 +1,6 @@
 import sheet from './select.css';
-import { heSpaceBelow, hePositionRelative, heEnableBodyScroll, heDisableBodyScroll } from "./utils.js";
+import { heSpaceBelow, heCallOnOutsideClick } from "./utils.js";
+import { HeliumPopover } from "./popover.js";
 
 export class HeliumSelect extends HTMLElement {
     static formAssociated = true;
@@ -8,44 +9,59 @@ export class HeliumSelect extends HTMLElement {
         'filter',
         'disabled',
     ];
-    /** @type {HTMLDivElement} */
+    /** @type {HeliumPopover} */
     $popover;
+    /** @type {HTMLDivElement} */
+    $popoverContent;
     /** @type {HeliumInput} */
     $filter;
     /** @type {HTMLElement} */
     $options;
     /** @type {HTMLElement} */
-    $input;
+    $button;
+    /** @type {HTMLDivElement} */
+    $contButton;
     /** @type {ElementInternals} */
     internals;
     /** @type {number | TimerHandler} */
     _filterTimeout = 0;
-    ignoreAttributes = false;
 
     constructor() {
         super();
         let shadow = this.attachShadow({ mode: "open" });
         this.internals = this.attachInternals();
 
-        this.$popover = document.createElement('div');
-        this.$popover.id = 'popover';
-        this.$popover.popover = '';
+        this.$contButton = document.createElement('div');
+        this.$contButton.id = 'cont-button';
+        shadow.append(this.$contButton);
 
-        this.$popover.addEventListener("beforetoggle", (e) => this._beforetoggledPopoverCallback.bind(this)(e));
-        this.$popover.addEventListener("toggle", (e) => this._toggledPopoverCallback.bind(this)(e));
+        this.$popover = document.createElement('he-popover');
+        this.$popover.id = 'popover';
+        this.$popover.dismiss = 'manual';
+        this.$popover.$anchor = this.$contButton;
+
+        this.$popoverContent = document.createElement('div');
+        this.$popoverContent.id = 'popover-content';
+        this.$popoverContent.slot = 'content'
+        this.$popover.append(this.$popoverContent);
 
         this.$filter = document.createElement('he-input');
         this.$filter.id = 'filter';
         this.$filter.style.display = 'none';
-        this.$filter.onkeyup = () => this._changedFilterCallback.bind(this)();
+        this.$filter.oninput = (e) => this._handleChangeFilter.bind(this)(e);
 
-        this.$input = document.createElement('button');
-        this.$input.id = 'inp';
+        this.$button = document.createElement('button');
+        this.$button.id = 'inp';
+        this.$button.onclick = () => {
+            this.open = true;
+        };
+        this.$contButton.append(this.$button);
 
         this.$options = document.createElement('div');
         this.$options.id = 'cont-options';
-        this.$options.slot = 'content';
-        this.$popover.append(this.$options);
+        this.$popoverContent.append(this.$options);
+
+        this.onkeydown = (e) => this._handleKeydown(e);
 
         shadow.append(this.$popover);
         shadow.adoptedStyleSheets = [sheet];
@@ -107,9 +123,9 @@ export class HeliumSelect extends HTMLElement {
      */
     set open(val) {
         if (val) {
-            this.$popover.showPopover();
+            this.setAttribute('open', '');
         } else {
-            this.$popover.hidePopover();
+            this.removeAttribute('open');
         }
     }
 
@@ -138,15 +154,12 @@ export class HeliumSelect extends HTMLElement {
      * @param {string} newValue The new attribute value
      */
     attributeChangedCallback(name, _oldValue, newValue) {
-        if (this.ignoreAttributes) {
-            return;
-        }
         switch (name) {
             case 'open':
-                if (newValue) {
-                    this.$popover.showPopover();
+                if (newValue != null) {
+                    this._showPopover();
                 } else {
-                    this.$popover.hidePopover();
+                    this._hidePopover();
                 }
                 break;
             case 'filter':
@@ -157,7 +170,7 @@ export class HeliumSelect extends HTMLElement {
                 }
                 break;
             case 'disabled':
-                if (newValue) {
+                if (newValue != null) {
                     this.internals.setFormValue(null);
                 } else {
                     this.internals.setFormValue(this.value);
@@ -177,21 +190,22 @@ export class HeliumSelect extends HTMLElement {
         return true;
     }
 
+    /**
+     * This callback function is triggered once the `he-select` is attached to the document.
+     */
     connectedCallback() {
         switch (this.getAttribute('filter')) {
             case 'inline':
-                this.shadowRoot.append(this.filter);
-                this.$filter.setAttribute('popovertarget', 'popover');
+                this.$contButton.append(this.$filter);
+                this.$filter.style.display = 'none';
                 break;
             default:
-                this.$input.setAttribute('popovertarget', 'popover');
-                this.$popover.prepend(this.$filter);
-                this.shadowRoot.append(this.$input);
+                this.$popoverContent.prepend(this.$filter);
                 break;
         }
 
         for (const $opt of this.querySelectorAll('option')) {
-            $opt.onclick = (e) => this._clickedOptionCallback.bind(this)(e);
+            $opt.onclick = (e) => this._handleClickOption.bind(this)(e);
             this.$options.append($opt);
         }
 
@@ -215,7 +229,7 @@ export class HeliumSelect extends HTMLElement {
         }
 
         if ($optionSelected == null) {
-            this.$input.innerHTML = '';
+            this.$button.innerHTML = '';
             this.internals.setFormValue(null);
             return;
         }
@@ -223,13 +237,18 @@ export class HeliumSelect extends HTMLElement {
         this._select($optionSelected);
     }
 
+    /**
+     * Returns all option elements.
+     * @returns {HTMLCollection}
+     */
     getOptions() {
         return this.$options.children;
     }
 
     /**
-     * 
-     * @param {Array<string>} [values=null]
+     * Hides the provided options in the option list.
+     * Hides all options if `null` passed. 
+     * @param {Array<string>} [values=null] A list of option values to hide.
      * @returns {Self}
      */
     hideOptions(values=null) {
@@ -246,12 +265,89 @@ export class HeliumSelect extends HTMLElement {
         }
 
         if ($sel == null) {
-            this.$input.innerHTML = '';
+            this.$button.innerHTML = '';
             this.internals.setFormValue(null);
         } else {
             this._select($sel);
         }
         return this;
+    }
+
+    /**
+     * Selects the next option.
+     */
+    nextOption(visualOnly=false) {
+        let $elem = visualOnly 
+            ? this.$highlight
+            : this.$selection;
+
+        if (!$elem) {
+            if (visualOnly) {
+                this._highlight(this.$options.firstChild);
+            } else {
+                this._select(this.$options.firstChild);
+            }
+            return;
+        }
+
+        let $next = $elem.nextSibling;
+        while (true) {
+            if ($elem.isSameNode($next)) {
+                return;
+            }
+
+            if ($next == null) {
+                $next = this.$options.firstChild;
+                continue;
+            }
+
+            if (!$next.hidden) {
+                break;
+            }
+            $next = $next.nextSibling;
+        }
+        if (visualOnly) {
+            this._highlight($next);
+            return;
+        }
+        this._select($next);
+    }
+
+    prevOption(visualOnly=false) {
+        let $elem = visualOnly 
+            ? this.$highlight
+            : this.$selection;
+
+        if (!$elem) {
+            if (visualOnly) {
+                this._highlight(this.$options.lastChild);
+            } else {
+                this._select(this.$options.lastChild);
+            }
+            return;
+        }
+
+        let $prev = $elem.previousSibling;
+        while (true) {
+            if ($elem.isSameNode($prev)) {
+                return;
+            }
+
+            if ($prev == null) {
+                $prev = this.$options.lastChild;
+                continue;
+            }
+
+            if (!$prev.hidden) {
+                break;
+            }
+            $prev = $prev.previousSibling;
+        }
+        if (visualOnly) {
+            this._highlight($prev);
+            return;
+        }
+        this._select($prev);
     }
 
     /**
@@ -270,7 +366,7 @@ export class HeliumSelect extends HTMLElement {
             let $opt = document.createElement('option');
             $opt.value = val;
             $opt.innerHTML = displayMapping[val] ?? val;
-            $opt.onclick = (e) => this._clickedOptionCallback.bind(this)(e);
+            $opt.onclick = (e) => this._handleClickOption.bind(this)(e);
             this.$options.append($opt);
 
             if (valOld === val) {
@@ -322,22 +418,20 @@ export class HeliumSelect extends HTMLElement {
         this._select(option);
     }
 
+    /**
+     * Opens the select element if closed, closes it if open.
+     * @returns {Self}
+     */
     toggle() {
         this.$popover.togglePopover();
+        return this;
     }
 
-    _beforetoggledPopoverCallback(e) {
-        this.ignoreAttributes = true;
-        if (e.newState === "open") {
-            this.$popover.style.visibility = 'hidden';
-            this.setAttribute('open', true);
-        } else {
-            this.removeAttribute('open');
-        }
-        this.ignoreAttributes = false;
-    }
-
-    _changedFilterCallback() {
+    /**
+     * This callback is called when the filter value changes
+     * @returns {void}
+     */
+    _handleChangeFilter() {
         window.clearTimeout(this._filterTimeout);
 
         this._filterTimeout = setTimeout(() => {
@@ -346,25 +440,136 @@ export class HeliumSelect extends HTMLElement {
                 filterVal.toLowerCase();
             }
 
-            for (const option of this.$options.children) {
-                if (filterVal.length === 0 || (option.value !== '' && option.innerText.toLowerCase().includes(filterVal))) {
-                    option.style.display = '';
+            let $firstVisible = null;
+            for (const $option of this.$options.children) {
+                if (filterVal.length === 0 || ($option.value !== '' && $option.innerText.toLowerCase().includes(filterVal))) {
+                    if ($firstVisible == null) {
+                        $firstVisible = $option;
+                    }
+                    $option.hidden = false;
                 } else {
-                    option.style.display = 'none';
+                    $option.hidden = true;
                 }
             }
-        }, 500);
+            this._highlight($firstVisible);
+        }, 250);
+    }
+
+    /**
+     * This callback is called when an option is clicked.
+     * @returns {void}
+     */
+    _handleClickOption(e) {
+        this.open = false;
+        const $target = e.currentTarget;
+        this._select($target);
+
+        this.dispatchEvent(new CustomEvent('change'));
+    }
+
+    /**
+     * This callback handles all shortcuts.
+     * @param {KeyboardEvent} e
+     */
+    _handleKeydown(e) {
+        switch (e.key) {
+            case 'ArrowDown':
+                e.preventDefault();
+                this.nextOption(true);
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                this.prevOption(true);
+                break;
+            case 'Enter':
+                if (this.open) {
+                    e.preventDefault();
+                    this._select(this.$highlight);
+                    this._hidePopover();
+                } else {
+                    this.open = true;
+                }
+
+                break;
+            case 'Escape':
+                this._hidePopover();
+                break;
+        }
+    }
+
+    /**
+     * This callback is responsible for hiding the popover
+     * @returns {void}
+     */
+    _hidePopover() {
+        if (this.getAttribute('filter') === 'inline') {
+            this.$button.style.display = '';
+            this.$filter.style.display = 'none';
+        }
+        this.$filter.value = '';
+        this.$popover.hidePopover();
+    }
+    
+    _highlight($option) {
+        if (this.$highlight) {
+            this.$highlight.removeAttribute('highlighted');
+        }
+        if ($option == null) {
+            return;
+        }
+        this.$highlight = $option;
+        this.$highlight.setAttribute('highlighted', '');
+    }
+
+    /**
+     * This callback is responsible for showing the popover.
+     * @returns {void}
+     */
+    _showPopover() {
+        if (this.getAttribute('filter') === 'inline') {
+            this.$button.style.display = 'none';
+            this.$filter.style.display = '';
+        }
+
+        let positionDefault = 'bottom-left';
+        if (heSpaceBelow(this) < this.$popover.offsetHeight + 20) {
+            positionDefault = 'top-left';
+        }
+        heCallOnOutsideClick([this.$popoverContent, this.$contButton], () => {
+            this.open = false;
+        });
+        this.$popover.setAttribute('position', this.getAttribute('position') ?? positionDefault);
+        this.$filter.value = '';
+        this.showOptions();
+        this.$popover.style.visibility = 'hidden';
+        this.$popover.showPopover();
+        let width = this.$options.getBoundingClientRect().width;
+        let btnWidth = this.$contButton.getBoundingClientRect().width;
+        if (btnWidth > width) {
+            this.$options.style.width = btnWidth + 'px';
+        }
+        this.$popover.style.visibility = '';
+        this._highlight(this.$selection);
+        this.$filter.focus();
     }
 
     /** 
-     * @param {HTMLOptionElement} $option
-     * @returns void
+     * Selects a specific options given the option HTML element.
+     * @param {?HTMLOptionElement} $option
+     * @param {boolean} visalOnly If `true`, changes the selection only visually
+     * @returns {void}
      */
     _select($option) {
-        this.$input.innerHTML = $option.innerHTML;
-        if (this.$selection != null) {
+        if (this.$selection) {
             this.$selection.removeAttribute('selected');
         }
+        if ($option == null) {
+            this.$selection = null;
+            this.internals.setFormValue(null);
+            this.$filter.value = '';
+            return;
+        }
+        this.$button.innerHTML = $option.innerHTML;
         this.$selection = $option;
         this.$selection.setAttribute('selected', '');
 
@@ -372,42 +577,6 @@ export class HeliumSelect extends HTMLElement {
             this.internals.setFormValue(this.$selection.value);
         }
     }
-
-    _toggledPopoverCallback(e) {
-        if (e.newState === "open") {
-            let positionDefault = 'bottom-left';
-            if (heSpaceBelow(this) < this.$popover.offsetHeight + 20) {
-                positionDefault = 'top-left';
-            }
-            const position = this.getAttribute('position') ?? positionDefault;
-            hePositionRelative(this.$popover, this.$input, position, 3);
-            // Manually compensate for the margins with the number
-            const compensation = 7;
-            if (this.$popover.offsetWidth < this.$input.offsetWidth - compensation) {
-                this.$popover.style.width = this.$input.offsetWidth - 7 + 'px';
-            }
-            heDisableBodyScroll();
-            this.$popover.style.visibility = '';
-            this.$filter.focus();
-        } else {
-            this.$filter.value = '';
-
-            for (const option of this.$options.children) {
-                option.style.display = '';
-            }
-
-            heEnableBodyScroll();
-        }
-    }
-
-    _clickedOptionCallback(e) {
-        this.open = false;
-        const target = e.currentTarget;
-        this._select(target);
-
-        this.dispatchEvent(new CustomEvent('change'));
-    }
-
 }
 
 if (!customElements.get('he-select')) {

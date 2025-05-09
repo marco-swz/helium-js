@@ -5,7 +5,7 @@ export class HeliumPopover extends HTMLElement {
     static observedAttributes = [
         'attach',
         'position',
-        'open,',
+        'open',
         'trigger',
         'anchor',
         'dismiss',
@@ -18,7 +18,6 @@ export class HeliumPopover extends HTMLElement {
     $anchor;
     /** @type {ElementInternals} */
     internals;
-    $ignoreAttributes = false;
 
     constructor() {
         super();
@@ -92,9 +91,9 @@ export class HeliumPopover extends HTMLElement {
      */
     set open(val) {
         if (val) {
-            this.$popover.showPopover();
+            this.setAttribute('open', '');
         } else {
-            this.$popover.hidePopover();
+            this.removeAttribute('open');
         }
     }
 
@@ -109,21 +108,16 @@ export class HeliumPopover extends HTMLElement {
      * @param {string} newValue The new attribute value
      */
     attributeChangedCallback(name, _oldValue, newValue) {
-        if (this.ignoreAttributes) {
-            return;
-        }
-
         switch (name) {
             case 'open':
-                if (newValue == null || newValue === 'false') {
-                    this.$popover.hide();
+                if (newValue != null) {
+                    this.$popover.showPopover();
                 } else {
-                    this.$popover.show();
+                    this.$popover.hidePopover();
                 }
-
                 break;
             case 'attach': 
-                $attach = document.querySelector(newValue);
+                let $attach = document.querySelector(newValue);
                 if ($attach == null) {
                     throw new Error('Attachment element not found!');
                 }
@@ -151,8 +145,37 @@ export class HeliumPopover extends HTMLElement {
     }
 
     connectedCallback() {
-        this.$popover.addEventListener("beforetoggle", (e) => this._beforetoggledPopoverCallback.bind(this)(e));
-        this.$popover.addEventListener("toggle", (e) => this._toggledPopoverCallback.bind(this)(e));
+        this.$popover.addEventListener("beforetoggle", (e) => this._handleBeforeToggledPopover.bind(this)(e));
+        this.$popover.addEventListener("toggle", (e) => this._handleToggledPopover.bind(this)(e));
+    }
+
+    /**
+     * Returns the width and height of the popover.
+     * Also works if the popover is hidden.
+     * @returns {Array<number, number>}
+     */
+    getSize() {
+        if (this.open) {
+            let rect = this.$popover.getBoundingClientRect();
+            return [rect.width, rect.height];
+        }
+        let pos = this.getAttribute('position');
+        this.setAttribute('position', 'offscreen');
+        this.open = true;
+        let rect = this.$popover.getBoundingClientRect();
+        let width = rect.width;
+        let height = rect.height;
+        this.open = false;
+        this.setAttribute('position', pos);
+        return [width, height];
+    }
+
+    hidePopover() {
+        this.open = false;
+    }
+
+    showPopover() {
+        this.open = true;
     }
 
     /**
@@ -169,7 +192,7 @@ export class HeliumPopover extends HTMLElement {
      * @returns {Self}
      */
     togglePopover() {
-        this.$popover.togglePopover();
+        this.open = !this.open;
         return this;
     }
 
@@ -183,21 +206,16 @@ export class HeliumPopover extends HTMLElement {
         this.$attach = $elem;
     }
 
-    _beforetoggledPopoverCallback(e) {
-        this.ignoreAttributes = true;
+    _handleBeforeToggledPopover(e) {
         if (e.newState === "open") {
             this.$popover.style.visibility = 'hidden';
-            this.setAttribute('open', true);
         } else {
             this.removeAttribute('open');
         }
-        this.ignoreAttributes = false;
     }
 
-    _toggledPopoverCallback(e) {
+    _handleToggledPopover(e) {
         if (e.newState === "open") {
-            this.internals.states.add('open');
-
             if (this.$anchor) {
                 let positionDefault = 'bottom-left';
                 if (heSpaceBelow(this) < this.$popover.offsetHeight + 20) {
@@ -216,7 +234,6 @@ export class HeliumPopover extends HTMLElement {
             this.$popover.style.visibility = '';
 
         } else {
-            this.internals.states.delete('open');
             heEnableBodyScroll();
         }
     }
