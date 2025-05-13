@@ -810,24 +810,6 @@ export class HeliumTable extends HTMLElement {
         }
     }
 
-    _applyColumnClickCallback(e, $col) {
-        e.preventDefault();
-        const filterVal = $col.querySelector('.column-filter').value;
-        this.disableRequest = true;
-        this._filterColumn($col, filterVal);
-        this.disableRequest = false;
-        const asc = $col.querySelector('.btn-sort-asc').hasAttribute('selected');
-        const desc = $col.querySelector('.btn-sort-desc').hasAttribute('selected');
-        let sort = null;
-        if (asc) {
-            sort = 'asc';
-        } else if (desc) {
-            sort = 'desc';
-        }
-        this._sortColumn($col, sort);
-        $col.querySelector('.column-menu').removeAttribute('open');
-    }
-
     /**
     * @param {HTMLTableRowElement} $row 
     * @param {string} $colName
@@ -929,27 +911,6 @@ export class HeliumTable extends HTMLElement {
     }
 
     /**
-     * Callback when the checkbox on top has changed.
-     * @returns void
-     */
-    _checkAllCheckCallback() {
-        this.$checkAll.indeterminate = false;
-        const checks = this.$body.querySelectorAll('.check-row');
-
-        if (this.$checkAll.checked) {
-            for (const check of checks) {
-                check.checked = true;
-            }
-            this._updateExternElements(checks);
-        } else {
-            for (const $check of checks) {
-                $check.checked = false;
-                this._updateExternElements([]);
-            }
-        }
-    }
-
-    /**
      * @param {HTMLDivElement} $menu
      * @returns void
      */
@@ -958,35 +919,6 @@ export class HeliumTable extends HTMLElement {
             this.$menuOpen.open = false;
             this.$menuOpen = null;
         }
-    }
-
-    /**
-     * @param {HTMLTableCellElement} $column 
-     */
-    _colClickCallback(e, $column) {
-        e.stopPropagation();
-        this._closeColumnMenu();
-        switch ($column.getAttribute('sort')) {
-            case 'desc':
-                $column.querySelector('.btn-sort-desc').setAttribute('selected', '');
-                $column.querySelector('.btn-sort-asc').removeAttribute('selected');
-                break;
-            case 'asc':
-                $column.querySelector('.btn-sort-asc').setAttribute('selected', '');
-                $column.querySelector('.btn-sort-desc').removeAttribute('selected');
-                break;
-            default:
-                $column.querySelector('.btn-sort-desc').removeAttribute('selected');
-                $column.querySelector('.btn-sort-asc').removeAttribute('selected');
-        }
-        let $menu = $column.querySelector('.column-menu');
-        $menu.open = true;
-        let $filter = $column.querySelector('.column-filter');
-        $filter.value = $column.getAttribute('filter') ?? '';
-        if ($filter.nodeName === 'HE-INPUT') {
-            $filter.select();
-        }
-        this.$menuOpen = $menu;
     }
 
     /**
@@ -1003,15 +935,6 @@ export class HeliumTable extends HTMLElement {
         }
 
         throw new Error(`No column found with name ${colName}`);
-    }
-
-    _filterChangeCallback(e) {
-        this.offset = 0;
-
-        const filterValue = e.currentTarget.value;
-        const idx = e.currentTarget.closest('td').cellIndex;
-        const $col = this._getColumns(false)[idx];
-        this._filterColumn($col, filterValue);
     }
 
     /**
@@ -1096,9 +1019,135 @@ export class HeliumTable extends HTMLElement {
             .map((row) => this._getRowData(row, returnDisplayValues));
     }
 
-    _handlePagination() {
+    _handleChangeFilter(e) {
+        this.offset = 0;
+
+        const filterValue = e.currentTarget.value;
+        const idx = e.currentTarget.closest('td').cellIndex;
+        const $col = this._getColumns(false)[idx];
+        this._filterColumn($col, filterValue);
+    }
+
+    /**
+     * Callback when the checkbox on top has changed.
+     * @returns void
+     */
+    _handleCheckAll() {
+        this.$checkAll.indeterminate = false;
+        const checks = this.$body.querySelectorAll('.check-row');
+
+        if (this.$checkAll.checked) {
+            for (const check of checks) {
+                check.checked = true;
+            }
+            this._updateExternElements(checks);
+        } else {
+            for (const $check of checks) {
+                $check.checked = false;
+                this._updateExternElements([]);
+            }
+        }
+    }
+
+    _handleClickApplyColumn(e, $col) {
+        e.preventDefault();
+        const filterVal = $col.querySelector('.column-filter').value;
+        this.disableRequest = true;
+        this._filterColumn($col, filterVal);
+        this.disableRequest = false;
+        const asc = $col.querySelector('.btn-sort-asc').hasAttribute('selected');
+        const desc = $col.querySelector('.btn-sort-desc').hasAttribute('selected');
+        let sort = null;
+        if (asc) {
+            sort = 'asc';
+        } else if (desc) {
+            sort = 'desc';
+        }
+        this._sortColumn($col, sort);
+        $col.querySelector('.column-menu').removeAttribute('open');
+    }
+
+    /**
+     * @param {HTMLTableCellElement} $column 
+     */
+    _handleClickColumn(e, $column) {
+        e.stopPropagation();
+        this._closeColumnMenu();
+        switch ($column.getAttribute('sort')) {
+            case 'desc':
+                $column.querySelector('.btn-sort-desc').setAttribute('selected', '');
+                $column.querySelector('.btn-sort-asc').removeAttribute('selected');
+                break;
+            case 'asc':
+                $column.querySelector('.btn-sort-asc').setAttribute('selected', '');
+                $column.querySelector('.btn-sort-desc').removeAttribute('selected');
+                break;
+            default:
+                $column.querySelector('.btn-sort-desc').removeAttribute('selected');
+                $column.querySelector('.btn-sort-asc').removeAttribute('selected');
+        }
+        let $menu = $column.querySelector('.column-menu');
+        $menu.open = true;
+        let $filter = $column.querySelector('.column-filter');
+        $filter.value = $column.getAttribute('filter') ?? '';
+        if ($filter.nodeName === 'HE-INPUT') {
+            $filter.select();
+        }
+        this.$menuOpen = $menu;
+    }
+
+    _handleClickPagination() {
         this.offset += this.pagination ?? 0;
         this._requestRows(this._appendRows);
+    }
+
+    /**
+     * 
+     * @param {InputEvent} e
+     * @returns void
+     */
+    _handleClickRow(e) {
+        const $row = e.currentTarget;
+        let checked = null;
+        if (this.$checkAll) {
+            const allowMultiple = this.$checkAll.parentElement.getAttribute('multiple') !== 'false';
+            checked = this.$body.querySelectorAll('.check-row:state(checked)');
+
+            if (!allowMultiple || !e.target.classList.contains('check-row')) {
+                for (let check of checked) {
+                    check.checked = false;
+                }
+
+                $row.children[0].children[0].checked = true;
+            }
+
+            checked = this.$body.querySelectorAll('.check-row:state(checked)');
+            this._updateCheckAll(checked);
+        }
+
+        const $rowOld = this.$body.querySelector('tr[selected]');
+        if ($rowOld) {
+            $rowOld.removeAttribute('selected');
+        }
+        $row.setAttribute('selected', '');
+        this._updateExternElements(checked ?? [$row]);
+    }
+
+    /**
+     * @param {InputEvent} e 
+     * @param {bool} isDesc 
+     * @returns void
+     */
+    _handleClickSort(e, isDesc) {
+        /** @type {HTMLElement} */
+        let $sort = e.currentTarget;
+        let $col = $sort.closest('th');
+        let dir = isDesc ? 'desc' : 'asc';
+        this._sortColumn($col, dir);
+    }
+
+    _handleClickWindow() {
+        this._closeColumnMenu();
     }
 
     /**
@@ -1112,7 +1161,7 @@ export class HeliumTable extends HTMLElement {
         $cell.colSpan = '100';
         $cell.title = 'Mehr anzeigen';
         $cell.innerHTML = 'Mehr anzeigen';
-        $cell.onclick = () => this._handlePagination();
+        $cell.onclick = () => this._handleClickPagination();
 
         $row.append($cell);
         return $row;
@@ -1186,7 +1235,7 @@ export class HeliumTable extends HTMLElement {
     _renderRow(data) {
         let $row = document.createElement('tr');
         $row.id = 'row-' + this.nextRowId++;
-        $row.onclick = (e) => this._rowClickCallback.bind(this)(e);
+        $row.onclick = (e) => this._handleClickRow.bind(this)(e);
 
         for (let $column of this._getColumns()) {
             const colName = $column.getAttribute('column');
@@ -1302,7 +1351,7 @@ export class HeliumTable extends HTMLElement {
         $radioSortAsc.name = 'sort';
         $radioSortAsc.value = colName + '-asc';
         $radioSortAsc.id = colName + '-asc';
-        $radioSortAsc.onclick = (e) => this._sortClickCallback.bind(this)(e, false);
+        $radioSortAsc.onclick = (e) => this._handleClickSort.bind(this)(e, false);
         if (checked === 'asc') {
             $radioSortAsc.checked = true;
         }
@@ -1318,7 +1367,7 @@ export class HeliumTable extends HTMLElement {
         $radioSortDesc.name = 'sort';
         $radioSortDesc.value = colName + '-desc';
         $radioSortDesc.id = colName + '-desc';
-        $radioSortDesc.onclick = (e) => this._sortClickCallback.bind(this)(e, true);
+        $radioSortDesc.onclick = (e) => this._handleClickSort.bind(this)(e, true);
         if (checked === 'desc') {
             $radioSortDesc.checked = true;
         }
@@ -1402,7 +1451,7 @@ export class HeliumTable extends HTMLElement {
             $filter.placeholder = ' ';
         }
 
-        $filter.onchange = (e) => this._filterChangeCallback(e);
+        $filter.onchange = (e) => this._handleChangeFilter(e);
         $filter.value = $column.getAttribute('filter') ?? '';
         $filter.id = 'filter-' + colName;
         $filter.name = colName;
@@ -1476,7 +1525,7 @@ export class HeliumTable extends HTMLElement {
                 case 'check':
                     this.$checkAll = document.createElement('he-check');
                     this.$checkAll.id = 'check-all';
-                    this.$checkAll.onchange = (e) => this._checkAllCheckCallback.bind(this)(e);
+                    this.$checkAll.onchange = (e) => this._handleCheckAll.bind(this)(e);
                     $column.setAttribute('type', 'check');
                     if (attrFilter === 'below') {
                         $filterCell.append(this.$checkAll);
@@ -1512,8 +1561,8 @@ export class HeliumTable extends HTMLElement {
                 $contHeaderCell.append($spanName);
                 $contHeaderCell.classList.add('cont-colname');
                 $contHeaderCell.append(this._renderColumnMenu($column));
-                $spanName.addEventListener('click', (e) => this._colClickCallback.bind(this)(e, $column));
-                window.addEventListener('click', () => this._windowClickCallback.bind(this)());
+                $spanName.addEventListener('click', (e) => this._handleClickColumn.bind(this)(e, $column));
+                window.addEventListener('click', () => this._handleClickWindow.bind(this)());
 
             } else if (attrFilter === 'below') {
                 let $filter = this._renderFilter($column, colName);
@@ -1574,7 +1623,7 @@ export class HeliumTable extends HTMLElement {
             options.unshift('');
 
             let $selFilter = document.createElement('he-select');
-            $selFilter.setAttribute('filter', 'true');
+            $selFilter.setAttribute('filter', 'inline');
             $selFilter.classList.add("column-filter");
             $selFilter.name = "filter";
             $selFilter.replaceOptions(options, valMap);
@@ -1621,7 +1670,7 @@ export class HeliumTable extends HTMLElement {
         let $btnApply = document.createElement('div');
         $btnApply.classList.add('btn-apply-filter');
         $btnApply.innerHTML = 'Anwenden';
-        $btnApply.onclick = (e) => this._applyColumnClickCallback.bind(this)(e, $column);
+        $btnApply.onclick = (e) => this._handleClickApplyColumn.bind(this)(e, $column);
         $content.append($btnApply);
 
         $content.addEventListener('keyup', (event) => {
@@ -1688,38 +1737,6 @@ export class HeliumTable extends HTMLElement {
         //     this.$diagColumn = this._renderDialogColumn();
         //     shadow.append(this.$diagColumn);
         // }
-    }
-
-    /**
-     * 
-     * @param {InputEvent} e
-     * @returns void
-     */
-    _rowClickCallback(e) {
-        const $row = e.currentTarget;
-        let checked = null;
-        if (this.$checkAll) {
-            const allowMultiple = this.$checkAll.parentElement.getAttribute('multiple') !== 'false';
-            checked = this.$body.querySelectorAll('.check-row:state(checked)');
-
-            if (!allowMultiple || !e.target.classList.contains('check-row')) {
-                for (let check of checked) {
-                    check.checked = false;
-                }
-
-                $row.children[0].children[0].checked = true;
-            }
-
-            checked = this.$body.querySelectorAll('.check-row:state(checked)');
-            this._updateCheckAll(checked);
-        }
-
-        const $rowOld = this.$body.querySelector('tr[selected]');
-        if ($rowOld) {
-            $rowOld.removeAttribute('selected');
-        }
-        $row.setAttribute('selected', '');
-        this._updateExternElements(checked ?? [$row]);
     }
 
     _showDialogEdit($row) {
@@ -1792,19 +1809,6 @@ export class HeliumTable extends HTMLElement {
     }
 
     /**
-     * @param {InputEvent} e 
-     * @param {bool} isDesc 
-     * @returns void
-     */
-    _sortClickCallback(e, isDesc) {
-        /** @type {HTMLElement} */
-        let $sort = e.currentTarget;
-        let $col = $sort.closest('th');
-        let dir = isDesc ? 'desc' : 'asc';
-        this._sortColumn($col, dir);
-    }
-
-    /**
      * 
      * @param {Array<HeliumCheck>} checked 
      * @returns {void}
@@ -1844,9 +1848,6 @@ export class HeliumTable extends HTMLElement {
         this.dispatchEvent(evt);
     }
 
-    _windowClickCallback() {
-        this._closeColumnMenu();
-    }
 }
 
 if (!customElements.get('he-table')) {

@@ -9,7 +9,7 @@
     --he-input-loading-spinner-color: black;
     --he-input-padding: 0.3rem 0.4rem;
 
-    display: inline-flex;
+    display: inline-block;
     position: relative;
     border-radius: 3px;
     background-color: var(--he-input-backgroundColor);
@@ -21,6 +21,10 @@
     border-width: var(--he-input-borderWidth);
     color: var(--he-input-color);
     cursor: text;
+}
+
+#cont-inp {
+    display: inline-flex;
 }
 
 :host(:hover), :host([variant="underline"]:hover) {

@@ -86,6 +86,9 @@ export class HeliumInput extends HTMLElement {
         super();
         let shadow = this.attachShadow({ mode: "open" });
 
+        let $contInp = document.createElement('div');
+        $contInp.id = 'cont-inp';
+
         this.$input = document.createElement('input');
         this.$input.type = 'text';
         this.$input.autocomplete = 'off';
@@ -107,7 +110,8 @@ export class HeliumInput extends HTMLElement {
         this.$popover.dismiss = "manual";
         this.$popover.anchorElement = this;
 
-        shadow.append(this.$input);
+        $contInp.append(this.$input);
+        shadow.append($contInp);
         shadow.append(this.$popover);
         shadow.adoptedStyleSheets = [sheet];
         this.internals = this.attachInternals();
