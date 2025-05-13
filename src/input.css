@@ -25,6 +25,7 @@
 
 #cont-inp {
     display: inline-flex;
+    width: 100%;
 }
 
 :host(:hover), :host([variant="underline"]:hover) {
