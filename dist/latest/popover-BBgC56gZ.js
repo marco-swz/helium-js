@@ -1,4 +1,4 @@
-import { h as heSpaceBelow, b as hePositionRelative, c as heEnableBodyScroll } from './utils-ML_UsLfp.js';
+import { h as heSpaceBelow, b as hePositionRelative, c as heEnableBodyScroll } from './utils-BQyqhbo8.js';
 
 const sheet = new CSSStyleSheet();sheet.replaceSync("#popover {\n    --he-popover-borderColor: hsl(240 5.9% 90%);\n    --he-popover-borderRadius: 3px;\n\n    padding: 0;\n    inset: unset;\n    outline: none;\n    border: 1px solid var(--he-popover-borderColor);\n    border-radius: var(--he-popover-borderRadius);\n    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);\n}\n\n");
 
@@ -114,7 +114,9 @@ class HeliumPopover extends HTMLElement {
                 if (newValue != null) {
                     this.$popover.showPopover();
                 } else {
-                    this.$popover.hidePopover();
+                    if (this.$popover.matches(':popover-open')) {
+                        this.$popover.hidePopover();
+                    }
                 }
                 break;
             case 'attach': 
@@ -208,8 +210,6 @@ class HeliumPopover extends HTMLElement {
     _handleBeforeToggledPopover(e) {
         if (e.newState === "open") {
             this.$popover.style.visibility = 'hidden';
-        } else {
-            this.removeAttribute('open');
         }
     }
 
@@ -232,6 +232,7 @@ class HeliumPopover extends HTMLElement {
 
         } else {
             heEnableBodyScroll();
+            this.removeAttribute('open');
         }
     }
 }

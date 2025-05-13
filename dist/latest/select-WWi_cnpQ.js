@@ -1,5 +1,5 @@
-import { h as heSpaceBelow, a as heCallOnOutsideClick } from './utils-ML_UsLfp.js';
-import './popover-UtTI8XIi.js';
+import { h as heSpaceBelow, a as heCallOnOutsideClick } from './utils-BQyqhbo8.js';
+import './popover-BBgC56gZ.js';
 
 const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\n    --he-select-backgroundColor: whitesmoke;\n    --he-select-borderColor: lightgrey;\n    --he-select-borderWidth: 1px;\n    --he-select-borderRadius: 3px;\n    --he-select-hover-borderColor: grey;\n    --he-select-color: black;\n    --he-select-padding: 0.3rem 0.4rem;\n    --he-select-popover-borderRadius: 4px;\n    --he-select-option-hover-backgroundColor: whitesmoke;\n    --he-select-option-selected-backgroundColor: whitesmoke;\n    --he-select-after-margin: auto 4px auto auto;\n    --he-select-after-content: \"▼\";\n    --he-select-after-fontSize: 10px;\n    --he-select-disabled-color: hsl(from var(--he-select-color) h s calc(l + 50));\n\n    height: 1.6rem;\n    font-size: 14px;\n    min-width: 150px;\n    width: 150px;\n    display: inline-block;\n}\n\n:host([disabled]) {\n    pointer-events: none;\n    color: var(--he-select-disabled-color);\n}\n\n:host([variant=\"underline\"]) {\n    #inp {\n        border-top: 0;\n        border-left: 0;\n        border-right: 0;\n        border-radius: 0;\n    }\n}\n\n#cont-button {\n    height: inherit;\n    width: inherit;\n}\n\n#inp {\n    position: relative;\n    background-color: var(--he-select-backgroundColor);\n    border-width: var(--he-select-borderWidth);\n    border-radius: var(--he-select-borderRadius);\n    border-color: var(--he-select-borderColor);\n    border-style: solid;\n    font-size: inherit;\n    width: 100%;\n    height: inherit;\n    min-width: inherit;\n    padding: var(--he-select-padding);\n    outline: none;\n    text-align: left;\n    padding-right: 25px;\n    text-wrap: nowrap;\n    color: inherit;\n    overflow: hidden;\n    text-overflow: ellipsis;\n}\n\n#inp:hover {\n    transition:\n        border-color 0.2s;\n    cursor: pointer;\n    border-color: var(--he-select-hover-borderColor);\n}\n\n#inp::after {\n    content: var(--he-select-after-content);\n    position: absolute;\n    font-size: var(--he-select-after-fontSize);\n    width: fit-content;\n    height: fit-content;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    margin: var(--he-select-after-margin);\n}\n\n#popover {\n    border-radius: var(--he-select-popover-borderRadius);\n}\n\n#cont-options {\n    display: flex;\n    flex-direction: column;\n    background-color: var(--he-select-clr-bg, white);\n    max-height: 300px;\n    overflow: auto;\n    overscroll-behavior: contain;\n    user-select: none;\n}\n\n#cont-options option {\n    padding: 5px 10px;\n    border-radius: 3px;\n    text-align: left;\n    width: 100%;\n    width: -moz-available;          /* WebKit-based browsers will ignore this. */\n    width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */\n    width: fill-available;\n\n    &::after {\n        font-family: \"Font Awesome 5 Pro\";\n        content: \"\\f00c\";\n        font-weight: 600;\n        color: transparent;\n        margin-left: 6px;\n        float: right;\n    }\n}\n\n#cont-options option[selected] {\n    &::after {\n        color: steelblue;\n    }\n}\n\n#cont-options:not(:hover) option[highlighted] {\n    background-color: var(--he-select-option-selected-backgroundColor);\n}\n\n#cont-options option:hover:not(:disabled) {\n    background-color: var(--he-select-option-hover-backgroundColor);\n    cursor: pointer;\n}\n\n#filter {\n    width: 100%;\n    width: -moz-available;          /* WebKit-based browsers will ignore this. */\n    width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */\n    width: fill-available;\n    margin: 3px;\n}\n\n:host([filter=\"inline\"]) {\n    #filter {\n        --he-input-padding: var(--he-select-padding);\n        background-color: var(--he-select-backgroundColor);\n        border-width: var(--he-select-borderWidth);\n        border-radius: var(--he-select-borderRadius);\n        border-color: var(--he-select-borderColor);\n        border-style: solid;\n        font-size: inherit;\n        width: 100%;\n        height: inherit;\n        margin: 0;\n        min-width: inherit;\n        outline: none;\n        text-align: left;\n        text-wrap: nowrap;\n        color: inherit;\n    }\n}\n\n");
 
@@ -26,6 +26,8 @@ class HeliumSelect extends HTMLElement {
     internals;
     /** @type {number | TimerHandler} */
     _filterTimeout = 0;
+    /** @type {function(InputEvent): void} The click handler to detect outside clicks. This should be cleaned up when closing */
+    _handleClickDocument;
 
     constructor() {
         super();
@@ -491,6 +493,7 @@ class HeliumSelect extends HTMLElement {
 
                 break;
             case 'Escape':
+                e.preventDefault();
                 this._hidePopover();
                 break;
         }
@@ -507,6 +510,7 @@ class HeliumSelect extends HTMLElement {
         }
         this.$filter.value = '';
         this.$popover.hidePopover();
+        document.removeEventListener('click', this._handleClickDocument);
     }
     
     _highlight($option) {
@@ -534,9 +538,10 @@ class HeliumSelect extends HTMLElement {
         if (heSpaceBelow(this) < this.$popover.offsetHeight + 20) {
             positionDefault = 'top-left';
         }
-        heCallOnOutsideClick([this.$popoverContent, this.$contButton], () => {
+        this._handleClickDocument = heCallOnOutsideClick([this.$popoverContent, this.$contButton], () => {
             this.open = false;
         });
+
         this.$popover.setAttribute('position', this.getAttribute('position') ?? positionDefault);
         this.$filter.value = '';
         this.showOptions();

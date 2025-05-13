@@ -113,7 +113,9 @@ export class HeliumPopover extends HTMLElement {
                 if (newValue != null) {
                     this.$popover.showPopover();
                 } else {
-                    this.$popover.hidePopover();
+                    if (this.$popover.matches(':popover-open')) {
+                        this.$popover.hidePopover();
+                    }
                 }
                 break;
             case 'attach': 
@@ -209,8 +211,6 @@ export class HeliumPopover extends HTMLElement {
     _handleBeforeToggledPopover(e) {
         if (e.newState === "open") {
             this.$popover.style.visibility = 'hidden';
-        } else {
-            this.removeAttribute('open');
         }
     }
 
@@ -235,6 +235,7 @@ export class HeliumPopover extends HTMLElement {
 
         } else {
             heEnableBodyScroll();
+            this.removeAttribute('open');
         }
     }
 }

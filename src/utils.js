@@ -92,7 +92,7 @@ export function heEnableBodyScroll() {
  * Calls the provided callback if the a click occurs outside of the elements.
  * @param {Array<HTMLElement>} elements
  * @param {function(): void} callback
- * @returns {void}
+ * @returns {function(InputEvent): void} The listener callback to clean up manually
  */
 export function heCallOnOutsideClick(elements, callback) {
     const outsideClickListener = event => {
@@ -104,6 +104,7 @@ export function heCallOnOutsideClick(elements, callback) {
             }
         }
 
+        // TODO(marco); Remove last listener. Currently one stays attached
         if (!isInside) {
             removeClickListener();
             callback();
@@ -114,7 +115,9 @@ export function heCallOnOutsideClick(elements, callback) {
         document.removeEventListener('click', outsideClickListener);
     }
 
-    document.addEventListener('click', outsideClickListener);
+    document.removeEventListener('click', outsideClickListener);
+    document.addEventListener('click', outsideClickListener, true);
+    return outsideClickListener;
 }
 
 export function heIsVisible(elem) {

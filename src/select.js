@@ -25,6 +25,8 @@ export class HeliumSelect extends HTMLElement {
     internals;
     /** @type {number | TimerHandler} */
     _filterTimeout = 0;
+    /** @type {function(InputEvent): void} The click handler to detect outside clicks. This should be cleaned up when closing */
+    _handleClickDocument;
 
     constructor() {
         super();
@@ -492,6 +494,7 @@ export class HeliumSelect extends HTMLElement {
 
                 break;
             case 'Escape':
+                e.preventDefault();
                 this._hidePopover();
                 break;
         }
@@ -508,6 +511,7 @@ export class HeliumSelect extends HTMLElement {
         }
         this.$filter.value = '';
         this.$popover.hidePopover();
+        document.removeEventListener('click', this._handleClickDocument);
     }
     
     _highlight($option) {
@@ -535,9 +539,10 @@ export class HeliumSelect extends HTMLElement {
         if (heSpaceBelow(this) < this.$popover.offsetHeight + 20) {
             positionDefault = 'top-left';
         }
-        heCallOnOutsideClick([this.$popoverContent, this.$contButton], () => {
+        this._handleClickDocument = heCallOnOutsideClick([this.$popoverContent, this.$contButton], () => {
             this.open = false;
         });
+
         this.$popover.setAttribute('position', this.getAttribute('position') ?? positionDefault);
         this.$filter.value = '';
         this.showOptions();
