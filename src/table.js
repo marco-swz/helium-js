@@ -1086,13 +1086,18 @@ export class HeliumTable extends HTMLElement {
                 $column.querySelector('.btn-sort-desc').removeAttribute('selected');
                 $column.querySelector('.btn-sort-asc').removeAttribute('selected');
         }
+
         let $menu = $column.querySelector('.column-menu');
         $menu.open = true;
+
         let $filter = $column.querySelector('.column-filter');
         $filter.value = $column.getAttribute('filter') ?? '';
         if ($filter.nodeName === 'HE-INPUT') {
-            $filter.select();
+            setTimeout(() => {
+                $filter.select();
+            }, 10);
         }
+
         this.$menuOpen = $menu;
     }
 

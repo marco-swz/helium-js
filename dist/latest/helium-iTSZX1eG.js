@@ -2,7 +2,7 @@ import './button-o1PjtLCn.js';
 import './input-DxssQOXv.js';
 import './dialog-n93JF9Jz.js';
 import './form_dialog-DeMpzkhX.js';
-import './table-BoUQrFZn.js';
+import './table-TU9NmMee.js';
 import './menu-DtEDCG1z.js';
 import './tabs-dUaQiEV-.js';
 import './select-DkcaisrZ.js';
