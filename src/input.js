@@ -387,10 +387,10 @@ export class HeliumInput extends HTMLElement {
      * @returns {void}
      */
     connectedCallback() {
-        this.$input.addEventListener('change', () => this._inputChangedCallback.bind(this)());
-        this.addEventListener('focus', () => this._inputFocusCallback.bind(this)());
-        this.addEventListener('focusout', (e) => setTimeout(() => this._inputBlurCallback.bind(this)(e), 200));
-        this.$slot.onslotchange = () => this._slotChangedCallback.bind(this)();
+        this.$input.addEventListener('change', () => this._handleChangeInput.bind(this)());
+        this.addEventListener('focus', () => this._handleFocusInput.bind(this)());
+        this.addEventListener('focusout', (e) => setTimeout(() => this._handleBlurInput.bind(this)(e), 200));
+        this.$slot.onslotchange = () => this._handleChangeSlot.bind(this)();
     }
 
 
@@ -430,26 +430,7 @@ export class HeliumInput extends HTMLElement {
         return this;
     }
 
-    /**
-     * Callback for input changes.
-     */
-    _inputChangedCallback() {
-        if (this.disabled) {
-            return;
-        }
-
-        if (this.checkValidity()) {
-            this.internals.setFormValue(this.$input.value);
-        }
-
-        this.dispatchEvent(new CustomEvent('change'));
-    }
-
-    _inputFocusCallback() {
-        this._updatePopover();
-    }
-
-    _inputBlurCallback(e) {
+    _handleBlurInput() {
         if (document.activeElement !== this || document.activeElement !== document.body) {
             this.$popover.open = false;
             const evt = new CustomEvent('toggle', {
@@ -463,7 +444,29 @@ export class HeliumInput extends HTMLElement {
         }
     }
 
-    _optionClickedCallback(e) {
+    /**
+     * Callback for input changes.
+     */
+    _handleChangeInput() {
+        if (this.disabled) {
+            return;
+        }
+
+        if (this.checkValidity()) {
+            this.internals.setFormValue(this.$input.value);
+        }
+
+        this.dispatchEvent(new CustomEvent('change'));
+    }
+
+    _handleChangeSlot() {
+        for (const $option of this.$slot.assignedElements()) {
+            $option.onclick = (e) => this._handleClickOption.bind(this)(e);
+        }
+        this._updatePopover();
+    }
+
+    _handleClickOption(e) {
         const $option = e.target;
         const val = $option.value ?? $option.innerHTML;
 
@@ -480,10 +483,7 @@ export class HeliumInput extends HTMLElement {
         this.dispatchEvent(evt);
     }
 
-    _slotChangedCallback() {
-        for (const $option of this.$slot.assignedElements()) {
-            $option.onclick = (e) => this._optionClickedCallback.bind(this)(e);
-        }
+    _handleFocusInput() {
         this._updatePopover();
     }
 
