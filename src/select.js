@@ -137,6 +137,16 @@ export class HeliumSelect extends HTMLElement {
 
     set value(val) {
         if (val) {
+            if (this.hasAttribute('slotted')) {
+                let $option = this.$options.children[0].assignedNodes()
+                    .filter($el => $el.getAttribute('value') === val)[0];
+                if ($option == null)  {
+                    throw new Error('No option found with provided value!');
+                }
+                this._select($option);
+                return;
+            }
+
             const $option = this.$options.querySelector(`[value="${val}"]`);
             if ($option == null)  {
                 throw new Error('No option found with provided value!');
@@ -206,9 +216,19 @@ export class HeliumSelect extends HTMLElement {
                 break;
         }
 
-        for (const $opt of this.querySelectorAll('option')) {
-            $opt.onclick = (e) => this._handleClickOption.bind(this)(e);
-            this.$options.append($opt);
+        if (this.hasAttribute('slotted')) {
+            let $slot = document.createElement('slot');
+            $slot.name = 'option';
+            $slot.addEventListener('slotchange', (e) => this._handleSlotchange(e));
+            this.$options.append($slot);
+            $slot = document.createElement('slot');
+            $slot.name = 'button';
+            this.$button.append($slot);
+        } else {
+            for (let $opt of this.querySelectorAll('option')) {
+                $opt.onclick = (e) => this._handleClickOption.bind(this)(e);
+                this.$options.append($opt);
+            }
         }
 
         this.select(0);
@@ -223,8 +243,8 @@ export class HeliumSelect extends HTMLElement {
      */
     formResetCallback() {
         let $optionSelected = null;
-        for (const $opt of this.$options.children) {
-            if (!$opt.hidden && !$opt.disabled) {
+        for (const $opt of this.getOptions()) {
+            if ($opt.style.display !== 'none' && !$opt.disabled) {
                 $optionSelected = $opt;
                 break;
             }
@@ -244,7 +264,9 @@ export class HeliumSelect extends HTMLElement {
      * @returns {HTMLCollection}
      */
     getOptions() {
-        return this.$options.children;
+        return this.hasAttribute('slotted')
+            ? this.$options.children[0].assignedNodes()
+            : this.$options.children;
     }
 
     /**
@@ -255,11 +277,11 @@ export class HeliumSelect extends HTMLElement {
      */
     hideOptions(values=null) {
         let $sel = null;
-        for (let $el of this.$options.children) {
+        for (let $el of this.getOptions()) {
             if (values == null || values.includes($el.value)) {
-                $el.hidden = true;
+                $el.style.display = 'none';
             } else {
-                $el.hidden = false;
+                $el.style.display = '';
                 if ($sel == null) {
                     $sel = $el;
                 }
@@ -283,11 +305,12 @@ export class HeliumSelect extends HTMLElement {
             ? this.$highlight
             : this.$selection;
 
+        let options = this.getOptions();
         if (!$elem) {
             if (visualOnly) {
-                this._highlight(this.$options.firstChild);
+                this._highlight(options[0]);
             } else {
-                this._select(this.$options.firstChild);
+                this._select(options[0]);
             }
             return;
         }
@@ -299,11 +322,11 @@ export class HeliumSelect extends HTMLElement {
             }
 
             if ($next == null) {
-                $next = this.$options.firstChild;
+                $next = options[0];
                 continue;
             }
 
-            if (!$next.hidden) {
+            if ($next.style.display !== 'none') {
                 break;
             }
             $next = $next.nextSibling;
@@ -320,11 +343,12 @@ export class HeliumSelect extends HTMLElement {
             ? this.$highlight
             : this.$selection;
 
+        let options = this.getOptions();
         if (!$elem) {
             if (visualOnly) {
-                this._highlight(this.$options.lastChild);
+                this._highlight(options[options.length - 1]);
             } else {
-                this._select(this.$options.lastChild);
+                this._select(options[options.length - 1]);
             }
             return;
         }
@@ -336,11 +360,11 @@ export class HeliumSelect extends HTMLElement {
             }
 
             if ($prev == null) {
-                $prev = this.$options.lastChild;
+                $prev = options[options.length - 1];
                 continue;
             }
 
-            if (!$prev.hidden) {
+            if ($prev.style.display !== 'none') {
                 break;
             }
             $prev = $prev.previousSibling;
@@ -360,21 +384,35 @@ export class HeliumSelect extends HTMLElement {
      * @returns {Self}
      */
     replaceOptions(newOptions, displayMapping = null) {
+        if (this.hasAttribute('slotted')) {
+            this.innerHTML = '';
+        } else {
+            this.$options.innerHTML = '';
+        }
+
         displayMapping = displayMapping ?? {};
-        this.$options.innerHTML = '';
         const valOld = this.value;
         let $optSelect = null;
+
         for (const val of newOptions) {
             let $opt = document.createElement('option');
             $opt.value = val;
             $opt.innerHTML = displayMapping[val] ?? val;
-            $opt.onclick = (e) => this._handleClickOption.bind(this)(e);
-            this.$options.append($opt);
+
+            if (this.hasAttribute('slotted')) {
+                $opt.slot = 'option';
+                //$opt.onclick = (e) => this._handleClickOption.bind(this)(e);
+                this.append($opt);
+            } else {
+                this.$options.append($opt);
+                $opt.onclick = (e) => this._handleClickOption.bind(this)(e);
+            }
 
             if (valOld === val) {
                 $optSelect = $opt;
             }
         }
+
         if ($optSelect != null) {
             this._select($optSelect);
         } else {
@@ -390,9 +428,9 @@ export class HeliumSelect extends HTMLElement {
      */
     showOptions(values=null) {
         let $sel = null;
-        for (let $el of this.$options.children) {
+        for (let $el of this.getOptions()) {
             if (values == null || values.includes($el.value)) {
-                $el.hidden = false;
+                $el.style.display = '';
                 if ($sel == null) {
                     $sel = $el;
                 }
@@ -412,10 +450,11 @@ export class HeliumSelect extends HTMLElement {
      * @returns void
      */
     select(optionIndex) {
-        if (this.$options.children.length === 0 && optionIndex === 0) {
+        let options = this.getOptions();
+        if (options.length === 0 && optionIndex === 0) {
             return;
         }
-        const option = this.$options.children[optionIndex];
+        const option = options[optionIndex];
         console.assert(option != null, `No option with the given index ${optionIndex}!`);
         this._select(option);
     }
@@ -443,14 +482,15 @@ export class HeliumSelect extends HTMLElement {
             }
 
             let $firstVisible = null;
-            for (const $option of this.$options.children) {
+            let options = this.getOptions();
+            for (const $option of options) {
                 if (filterVal.length === 0 || ($option.value !== '' && $option.innerText.toLowerCase().includes(filterVal))) {
                     if ($firstVisible == null) {
                         $firstVisible = $option;
                     }
-                    $option.hidden = false;
+                    $option.style.display = '';
                 } else {
-                    $option.hidden = true;
+                    $option.style.display = 'none';
                 }
             }
             this._highlight($firstVisible);
@@ -497,6 +537,25 @@ export class HeliumSelect extends HTMLElement {
                 e.preventDefault();
                 this._hidePopover();
                 break;
+        }
+    }
+
+    _handleSlotchange() {
+        let $first = null;
+        let isSelectionPresent = false;
+        for (let $opt of this.$options.children[0].assignedNodes()) {
+            $opt.onclick = (e) => this._handleClickOption.bind(this)(e);
+            if ($first == null) {
+                $first = $opt;
+            }
+
+            if ($opt.isSameNode(this.$selection)) {
+                isSelectionPresent = true;
+            }
+        }
+
+        if (!isSelectionPresent) {
+            this._select($first);
         }
     }
 
@@ -574,7 +633,18 @@ export class HeliumSelect extends HTMLElement {
             this.$filter.value = '';
             return;
         }
-        this.$button.innerHTML = $option.innerHTML;
+        if (this.hasAttribute('slotted')) {
+            let $opt = $option.cloneNode();
+            $opt.innerHTML = $option.innerHTML;
+            $opt.slot = 'button';
+            let $elemOld = this.querySelector('[slot="button"]');
+            if ($elemOld) {
+                $elemOld.remove();
+            }
+            this.append($opt);
+        } else {
+            this.$button.innerHTML = $option.innerHTML;
+        }
         this.$selection = $option;
         this.$selection.setAttribute('selected', '');
 

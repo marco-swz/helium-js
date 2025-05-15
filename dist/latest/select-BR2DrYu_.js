@@ -1,7 +1,7 @@
-import { h as heSpaceBelow, a as heCallOnOutsideClick } from './utils-BQyqhbo8.js';
-import './popover-BBgC56gZ.js';
+import { h as heSpaceBelow, a as heCallOnOutsideClick } from './utils-SP1Llz9F.js';
+import './popover-DFROOrPY.js';
 
-const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\n    --he-select-backgroundColor: whitesmoke;\n    --he-select-borderColor: lightgrey;\n    --he-select-borderWidth: 1px;\n    --he-select-borderRadius: 3px;\n    --he-select-hover-borderColor: grey;\n    --he-select-color: black;\n    --he-select-padding: 0.3rem 0.4rem;\n    --he-select-popover-borderRadius: 4px;\n    --he-select-option-hover-backgroundColor: whitesmoke;\n    --he-select-option-selected-backgroundColor: whitesmoke;\n    --he-select-after-margin: auto 4px auto auto;\n    --he-select-after-content: \"▼\";\n    --he-select-after-fontSize: 10px;\n    --he-select-disabled-color: hsl(from var(--he-select-color) h s calc(l + 50));\n\n    height: 1.6rem;\n    font-size: 14px;\n    min-width: 150px;\n    width: 150px;\n    display: inline-block;\n}\n\n:host([disabled]) {\n    pointer-events: none;\n    color: var(--he-select-disabled-color);\n}\n\n:host([variant=\"underline\"]) {\n    #inp {\n        border-top: 0;\n        border-left: 0;\n        border-right: 0;\n        border-radius: 0;\n    }\n}\n\n#cont-button {\n    height: inherit;\n    width: inherit;\n}\n\n#inp {\n    position: relative;\n    background-color: var(--he-select-backgroundColor);\n    border-width: var(--he-select-borderWidth);\n    border-radius: var(--he-select-borderRadius);\n    border-color: var(--he-select-borderColor);\n    border-style: solid;\n    font-size: inherit;\n    width: 100%;\n    height: inherit;\n    min-width: inherit;\n    padding: var(--he-select-padding);\n    outline: none;\n    text-align: left;\n    padding-right: 25px;\n    text-wrap: nowrap;\n    color: inherit;\n    overflow: hidden;\n    text-overflow: ellipsis;\n}\n\n#inp:hover {\n    transition:\n        border-color 0.2s;\n    cursor: pointer;\n    border-color: var(--he-select-hover-borderColor);\n}\n\n#inp::after {\n    content: var(--he-select-after-content);\n    position: absolute;\n    font-size: var(--he-select-after-fontSize);\n    width: fit-content;\n    height: fit-content;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    margin: var(--he-select-after-margin);\n}\n\n#popover {\n    border-radius: var(--he-select-popover-borderRadius);\n}\n\n#cont-options {\n    display: flex;\n    flex-direction: column;\n    background-color: var(--he-select-clr-bg, white);\n    max-height: 300px;\n    overflow: auto;\n    overscroll-behavior: contain;\n    user-select: none;\n}\n\n#cont-options option {\n    padding: 5px 10px;\n    border-radius: 3px;\n    text-align: left;\n    width: 100%;\n    width: -moz-available;          /* WebKit-based browsers will ignore this. */\n    width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */\n    width: fill-available;\n\n    &::after {\n        font-family: \"Font Awesome 5 Pro\";\n        content: \"\\f00c\";\n        font-weight: 600;\n        color: transparent;\n        margin-left: 6px;\n        float: right;\n    }\n}\n\n#cont-options option[selected] {\n    &::after {\n        color: steelblue;\n    }\n}\n\n#cont-options:not(:hover) option[highlighted] {\n    background-color: var(--he-select-option-selected-backgroundColor);\n}\n\n#cont-options option:hover:not(:disabled) {\n    background-color: var(--he-select-option-hover-backgroundColor);\n    cursor: pointer;\n}\n\n#filter {\n    width: 100%;\n    width: -moz-available;          /* WebKit-based browsers will ignore this. */\n    width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */\n    width: fill-available;\n    margin: 3px;\n}\n\n:host([filter=\"inline\"]) {\n    #filter {\n        --he-input-padding: var(--he-select-padding);\n        background-color: var(--he-select-backgroundColor);\n        border-width: var(--he-select-borderWidth);\n        border-radius: var(--he-select-borderRadius);\n        border-color: var(--he-select-borderColor);\n        border-style: solid;\n        font-size: inherit;\n        width: 100%;\n        height: inherit;\n        margin: 0;\n        min-width: inherit;\n        outline: none;\n        text-align: left;\n        text-wrap: nowrap;\n        color: inherit;\n    }\n}\n\n");
+const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\n    --he-select-backgroundColor: whitesmoke;\n    --he-select-borderColor: lightgrey;\n    --he-select-borderWidth: 1px;\n    --he-select-borderRadius: 3px;\n    --he-select-hover-borderColor: grey;\n    --he-select-color: black;\n    --he-select-padding: 0.3rem 0.4rem;\n    --he-select-popover-borderRadius: 4px;\n    --he-select-popover-maxHeight: 300px;\n    --he-select-popover-maxWidth: 300px;\n    --he-select-popover-width: fit-content;\n    --he-select-popover-backgroundColor: white;\n    --he-select-option-hover-backgroundColor: whitesmoke;\n    --he-select-option-selected-backgroundColor: whitesmoke;\n    --he-select-after-margin: auto 4px auto auto;\n    --he-select-after-content: \"▼\";\n    --he-select-after-fontSize: 10px;\n    --he-select-disabled-color: hsl(from var(--he-select-color) h s calc(l + 50));\n\n    height: 1.6rem;\n    font-size: 14px;\n    min-width: 150px;\n    width: 150px;\n    display: inline-block;\n}\n\n:host([disabled]), \n:host([disabled])::slotted([slot=button]) {\n    pointer-events: none;\n    color: var(--he-select-disabled-color);\n}\n\n:host([variant=\"underline\"]) {\n    #inp {\n        border-top: 0;\n        border-left: 0;\n        border-right: 0;\n        border-radius: 0;\n    }\n}\n\n#cont-button {\n    height: inherit;\n    width: inherit;\n}\n\n#inp {\n    position: relative;\n    background-color: var(--he-select-backgroundColor);\n    border-width: var(--he-select-borderWidth);\n    border-radius: var(--he-select-borderRadius);\n    border-color: var(--he-select-borderColor);\n    border-style: solid;\n    font-size: inherit;\n    width: 100%;\n    height: inherit;\n    min-width: inherit;\n    padding: var(--he-select-padding);\n    outline: none;\n    text-align: left;\n    padding-right: 25px;\n    text-wrap: nowrap;\n    color: inherit;\n    overflow: hidden;\n    text-overflow: ellipsis;\n}\n\n#inp:hover {\n    transition:\n        border-color 0.2s;\n    cursor: pointer;\n    border-color: var(--he-select-hover-borderColor);\n}\n\n#inp::after {\n    content: var(--he-select-after-content);\n    position: absolute;\n    font-size: var(--he-select-after-fontSize);\n    width: fit-content;\n    height: fit-content;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    margin: var(--he-select-after-margin);\n}\n\n#popover {\n    border-radius: var(--he-select-popover-borderRadius);\n}\n\n#cont-options {\n    display: flex;\n    flex-direction: column;\n    background-color: var(--he-select-popover-backgroundColor);\n    max-height: var(--he-select-popover-maxHeight);\n    width: var(--he-select-popover-width);\n    overflow: auto;\n    overscroll-behavior: contain;\n    user-select: none;\n}\n\nslot[name=option] {\n    display: inline-flex;\n    flex-direction: column;\n}\n\nslot[name=button] {\n    display: flex;\n    align-items: center;\n    height: 100%;\n}\n\n#cont-options option,\n::slotted(*) {\n    padding: 5px 10px;\n    border-radius: 3px;\n    text-align: left;\n    width: 100%;\n    width: -moz-available;          /* WebKit-based browsers will ignore this. */\n    width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */\n    width: fill-available;\n    display: inline-block;\n    text-overflow: ellipsis;\n    overflow: hidden;\n}\n\n#cont-options option[selected]::before,\n::slotted([slot=option][selected])::before {\n    font-family: \"Font Awesome 5 Pro\";\n    content: \"\\f00c\";\n    font-weight: 600;\n    margin-right: 6px;\n    color: steelblue;\n}\n\n#cont-options:not(:hover) option[highlighted],\n#cont-options:not(:hover) ::slotted([slot=option][highlighted]) {\n    background-color: var(--he-select-option-selected-backgroundColor);\n}\n\n#cont-options option:hover:not(:disabled),\n::slotted([slot=option]:hover:not(:disabled))\n{\n    background-color: var(--he-select-option-hover-backgroundColor);\n    cursor: pointer;\n}\n\n#filter {\n    width: 100%;\n    width: -moz-available;          /* WebKit-based browsers will ignore this. */\n    width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */\n    width: fill-available;\n    margin: 3px;\n}\n\n:host([filter=\"inline\"]) {\n    #filter {\n        --he-input-padding: var(--he-select-padding);\n        background-color: var(--he-select-backgroundColor);\n        border-width: var(--he-select-borderWidth);\n        border-radius: var(--he-select-borderRadius);\n        border-color: var(--he-select-borderColor);\n        border-style: solid;\n        font-size: inherit;\n        width: 100%;\n        height: inherit;\n        margin: 0;\n        min-width: inherit;\n        outline: none;\n        text-align: left;\n        text-wrap: nowrap;\n        color: inherit;\n    }\n}\n\n");
 
 class HeliumSelect extends HTMLElement {
     static formAssociated = true;
@@ -138,6 +138,16 @@ class HeliumSelect extends HTMLElement {
 
     set value(val) {
         if (val) {
+            if (this.hasAttribute('slotted')) {
+                let $option = this.$options.children[0].assignedNodes()
+                    .filter($el => $el.getAttribute('value') === val)[0];
+                if ($option == null)  {
+                    throw new Error('No option found with provided value!');
+                }
+                this._select($option);
+                return;
+            }
+
             const $option = this.$options.querySelector(`[value="${val}"]`);
             if ($option == null)  {
                 throw new Error('No option found with provided value!');
@@ -205,9 +215,19 @@ class HeliumSelect extends HTMLElement {
                 break;
         }
 
-        for (const $opt of this.querySelectorAll('option')) {
-            $opt.onclick = (e) => this._handleClickOption.bind(this)(e);
-            this.$options.append($opt);
+        if (this.hasAttribute('slotted')) {
+            let $slot = document.createElement('slot');
+            $slot.name = 'option';
+            $slot.addEventListener('slotchange', (e) => this._handleSlotchange(e));
+            this.$options.append($slot);
+            $slot = document.createElement('slot');
+            $slot.name = 'button';
+            this.$button.append($slot);
+        } else {
+            for (let $opt of this.querySelectorAll('option')) {
+                $opt.onclick = (e) => this._handleClickOption.bind(this)(e);
+                this.$options.append($opt);
+            }
         }
 
         this.select(0);
@@ -222,8 +242,8 @@ class HeliumSelect extends HTMLElement {
      */
     formResetCallback() {
         let $optionSelected = null;
-        for (const $opt of this.$options.children) {
-            if (!$opt.hidden && !$opt.disabled) {
+        for (const $opt of this.getOptions()) {
+            if ($opt.style.display !== 'none' && !$opt.disabled) {
                 $optionSelected = $opt;
                 break;
             }
@@ -243,7 +263,9 @@ class HeliumSelect extends HTMLElement {
      * @returns {HTMLCollection}
      */
     getOptions() {
-        return this.$options.children;
+        return this.hasAttribute('slotted')
+            ? this.$options.children[0].assignedNodes()
+            : this.$options.children;
     }
 
     /**
@@ -254,11 +276,11 @@ class HeliumSelect extends HTMLElement {
      */
     hideOptions(values=null) {
         let $sel = null;
-        for (let $el of this.$options.children) {
+        for (let $el of this.getOptions()) {
             if (values == null || values.includes($el.value)) {
-                $el.hidden = true;
+                $el.style.display = 'none';
             } else {
-                $el.hidden = false;
+                $el.style.display = '';
                 if ($sel == null) {
                     $sel = $el;
                 }
@@ -282,11 +304,12 @@ class HeliumSelect extends HTMLElement {
             ? this.$highlight
             : this.$selection;
 
+        let options = this.getOptions();
         if (!$elem) {
             if (visualOnly) {
-                this._highlight(this.$options.firstChild);
+                this._highlight(options[0]);
             } else {
-                this._select(this.$options.firstChild);
+                this._select(options[0]);
             }
             return;
         }
@@ -298,11 +321,11 @@ class HeliumSelect extends HTMLElement {
             }
 
             if ($next == null) {
-                $next = this.$options.firstChild;
+                $next = options[0];
                 continue;
             }
 
-            if (!$next.hidden) {
+            if ($next.style.display !== 'none') {
                 break;
             }
             $next = $next.nextSibling;
@@ -319,11 +342,12 @@ class HeliumSelect extends HTMLElement {
             ? this.$highlight
             : this.$selection;
 
+        let options = this.getOptions();
         if (!$elem) {
             if (visualOnly) {
-                this._highlight(this.$options.lastChild);
+                this._highlight(options[options.length - 1]);
             } else {
-                this._select(this.$options.lastChild);
+                this._select(options[options.length - 1]);
             }
             return;
         }
@@ -335,11 +359,11 @@ class HeliumSelect extends HTMLElement {
             }
 
             if ($prev == null) {
-                $prev = this.$options.lastChild;
+                $prev = options[options.length - 1];
                 continue;
             }
 
-            if (!$prev.hidden) {
+            if ($prev.style.display !== 'none') {
                 break;
             }
             $prev = $prev.previousSibling;
@@ -359,21 +383,35 @@ class HeliumSelect extends HTMLElement {
      * @returns {Self}
      */
     replaceOptions(newOptions, displayMapping = null) {
+        if (this.hasAttribute('slotted')) {
+            this.innerHTML = '';
+        } else {
+            this.$options.innerHTML = '';
+        }
+
         displayMapping = displayMapping ?? {};
-        this.$options.innerHTML = '';
         const valOld = this.value;
         let $optSelect = null;
+
         for (const val of newOptions) {
             let $opt = document.createElement('option');
             $opt.value = val;
             $opt.innerHTML = displayMapping[val] ?? val;
-            $opt.onclick = (e) => this._handleClickOption.bind(this)(e);
-            this.$options.append($opt);
+
+            if (this.hasAttribute('slotted')) {
+                $opt.slot = 'option';
+                //$opt.onclick = (e) => this._handleClickOption.bind(this)(e);
+                this.append($opt);
+            } else {
+                this.$options.append($opt);
+                $opt.onclick = (e) => this._handleClickOption.bind(this)(e);
+            }
 
             if (valOld === val) {
                 $optSelect = $opt;
             }
         }
+
         if ($optSelect != null) {
             this._select($optSelect);
         } else {
@@ -389,9 +427,9 @@ class HeliumSelect extends HTMLElement {
      */
     showOptions(values=null) {
         let $sel = null;
-        for (let $el of this.$options.children) {
+        for (let $el of this.getOptions()) {
             if (values == null || values.includes($el.value)) {
-                $el.hidden = false;
+                $el.style.display = '';
                 if ($sel == null) {
                     $sel = $el;
                 }
@@ -411,10 +449,11 @@ class HeliumSelect extends HTMLElement {
      * @returns void
      */
     select(optionIndex) {
-        if (this.$options.children.length === 0 && optionIndex === 0) {
+        let options = this.getOptions();
+        if (options.length === 0 && optionIndex === 0) {
             return;
         }
-        const option = this.$options.children[optionIndex];
+        const option = options[optionIndex];
         console.assert(option != null, `No option with the given index ${optionIndex}!`);
         this._select(option);
     }
@@ -442,14 +481,15 @@ class HeliumSelect extends HTMLElement {
             }
 
             let $firstVisible = null;
-            for (const $option of this.$options.children) {
+            let options = this.getOptions();
+            for (const $option of options) {
                 if (filterVal.length === 0 || ($option.value !== '' && $option.innerText.toLowerCase().includes(filterVal))) {
                     if ($firstVisible == null) {
                         $firstVisible = $option;
                     }
-                    $option.hidden = false;
+                    $option.style.display = '';
                 } else {
-                    $option.hidden = true;
+                    $option.style.display = 'none';
                 }
             }
             this._highlight($firstVisible);
@@ -496,6 +536,25 @@ class HeliumSelect extends HTMLElement {
                 e.preventDefault();
                 this._hidePopover();
                 break;
+        }
+    }
+
+    _handleSlotchange() {
+        let $first = null;
+        let isSelectionPresent = false;
+        for (let $opt of this.$options.children[0].assignedNodes()) {
+            $opt.onclick = (e) => this._handleClickOption.bind(this)(e);
+            if ($first == null) {
+                $first = $opt;
+            }
+
+            if ($opt.isSameNode(this.$selection)) {
+                isSelectionPresent = true;
+            }
+        }
+
+        if (!isSelectionPresent) {
+            this._select($first);
         }
     }
 
@@ -573,7 +632,18 @@ class HeliumSelect extends HTMLElement {
             this.$filter.value = '';
             return;
         }
-        this.$button.innerHTML = $option.innerHTML;
+        if (this.hasAttribute('slotted')) {
+            let $opt = $option.cloneNode();
+            $opt.innerHTML = $option.innerHTML;
+            $opt.slot = 'button';
+            let $elemOld = this.querySelector('[slot="button"]');
+            if ($elemOld) {
+                $elemOld.remove();
+            }
+            this.append($opt);
+        } else {
+            this.$button.innerHTML = $option.innerHTML;
+        }
         this.$selection = $option;
         this.$selection.setAttribute('selected', '');
 

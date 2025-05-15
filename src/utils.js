@@ -40,6 +40,16 @@ export function hePositionRelative($elem, $target, position, offset = 0) {
     const rect = $target.getBoundingClientRect();
 
     switch (position) {
+        case 'bottom':
+        case 'bottom-center':
+            $elem.style.left = (rect.left + rect.width / 2 - $elem.offsetWidth / 2) + 'px';
+            $elem.style.top = rect.bottom + offset + 'px';
+            break;
+        case 'top':
+        case 'top-center':
+            $elem.style.left = (rect.left + rect.width / 2 - $elem.offsetWidth / 2) + 'px';
+            $elem.style.top = rect.top - $elem.offsetHeight - offset + 'px';
+            break;
         case 'bottom-right':
             $elem.style.left = (rect.left + rect.width - $elem.offsetWidth) + 'px';
             $elem.style.top = rect.bottom + offset + 'px';

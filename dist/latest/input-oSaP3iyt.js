@@ -1,5 +1,5 @@
-import './popover-BBgC56gZ.js';
-import './utils-BQyqhbo8.js';
+import './popover-DFROOrPY.js';
+import './utils-SP1Llz9F.js';
 
 const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\n    --he-input-borderColor: lightgrey;\n    --he-input-borderWidth: 1px;\n    --he-input-borderStyle: solid;\n    --he-input-color: black;\n    --he-input-fontSize: 14px;\n    --he-input-backgroundColor: whitesmoke;\n    --he-input-hover-borderColor: grey;\n    --he-input-loading-spinner-color: black;\n    --he-input-padding: 0.3rem 0.4rem;\n\n    display: inline-block;\n    position: relative;\n    border-radius: 3px;\n    background-color: var(--he-input-backgroundColor);\n    width: 100%;\n    height: 1.6rem;\n    font-size: var(--he-input-fontSize);\n    border-style: var(--he-input-borderStyle);\n    border-color: var(--he-input-borderColor);\n    border-width: var(--he-input-borderWidth);\n    color: var(--he-input-color);\n    cursor: text;\n}\n\n#cont-inp {\n    display: inline-flex;\n    width: 100%;\n    height: 100%;\n}\n\n:host(:hover), :host([variant=\"underline\"]:hover) {\n    transition:\n        border-color 0.2s;\n    border-color: var(--he-input-hover-borderColor);\n}\n\n:host([variant=\"underline\"]) {\n    border-top: 0;\n    border-left: 0;\n    border-right: 0;\n    border-radius: 0;\n    border-bottom-color: var(--he-input-borderColor);\n\n}\n\n:host([invalid]) {\n    transition:\n        border-color 0.2s;\n    border-color: indianred;\n}\n\n:host([invalid]:hover) {\n    border-color: indianred;\n}\n\n:host([loading])::after {\n    content: \"\";\n    position: absolute;\n    width: 12px;\n    height: 12px;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    margin: auto 10px auto auto;\n    border: 3px solid darkgrey;\n    border-radius: 50%;\n    border-bottom-color: var(--he-input-loading-spinner-color);\n    animation: button-loading-spinner 1s ease infinite;\n}\n\n:host([ok]) {\n    border-color: green;\n}\n\n:host([ok])::after {\n    content: \"✔\";\n    position: absolute;\n    width: 10px;\n    height: 15px;\n    color: green;\n    top: 1px;\n    right: 8px;\n    font-weight: 700;\n}\n\n#inp-main {\n    font-family: inherit;\n    outline: none;\n    background-color: inherit;\n    width: 100%;\n    font-size:inherit;\n    border-radius: inherit;\n    border: none;\n    padding: var(--he-input-padding);\n    cursor: inherit;\n    color: inherit;\n}\n\n:host([readonly]:hover),\n:host([disabled]:hover) {\n    border-color: var(--he-input-borderColor);\n}\n\n:host([readonly]), :host([disabled]) {\n    cursor: default;\n    color: hsl(from var(--he-input-color) h s calc(l + 50))\n}\n\ndiv[slot=content] {\n    max-height: 200px;\n}\n\n#cont-options {\n    display: flex;\n    flex-direction: column;\n}\n\nhe-popover {\n    --he-popover-borderRadius: 5px;\n}\n\n::slotted(*) {\n    cursor: pointer;\n    padding: 5px 10px;\n    border-radius: 3px;\n}\n\n::slotted(*:hover) {\n    background-color: hsl(from white h s calc(l - 10));\n}\n\n@keyframes button-loading-spinner {\n    from {\n        transform: rotate(0turn);\n    }\n\n    to {\n        transform: rotate(1turn);\n    }\n}\n\n");
 
@@ -389,10 +389,10 @@ class HeliumInput extends HTMLElement {
      * @returns {void}
      */
     connectedCallback() {
-        this.$input.addEventListener('change', () => this._inputChangedCallback.bind(this)());
-        this.addEventListener('focus', () => this._inputFocusCallback.bind(this)());
-        this.addEventListener('focusout', (e) => setTimeout(() => this._inputBlurCallback.bind(this)(e), 200));
-        this.$slot.onslotchange = () => this._slotChangedCallback.bind(this)();
+        this.$input.addEventListener('change', () => this._handleChangeInput.bind(this)());
+        this.addEventListener('focus', () => this._handleFocusInput.bind(this)());
+        this.addEventListener('focusout', (e) => setTimeout(() => this._handleBlurInput.bind(this)(e), 200));
+        this.$slot.onslotchange = () => this._handleChangeSlot.bind(this)();
     }
 
 
@@ -432,26 +432,7 @@ class HeliumInput extends HTMLElement {
         return this;
     }
 
-    /**
-     * Callback for input changes.
-     */
-    _inputChangedCallback() {
-        if (this.disabled) {
-            return;
-        }
-
-        if (this.checkValidity()) {
-            this.internals.setFormValue(this.$input.value);
-        }
-
-        this.dispatchEvent(new CustomEvent('change'));
-    }
-
-    _inputFocusCallback() {
-        this._updatePopover();
-    }
-
-    _inputBlurCallback(e) {
+    _handleBlurInput() {
         if (document.activeElement !== this || document.activeElement !== document.body) {
             this.$popover.open = false;
             const evt = new CustomEvent('toggle', {
@@ -465,7 +446,29 @@ class HeliumInput extends HTMLElement {
         }
     }
 
-    _optionClickedCallback(e) {
+    /**
+     * Callback for input changes.
+     */
+    _handleChangeInput() {
+        if (this.disabled) {
+            return;
+        }
+
+        if (this.checkValidity()) {
+            this.internals.setFormValue(this.$input.value);
+        }
+
+        this.dispatchEvent(new CustomEvent('change'));
+    }
+
+    _handleChangeSlot() {
+        for (const $option of this.$slot.assignedElements()) {
+            $option.onclick = (e) => this._handleClickOption.bind(this)(e);
+        }
+        this._updatePopover();
+    }
+
+    _handleClickOption(e) {
         const $option = e.target;
         const val = $option.value ?? $option.innerHTML;
 
@@ -482,10 +485,7 @@ class HeliumInput extends HTMLElement {
         this.dispatchEvent(evt);
     }
 
-    _slotChangedCallback() {
-        for (const $option of this.$slot.assignedElements()) {
-            $option.onclick = (e) => this._optionClickedCallback.bind(this)(e);
-        }
+    _handleFocusInput() {
         this._updatePopover();
     }
 

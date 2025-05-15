@@ -1,4 +1,4 @@
-import { h as heSpaceBelow, b as hePositionRelative, c as heEnableBodyScroll } from './utils-BQyqhbo8.js';
+import { h as heSpaceBelow, b as hePositionRelative, c as heEnableBodyScroll } from './utils-SP1Llz9F.js';
 
 const sheet = new CSSStyleSheet();sheet.replaceSync("#popover {\n    --he-popover-borderColor: hsl(240 5.9% 90%);\n    --he-popover-borderRadius: 3px;\n\n    padding: 0;\n    inset: unset;\n    outline: none;\n    border: 1px solid var(--he-popover-borderColor);\n    border-radius: var(--he-popover-borderRadius);\n    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);\n}\n\n");
 
