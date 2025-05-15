@@ -17,6 +17,8 @@ export class HeliumSelect extends HTMLElement {
     $filter;
     /** @type {HTMLElement} */
     $options;
+    /** @type {?HTMLElement} */
+    $selection = null;
     /** @type {HTMLElement} */
     $button;
     /** @type {HTMLDivElement} */
@@ -156,7 +158,9 @@ export class HeliumSelect extends HTMLElement {
     }
 
     get value() {
-        return this.$selection ? this.$selection.value : '';
+        return this.$selection 
+            ? this.$selection.value ?? this.$selection.getAttribute('value')
+            : '';
     }
 
     /**
@@ -301,11 +305,22 @@ export class HeliumSelect extends HTMLElement {
      * Selects the next option.
      */
     nextOption(visualOnly=false) {
+        this._moveOption(visualOnly, 1);
+    }
+
+    /**
+     * Selects the next option.
+     */
+    _moveOption(visualOnly, dir) {
         let $elem = visualOnly 
             ? this.$highlight
             : this.$selection;
 
         let options = this.getOptions();
+        if (options.length === 0) {
+            return;
+        }
+
         if (!$elem) {
             if (visualOnly) {
                 this._highlight(options[0]);
@@ -315,21 +330,29 @@ export class HeliumSelect extends HTMLElement {
             return;
         }
 
-        let $next = $elem.nextSibling;
-        while (true) {
-            if ($elem.isSameNode($next)) {
-                return;
-            }
+        let i = Array.prototype.indexOf.call(
+            options,
+            $elem
+        );
+        let $next = $elem;
+        while (options.length > 1 && true) {
+            i += dir;
+            $next = options[i]
 
             if ($next == null) {
-                $next = options[0];
+                i = dir > 0
+                    ? -1
+                    : options.length;
                 continue;
+            }
+
+            if ($elem.isSameNode($next)) {
+                return;
             }
 
             if ($next.style.display !== 'none') {
                 break;
             }
-            $next = $next.nextSibling;
         }
         if (visualOnly) {
             this._highlight($next);
@@ -339,41 +362,7 @@ export class HeliumSelect extends HTMLElement {
     }
 
     prevOption(visualOnly=false) {
-        let $elem = visualOnly 
-            ? this.$highlight
-            : this.$selection;
-
-        let options = this.getOptions();
-        if (!$elem) {
-            if (visualOnly) {
-                this._highlight(options[options.length - 1]);
-            } else {
-                this._select(options[options.length - 1]);
-            }
-            return;
-        }
-
-        let $prev = $elem.previousSibling;
-        while (true) {
-            if ($elem.isSameNode($prev)) {
-                return;
-            }
-
-            if ($prev == null) {
-                $prev = options[options.length - 1];
-                continue;
-            }
-
-            if ($prev.style.display !== 'none') {
-                break;
-            }
-            $prev = $prev.previousSibling;
-        }
-        if (visualOnly) {
-            this._highlight($prev);
-            return;
-        }
-        this._select($prev);
+        this._moveOption(visualOnly, -1);
     }
 
     /**
@@ -484,7 +473,8 @@ export class HeliumSelect extends HTMLElement {
             let $firstVisible = null;
             let options = this.getOptions();
             for (const $option of options) {
-                if (filterVal.length === 0 || ($option.value !== '' && $option.innerText.toLowerCase().includes(filterVal))) {
+                let val = $option.value ?? $option.getAttribute('value');
+                if (filterVal.length === 0 || (val !== '' && $option.innerText.toLowerCase().includes(filterVal))) {
                     if ($firstVisible == null) {
                         $firstVisible = $option;
                     }
@@ -528,6 +518,7 @@ export class HeliumSelect extends HTMLElement {
                     e.preventDefault();
                     this._select(this.$highlight);
                     this._hidePopover();
+                    this.dispatchEvent(new CustomEvent('change'));
                 } else {
                     this.open = true;
                 }
@@ -649,7 +640,7 @@ export class HeliumSelect extends HTMLElement {
         this.$selection.setAttribute('selected', '');
 
         if (!this.disabled) {
-            this.internals.setFormValue(this.$selection.value);
+            this.internals.setFormValue(this.value);
         }
     }
 }
