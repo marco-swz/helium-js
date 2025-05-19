@@ -599,6 +599,7 @@ export class HeliumSelect extends HTMLElement {
         this.$popover.style.visibility = 'hidden';
         this.$popover.showPopover();
         let width = this.$options.getBoundingClientRect().width;
+        console.log(width);
         let btnWidth = this.$contButton.getBoundingClientRect().width;
         if (btnWidth > width) {
             this.$options.style.width = btnWidth + 'px';

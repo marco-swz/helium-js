@@ -86,7 +86,8 @@
     margin: var(--he-select-after-margin);
 }
 
-#popover {
+#popover-content {
+    width: min-content;
     border-radius: var(--he-select-popover-borderRadius);
 }
 
@@ -95,7 +96,7 @@
     flex-direction: column;
     background-color: var(--he-select-popover-backgroundColor);
     max-height: var(--he-select-popover-maxHeight);
-    width: var(--he-select-popover-width);
+    width: 100%;
     overflow: auto;
     overscroll-behavior: contain;
     user-select: none;
