@@ -1,4 +1,5 @@
 import sheet from './dialog.css';
+import { HeliumButton } from "./button.js";
 
 /**
  * Will open the targeted dialog.
@@ -211,24 +212,37 @@ export class HeliumDialog extends HTMLElement {
         }
     }
 
-    static showDialog(content, type) {
-        return heShowDialogTemp(content, type);
+    /**
+     * Creates a temporary dialog and shows the content.
+     * @param {'error'|'warn'|'info'|'success'} type The dialog type changes the title color and text
+     * @param {string} content The body content of the dialog
+     * @param {?string} title The title of the dialog
+     * @returns {void}
+     */
+    static showDialog(content, type, title=null) {
+        return heShowDialogTemp(content, type, title);
     }
 
     /**
-     * @returns Promise<()>
+     * Creates a temporary alert dialog.
+     * @param {string} content The body content of the dialog
+     * @param {?string} title The title of the dialog
+     * @returns {Promise<()>}
      */
     static showAlert(content, title='Achtung') {
         return heShowDialogTemp(content, 'error', title);
     }
 
     /**
-     * @returns Promise<string>
+     * Creates a temporary prompt dialog and returns the input text as promise.
+     * @param {string} text The text shown above the prompt input
+     * @param {?string} title The title of the dialog
+     * @returns {Promise<string>} The prompt input
      */
     static showPrompt(text, title='Eingabe') {
         let fnResolve = null;
         let fnReject = null;
-        let prom = new Promise((resolve, reject) => {
+        let promise = new Promise((resolve, reject) => {
             fnResolve = resolve;
             fnReject = reject;
         });
@@ -250,6 +264,7 @@ export class HeliumDialog extends HTMLElement {
 
             let $footer = document.createElement('div');
             $footer.slot = 'footer';
+            /** @type {HeliumButton} */
             let $btnSubmit = document.createElement('he-button');
             $btnSubmit.innerHTML = 'Absenden';
             $btnSubmit.setAttribute('variant', 'primary');
@@ -266,11 +281,14 @@ export class HeliumDialog extends HTMLElement {
         $diag.show().then(() => {
             fnReject();
         });
-        return prom;
+        return promise;
     }
 
     /**
-     * @returns Promise<bool>
+     * Creates a temporary confirm dialog and returns the selection as promise.
+     * @param {string} text The dialog text
+     * @param {?string} title The title of the dialog
+     * @returns {Promise<bool>}
      */
     static showConfirm(text, title='Achtung') {
         let fnResolve = null;
@@ -320,33 +338,34 @@ export class HeliumDialog extends HTMLElement {
     }
 }
 
-function heShowDialogTemp(content, type, title=null, ) {
+function heShowDialogTemp(content, type, title=null) {
     /** @type {HeliumDialog} */
     let $diag = document.querySelector('#he-dialog-temp');
     if ($diag === null) {
         $diag = document.createElement('he-dialog');
         $diag.id = 'he-dialog-temp';
-        switch (type) {
-            case 'error':
-                title = title ?? 'Fehler';
-                $diag.style.setProperty('--he-dialog-title-color', 'indianred');
-                break;
-            case 'warn':
-                title = title ?? 'Warnung';
-                $diag.style.setProperty('--he-dialog-title-color', 'orange');
-                break;
-            case 'success':
-                title = title ?? 'Erfolg';
-                $diag.style.setProperty('--he-dialog-title-color', 'seagreen');
-                break;
-            default:
-                title = title ?? 'Info';
-                $diag.style.removeProperty('--he-dialog-title-color');
-                break;
-        }
-        $diag.setAttribute('title-text', title);
         document.body.append($diag);
     }
+
+    switch (type) {
+        case 'error':
+            title = title ?? 'Fehler';
+            $diag.style.setProperty('--he-dialog-title-color', 'indianred');
+            break;
+        case 'warn':
+            title = title ?? 'Warnung';
+            $diag.style.setProperty('--he-dialog-title-color', 'orange');
+            break;
+        case 'success':
+            title = title ?? 'Erfolg';
+            $diag.style.setProperty('--he-dialog-title-color', 'seagreen');
+            break;
+        default:
+            title = title ?? 'Info';
+            $diag.style.removeProperty('--he-dialog-title-color');
+            break;
+    }
+    $diag.setAttribute('title-text', title);
 
     $diag.innerHTML = `
         <div slot="body">${content}</div>
