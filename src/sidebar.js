@@ -22,6 +22,8 @@ export class HeliumSidebar extends HTMLElement {
      * This is used to restore the pagetree to the state before the search.
      */
     pagetreeClosed = [];
+    /** @type {Time} Temorary storage for active search timeout */
+    _searchTimeout = null;
 
     constructor() {
         super();
@@ -41,7 +43,7 @@ export class HeliumSidebar extends HTMLElement {
 
         this.$resizer = document.createElement('div');
         this.$resizer.id = 'resizer';
-        let callback = this._resizeKeydownCallback.bind(this);
+        let callback = this._handleResizeKeydown.bind(this);
         this.$resizer.addEventListener('mousedown', (e) => {
             e.preventDefault();
             document.addEventListener("mousemove", callback, false);
@@ -106,6 +108,12 @@ export class HeliumSidebar extends HTMLElement {
         $btnReloadRights.href = '/reacl';
         this.$contAction.append($btnReloadRights);
 
+        let $btnClassicMenu = document.createElement('div');
+        $btnClassicMenu.id = 'btn-classic-menu';
+        $btnClassicMenu.innerHTML = 'Klassisches Menü verwenden';
+        $btnClassicMenu.onclick = () => this._handleClickClassicMenu.bind(this)();
+        this.$contAction.append($btnClassicMenu);
+
         let $contPageSearch = document.createElement('div');
         $contPageSearch.id = 'cont-page-search';
         this.$contPagetree.append($contPageSearch);
@@ -117,8 +125,8 @@ export class HeliumSidebar extends HTMLElement {
         let $inpSearch = document.createElement('input');
         $inpSearch.id = 'inp-search';
         $inpSearch.type = 'search';
-        $inpSearch.onchange = () => this._searchChangeCallback.bind(this)($inpSearch);
-        $btnPageSearch.onclick = () => this._searchChangeCallback.bind(this)($inpSearch);
+        $inpSearch.oninput = () => this._handleInputSearch.bind(this)($inpSearch);
+        $btnPageSearch.onclick = () => this._filterPages.bind(this)($inpSearch);
         $contPageSearch.append($inpSearch);
 
         shadow.append(this.$contSidebar);
@@ -126,7 +134,7 @@ export class HeliumSidebar extends HTMLElement {
 
         this.setAttribute('tab', localStorage.getItem('he-sidebar_tab') ?? 'pages');
 
-        const open = localStorage.getItem('he-sidebar_open') === 'true'?? true;
+        const open = localStorage.getItem('he-sidebar_open') === 'true' ?? true;
         if (open) {
             this.setAttribute('open', '');
             this._show(false);
@@ -180,7 +188,7 @@ export class HeliumSidebar extends HTMLElement {
     show() {
         this.setAttribute('open', '');
         this._show();
-        
+
     }
 
     toggle() {
@@ -191,7 +199,7 @@ export class HeliumSidebar extends HTMLElement {
         }
     }
 
-    _hide(animate=true) {
+    _hide(animate = true) {
         localStorage.setItem('he-sidebar_open', false);
         let $main = document.querySelector('main');
         const left = `-${this.$contSidebar.style.width}`;
@@ -218,7 +226,7 @@ export class HeliumSidebar extends HTMLElement {
         }
     }
 
-    _show(animate=true) {
+    _show(animate = true) {
         localStorage.setItem('he-sidebar_open', true);
         let $main = document.querySelector('main');
         if (animate) {
@@ -237,7 +245,7 @@ export class HeliumSidebar extends HTMLElement {
                 { duration: 100, fill: 'forwards', easing: 'ease-in-out' }
             );
         } else {
-            this.$contSidebar.style.left =  0;
+            this.$contSidebar.style.left = 0;
             let $main = document.querySelector('main');
             if ($main != null) {
                 $main.style.marginLeft = this.$contSidebar.style.width;
@@ -254,11 +262,11 @@ export class HeliumSidebar extends HTMLElement {
         this.setAttribute('tab', 'action');
         localStorage.setItem('he-sidebar_tab', 'action');
     }
-    
+
     /**
      * @param {HeliumInput} $inpSearch 
      */
-    _searchChangeCallback($inpSearch) {
+    _filterPages($inpSearch) {
         let searchText = $inpSearch.value;
         if (searchText === '') {
             this.$pagetree.filter(null);
@@ -271,7 +279,28 @@ export class HeliumSidebar extends HTMLElement {
         this.$pagetree.filter(searchText);
     }
 
-    _resizeKeydownCallback(evt) {
+    /**
+     * @param {HeliumInput} $inpSearch 
+     */
+    _handleInputSearch($inpSearch) {
+        window.clearTimeout(this._searchTimeout);
+
+        this._searchTimeout = setTimeout(() => {
+            this._filterPages($inpSearch);
+        }, 250);
+    }
+
+    _handleClickClassicMenu() {
+        let url = window.location.href;
+        if (url.indexOf('?') > -1) {
+            url += '&newMenu=0'
+        } else {
+            url += '?newMenu=0'
+        }
+        window.location.href = url;
+    }
+
+    _handleResizeKeydown(evt) {
         const width = evt.x
         if (width < 270) {
             return;

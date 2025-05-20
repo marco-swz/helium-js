@@ -158,7 +158,6 @@ a {
 }
 
 #btn-logout {
-
     &::before {
         font-family: 'Font Awesome 5 Pro';
         content: "\f08b";
@@ -169,10 +168,19 @@ a {
 }
 
 #btn-reload-rights {
-
     &::before {
         font-family: 'Font Awesome 5 Pro';
         content: "\f2f1";
+        font-style: normal;
+        padding-right: 10px;
+        font-weight: 800;
+    }
+}
+
+#btn-classic-menu {
+    &::before {
+        font-family: 'Font Awesome 5 Pro';
+        content: "\f362";
         font-style: normal;
         padding-right: 10px;
         font-weight: 800;
