@@ -9,7 +9,7 @@ import './select-B0p24LhY.js';
 import './check-Gn89XVO0.js';
 import './toast-CDI5DF2B.js';
 import './tree-CJAnt76C.js';
-import './sidebar-B0BZgMKY.js';
+import './sidebar-BhzXfAeT.js';
 import './menubar-kW1AzuR_.js';
 import './toggle-AURsSxPY.js';
 import './popover-DFROOrPY.js';
