@@ -6,6 +6,12 @@ export function html(text) {
     return text;
 }
 
+export function t(text) {
+    if (!HELIUM_TRANSLATIONS) {
+        return text;
+    }
+}
+
 export function preventDefaultForScrollKeys(e) {
     // left: 37, up: 38, right: 39, down: 40,
     // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36

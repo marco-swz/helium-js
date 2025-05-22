@@ -16,7 +16,15 @@
     --he-select-after-margin: auto 4px auto auto;
     --he-select-after-content: "▼";
     --he-select-after-fontSize: 10px;
+    --he-select-after-display: block;
+    --he-select-after-padding: 0px 2px 0px 5px;
     --he-select-disabled-color: hsl(from var(--he-select-color) h s calc(l + 50));
+    --he-select-before-color: black;
+    --he-select-before-content: '';
+    --he-select-before-fontFamily: 'Font Awesome 5 Pro';
+    --he-select-before-display: 'none';
+    --he-select-before-fontSize: 10px;
+    --he-select-before-padding: 0;
 
     height: 1.6rem;
     font-size: 14px;
@@ -32,7 +40,7 @@
 }
 
 :host([variant="underline"]) {
-    #inp {
+    & #inp {
         border-top: 0;
         border-left: 0;
         border-right: 0;
@@ -43,27 +51,50 @@
 #cont-button {
     height: inherit;
     width: inherit;
-}
-
-#inp {
-    position: relative;
+    display: flex;
+    align-items: center;
     background-color: var(--he-select-backgroundColor);
     border-width: var(--he-select-borderWidth);
     border-radius: var(--he-select-borderRadius);
     border-color: var(--he-select-borderColor);
     border-style: solid;
+    padding: 0;
+
+    &::before {
+        content: var(--he-select-before-content);
+        color: var(--he-select-before-color);
+        font-family: var(--he-select-before-fontFamily);
+        font-size: var(--he-select-before-fontSize);
+        display: var(--he-select-before-display);
+        padding: var(--he-select-before-padding);
+    }
+
+    &::after {
+        content: var(--he-select-after-content);
+        font-size: var(--he-select-after-fontSize);
+        display: var(--he-select-after-display);
+        margin: var(--he-select-after-margin);
+        padding: var(--he-select-after-padding);
+    }
+}
+
+#inp {
+    position: relative;
     font-size: inherit;
+    border-radius: var(--he-select-borderRadius);
     width: 100%;
     height: inherit;
     min-width: inherit;
-    padding: var(--he-select-padding);
     outline: none;
     text-align: left;
-    padding-right: 25px;
+    padding: var(--he-select-padding);
+    background-color: var(--he-select-backgroundColor);
     text-wrap: nowrap;
+    border: 0;
     color: inherit;
     overflow: hidden;
     text-overflow: ellipsis;
+    align-items: center;
 }
 
 #inp:hover {
@@ -71,19 +102,6 @@
         border-color 0.2s;
     cursor: pointer;
     border-color: var(--he-select-hover-borderColor);
-}
-
-#inp::after {
-    content: var(--he-select-after-content);
-    position: absolute;
-    font-size: var(--he-select-after-fontSize);
-    width: fit-content;
-    height: fit-content;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    margin: var(--he-select-after-margin);
 }
 
 #popover-content {
@@ -96,7 +114,7 @@
     flex-direction: column;
     background-color: var(--he-select-popover-backgroundColor);
     max-height: var(--he-select-popover-maxHeight);
-    width: 100%;
+    width: var(--he-select-popover-width);
     overflow: auto;
     overscroll-behavior: contain;
     user-select: none;
@@ -123,6 +141,7 @@ slot[name=button] {
     width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
     width: fill-available;
     display: inline-block;
+    align-items: center;
     text-overflow: ellipsis;
     overflow: hidden;
 }
@@ -157,22 +176,46 @@ slot[name=button] {
 }
 
 :host([filter="inline"]) {
-    #filter {
-        --he-input-padding: var(--he-select-padding);
-        background-color: var(--he-select-backgroundColor);
-        border-width: var(--he-select-borderWidth);
-        border-radius: var(--he-select-borderRadius);
-        border-color: var(--he-select-borderColor);
-        border-style: solid;
+    & #filter {
+        --he-input-padding: 0;
+        padding: var(--he-select-padding);
+        border: 0;
         font-size: inherit;
         width: 100%;
-        height: inherit;
         margin: 0;
         min-width: inherit;
+        border-radius: var(--he-select-borderRadius);
+        background-color: var(--he-select-backgroundColor);
         outline: none;
         text-align: left;
         text-wrap: nowrap;
         color: inherit;
+    }
+}
+
+:host([multiple]) {
+    --he-select-padding: 3px 15px;
+
+    & #cont-button {
+        & #inp {
+            display: flex;
+            gap: 3px;
+            & span:not(.placeholder) {
+                display: inline-table;
+                align-items: center;
+                border: 1px solid lightgrey;
+                border-radius: 5px;
+                padding: 2px 5px;
+                background-color: white;
+                overflow: hidden;
+                width: fit-content;
+                text-overflow: ellipsis;
+            }
+
+            & span.placeholder {
+                color: grey;
+            }
+        }
     }
 }
 

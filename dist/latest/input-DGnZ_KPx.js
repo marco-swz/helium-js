@@ -65,6 +65,7 @@ class HeliumInput extends HTMLElement {
         'report-validity',
         'type',
         'disabled',
+        'default',
         'readonly',
         'autocomplete',
         'placeholder',
@@ -118,6 +119,22 @@ class HeliumInput extends HTMLElement {
         shadow.adoptedStyleSheets = [sheet];
         this.internals = this.attachInternals();
         this.internals.setFormValue('');
+    }
+
+    /**
+     * Gets or sets the default value, which will be used if the input is empty.
+     * @type {boolean}
+     */
+    set default(val) {
+        if (val) {
+            this.setAttribute('default', val);
+        } else {
+            this.removeAttribute('default');
+        }
+    }
+
+    get default() {
+        return this.getAttribute('default');
     }
 
     /**
@@ -203,7 +220,7 @@ class HeliumInput extends HTMLElement {
 
     /**
      * Gets or sets the placeholder.
-     * The placeholder is set as value when the input is empty.
+     * This is used as hint, if the input is empty.
      * @type {string}
      */
     set placeholder(val) {
@@ -261,7 +278,7 @@ class HeliumInput extends HTMLElement {
 
     get value() {
         return this.$input.value === ''
-            ? this.placeholder ?? ''
+            ? this.default ?? ''
             : this.$input.value;
     }
 
@@ -286,14 +303,9 @@ class HeliumInput extends HTMLElement {
                     this.$input.removeAttribute(name);
                 }
                 break;
-            case 'placeholder':
-                if (newValue) {
-                    this.$input.setAttribute(name, newValue);
-                    if (this.value === '' && !this.disabled) {
-                        this.internals.setFormValue(newValue);
-                    }
-                } else {
-                    this.$input.removeAttribute(name);
+            case 'default':
+                if (this.value === '' && !this.disabled) {
+                    this.internals.setFormValue(newValue);
                 }
                 break;
             case 'value': 
@@ -310,11 +322,9 @@ class HeliumInput extends HTMLElement {
             case 'disabled':
                 if (newValue != null) {
                     this.internals.setFormValue(null);
-                    this.internals.states.add('disabled');
                     this.$input.disabled = true;
                 } else {
                     this.internals.setFormValue(this.value);
-                    this.internals.states.delete('disabled');
                     this.$input.disabled = false;
                 }
                 break;

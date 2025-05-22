@@ -8,6 +8,7 @@ export class HeliumSelect extends HTMLElement {
         'open',
         'filter',
         'disabled',
+        'placeholder',
     ];
     /** @type {HeliumPopover} */
     $popover;
@@ -17,14 +18,16 @@ export class HeliumSelect extends HTMLElement {
     $filter;
     /** @type {HTMLElement} */
     $options;
-    /** @type {?HTMLElement} */
-    $selection = null;
+    /** @type {Array<HTMLElement>} */
+    selections = [];
     /** @type {HTMLElement} */
     $button;
     /** @type {HTMLDivElement} */
     $contButton;
     /** @type {ElementInternals} */
     internals;
+    /** @type {function(string, HtmlElement): boolean} */
+    onfilter = this._onfilterDefault;
     /** @type {number | TimerHandler} */
     _filterTimeout = 0;
     /** @type {function(InputEvent): void} The click handler to detect outside clicks. This should be cleaned up when closing */
@@ -137,30 +140,95 @@ export class HeliumSelect extends HTMLElement {
         return this.getAttribute('open') !== null;
     }
 
-    set value(val) {
+    /**
+     * Gets or sets the placeholder.
+     * This is used as hint, if the input is empty.
+     * @type {string}
+     */
+    set placeholder(val) {
         if (val) {
-            if (this.hasAttribute('slotted')) {
-                let $option = this.$options.children[0].assignedNodes()
-                    .filter($el => $el.getAttribute('value') === val)[0];
-                if ($option == null)  {
-                    throw new Error('No option found with provided value!');
-                }
-                this._select($option);
-                return;
-            }
-
-            const $option = this.$options.querySelector(`[value="${val}"]`);
-            if ($option == null)  {
-                throw new Error('No option found with provided value!');
-            }
-            this._select($option);
+            this.setAttribute('placeholder', val);
+        } else {
+            this.removeAttribute('placeholder');
         }
     }
 
+    get placeholder() {
+        return this.getAttribute('placeholder');
+    }
+
+    set value(val) {
+        if (val == null) {
+            return;
+        }
+
+        if (Array.isArray(val)) { 
+            if(this.getAttribute('multiple') == null) {
+                throw new Error('Multiple values are not allowed unless the select has the attribute `multiple`');
+            }
+        } else {
+            val = [val];
+        }
+
+        if (this.hasAttribute('slotted')) {
+            /** @type {Array<HTMLElement>} */
+            let options = this.$options.children[0].assignedNodes()
+                .filter($el => val.includes($el.getAttribute('value')));
+            if (options.length === 0)  {
+                throw new Error('No option found with provided value!');
+            }
+            this._select(options);
+            return;
+        }
+
+        let options = [];
+        for (const v of val) {
+            let $opt = this.$options.querySelector(`[value="${v}"]`);
+            if ($opt == null) {
+                throw new Error('No option found with provided value!');
+            }
+            options.push($opt);
+        }
+        this._select(options);
+    }
+
     get value() {
-        return this.$selection 
-            ? this.$selection.value ?? this.$selection.getAttribute('value')
-            : '';
+        let selVals = this.selections.map(sel => sel.value ?? sel.getAttribute('value'));
+        switch (selVals.length) {
+            case 0:
+                return '';
+            case 1:
+                return selVals[0];
+        }
+        return selVals;
+    }
+    
+    addOption(text, value, fnInsertBefore=null) {
+        let $opt = document.createElement('option');
+        $opt.value = value;
+        $opt.innerHTML = text;
+
+        let $contInsert = this;
+        if (this.hasAttribute('slotted')) {
+            $opt.slot = 'option';
+            //$opt.onclick = (e) => this._handleClickOption.bind(this)(e);
+        } else {
+            $contInsert = this.$options;
+            $opt.onclick = (e) => this._handleClickOption.bind(this)(e);
+        }
+
+        if (fnInsertBefore == null) {
+            $contInsert.append($opt);
+            return $opt;
+        }
+
+        for (const $el of $contInsert.children) {
+            if (fnInsertBefore($el, $opt)) {
+                $contInsert.insertBefore($opt, $el);
+                return $opt;
+            }
+        }
+
     }
 
     /**
@@ -191,6 +259,8 @@ export class HeliumSelect extends HTMLElement {
                 } else {
                     this.internals.setFormValue(this.value);
                 }
+                break;
+            case 'placeholder':
                 break;
             default:
                 break;
@@ -246,21 +316,7 @@ export class HeliumSelect extends HTMLElement {
      * The native callback function for resetting the input a part of a form.
      */
     formResetCallback() {
-        let $optionSelected = null;
-        for (const $opt of this.getOptions()) {
-            if ($opt.style.display !== 'none' && !$opt.disabled) {
-                $optionSelected = $opt;
-                break;
-            }
-        }
-
-        if ($optionSelected == null) {
-            this.$button.innerHTML = '';
-            this.internals.setFormValue(null);
-            return;
-        }
-
-        this._select($optionSelected);
+        this._select([]);
     }
 
     /**
@@ -280,24 +336,15 @@ export class HeliumSelect extends HTMLElement {
      * @returns {Self}
      */
     hideOptions(values=null) {
-        let $sel = null;
         for (let $el of this.getOptions()) {
             if (values == null || values.includes($el.value)) {
                 $el.style.display = 'none';
             } else {
                 $el.style.display = '';
-                if ($sel == null) {
-                    $sel = $el;
-                }
             }
         }
 
-        if ($sel == null) {
-            this.$button.innerHTML = '';
-            this.internals.setFormValue(null);
-        } else {
-            this._select($sel);
-        }
+        this._select(this.selections);
         return this;
     }
 
@@ -312,9 +359,13 @@ export class HeliumSelect extends HTMLElement {
      * Selects the next option.
      */
     _moveOption(visualOnly, dir) {
+        if (!visualOnly && this.getAttribute('multiple')) {
+            return;
+        }
+
         let $elem = visualOnly 
             ? this.$highlight
-            : this.$selection;
+            : this.selections[0];
 
         let options = this.getOptions();
         if (options.length === 0) {
@@ -325,7 +376,7 @@ export class HeliumSelect extends HTMLElement {
             if (visualOnly) {
                 this._highlight(options[0]);
             } else {
-                this._select(options[0]);
+                this._select([options[0]]);
             }
             return;
         }
@@ -358,7 +409,7 @@ export class HeliumSelect extends HTMLElement {
             this._highlight($next);
             return;
         }
-        this._select($next);
+        this._select([$next]);
     }
 
     prevOption(visualOnly=false) {
@@ -380,34 +431,17 @@ export class HeliumSelect extends HTMLElement {
         }
 
         displayMapping = displayMapping ?? {};
-        const valOld = this.value;
-        let $optSelect = null;
 
         for (const val of newOptions) {
-            let $opt = document.createElement('option');
-            $opt.value = val;
-            $opt.innerHTML = displayMapping[val] ?? val;
-
-            if (this.hasAttribute('slotted')) {
-                $opt.slot = 'option';
-                //$opt.onclick = (e) => this._handleClickOption.bind(this)(e);
-                this.append($opt);
-            } else {
-                this.$options.append($opt);
-                $opt.onclick = (e) => this._handleClickOption.bind(this)(e);
-            }
-
-            if (valOld === val) {
-                $optSelect = $opt;
-            }
+            this.addOption(displayMapping[val] ?? val, val);
         }
 
-        if ($optSelect != null) {
-            this._select($optSelect);
-        } else {
-            this.select(0);
-        }
+        this._select(this.selections);
         return this;
+    }
+
+    reset() {
+        this.formResetCallback();
     }
 
     /**
@@ -416,21 +450,13 @@ export class HeliumSelect extends HTMLElement {
      * @returns {Self}
      */
     showOptions(values=null) {
-        let $sel = null;
         for (let $el of this.getOptions()) {
             if (values == null || values.includes($el.value)) {
                 $el.style.display = '';
-                if ($sel == null) {
-                    $sel = $el;
-                }
             }
         }
 
-        $sel = this.$selection ?? $sel;
-
-        if ($sel != null) {
-            this._select($sel);
-        }
+        this._select(this.selections);
         return this;
     }
 
@@ -445,7 +471,7 @@ export class HeliumSelect extends HTMLElement {
         }
         const option = options[optionIndex];
         console.assert(option != null, `No option with the given index ${optionIndex}!`);
-        this._select(option);
+        this._select([option]);
     }
 
     /**
@@ -467,14 +493,12 @@ export class HeliumSelect extends HTMLElement {
         this._filterTimeout = setTimeout(() => {
             let filterVal = this.$filter.value;
             if (filterVal) {
-                filterVal.toLowerCase();
             }
 
             let $firstVisible = null;
             let options = this.getOptions();
             for (const $option of options) {
-                let val = $option.value ?? $option.getAttribute('value');
-                if (filterVal.length === 0 || (val !== '' && $option.innerText.toLowerCase().includes(filterVal))) {
+                if (this.onfilter(filterVal, $option)) {
                     if ($firstVisible == null) {
                         $firstVisible = $option;
                     }
@@ -488,13 +512,44 @@ export class HeliumSelect extends HTMLElement {
     }
 
     /**
+     * @param {string} filterVal
+     * @param {HtmlElement} $option
+     * @returns {boolean} `true` if the options should be visible
+     */
+    _onfilterDefault(filterVal, $option) {
+        filterVal.toLowerCase();
+        let val = $option.value ?? $option.getAttribute('value');
+        return filterVal.length === 0 || (val !== '' && $option.innerText.toLowerCase().includes(filterVal))
+    }
+
+    /**
      * This callback is called when an option is clicked.
      * @returns {void}
      */
     _handleClickOption(e) {
-        this.open = false;
         const $target = e.currentTarget;
-        this._select($target);
+
+        if (this.hasAttribute('multiple')) {
+            let newSelections = [];
+            let isSelected = false;
+            for (let $sel of this.selections) {
+                if ($sel.isSameNode($target)) {
+                    isSelected = true;
+                    continue;
+                }
+                newSelections.push($sel);
+            }
+
+            if (!isSelected) {
+                newSelections.push($target);
+            }
+
+            this._select(newSelections);
+
+        } else {
+            this.open = false;
+            this._select([$target]);
+        }
 
         this.dispatchEvent(new CustomEvent('change'));
     }
@@ -516,8 +571,26 @@ export class HeliumSelect extends HTMLElement {
             case 'Enter':
                 if (this.open) {
                     e.preventDefault();
-                    this._select(this.$highlight);
-                    this._hidePopover();
+                    let $option = this.$highlight;
+
+                    let filterVal = this.$filter.value;
+                    if (this.hasAttribute('create-new') && filterVal !== '' && this.$highlight.innerHTML !== filterVal) {
+                        $option = this.addOption(filterVal, '#@+' + filterVal, ($el, $new) => $new.innerText.localeCompare($el.innerText) < 0);
+                    }
+
+                    if (this.hasAttribute('multiple')) {
+                        if ($option.hasAttribute('selected')) {
+                            this.selections = this.selections.filter($x => !$x.isSameNode($option));
+                            $option.removeAttribute('selected');
+                        } else {
+                            this.selections.push($option);
+                        }
+
+                        this._select(this.selections);
+                    } else {
+                        this._hidePopover();
+                        this._select([$option]);
+                    }
                     this.dispatchEvent(new CustomEvent('change'));
                 } else {
                     this.open = true;
@@ -532,22 +605,11 @@ export class HeliumSelect extends HTMLElement {
     }
 
     _handleSlotchange() {
-        let $first = null;
-        let isSelectionPresent = false;
         for (let $opt of this.$options.children[0].assignedNodes()) {
             $opt.onclick = (e) => this._handleClickOption.bind(this)(e);
-            if ($first == null) {
-                $first = $opt;
-            }
-
-            if ($opt.isSameNode(this.$selection)) {
-                isSelectionPresent = true;
-            }
         }
 
-        if (!isSelectionPresent) {
-            this._select($first);
-        }
+        this._select(this.selections);
     }
 
     /**
@@ -564,6 +626,9 @@ export class HeliumSelect extends HTMLElement {
         document.removeEventListener('click', this._handleClickDocument);
     }
     
+    /**
+     * @param {?HTMLElement} $option
+     */
     _highlight($option) {
         if (this.$highlight) {
             this.$highlight.removeAttribute('highlighted');
@@ -599,46 +664,84 @@ export class HeliumSelect extends HTMLElement {
         this.$popover.style.visibility = 'hidden';
         this.$popover.showPopover();
         let width = this.$options.getBoundingClientRect().width;
-        console.log(width);
         let btnWidth = this.$contButton.getBoundingClientRect().width;
         if (btnWidth > width) {
             this.$options.style.width = btnWidth + 'px';
         }
         this.$popover.style.visibility = '';
-        this._highlight(this.$selection);
+        this._highlight(this.selections[0]);
         this.$filter.focus();
+    }
+
+    /**
+     * @param {Array<HtmlElement>} options
+     */
+    _setButtonText(options) {
+        if (this.hasAttribute('slotted')) {
+            this.querySelectorAll('[slot="button"]')
+                .forEach($el => $el.remove());
+
+            for (const $option of options) {
+                let $opt = $option.cloneNode();
+                $opt.innerHTML = $option.innerHTML;
+                $opt.slot = 'button';
+                this.append($opt);
+            }
+        } else {
+            let html = options.length > 0 
+                ? options
+                    .reduce((xs, $x) => `${xs}<span>${$x.innerHTML}</span>`, '')
+                : '<span class="placeholder">' + this.getAttribute('placeholder') ?? '' + '</span>';
+            this.$button.innerHTML = html;
+        }
     }
 
     /** 
      * Selects a specific options given the option HTML element.
-     * @param {?HTMLOptionElement} $option
-     * @param {boolean} visalOnly If `true`, changes the selection only visually
+     * @param {Array<HTMLElement>} options
      * @returns {void}
      */
-    _select($option) {
-        if (this.$selection) {
-            this.$selection.removeAttribute('selected');
+    _select(options) {
+        let optionsValid = [];
+        // TODO(marco): It should be possible to make the search a bit more efficent.
+        for (let $optExisting of this.getOptions()) {
+            for (let $optNew of options) {
+                if ($optExisting.isSameNode($optNew) 
+                    && $optNew.style.display !== 'none' 
+                    && !$optNew.hasAttribute('disabled')
+                ) {
+                    optionsValid.push($optNew);
+                    break;
+                }
+            }
         }
-        if ($option == null) {
-            this.$selection = null;
+        this.selections.forEach($el => $el.removeAttribute('selected'));
+
+        if (optionsValid.length === 0) {
+            if (this.hasAttribute('multiple')) {
+                // In `multiple` mode, it should be allowed to select nothing
+                this.selections = [];
+                this._setButtonText([]);
+                return;
+            }
+            for (let $opt of this.getOptions()) {
+                if ($opt.style.display !== 'none' && !$opt.hasAttribute('disabled')) {
+                    return this._select([$opt]);
+                }
+            }
+            
+            this.selections = [];
             this.internals.setFormValue(null);
             this.$filter.value = '';
             return;
         }
-        if (this.hasAttribute('slotted')) {
-            let $opt = $option.cloneNode();
-            $opt.innerHTML = $option.innerHTML;
-            $opt.slot = 'button';
-            let $elemOld = this.querySelector('[slot="button"]');
-            if ($elemOld) {
-                $elemOld.remove();
-            }
-            this.append($opt);
-        } else {
-            this.$button.innerHTML = $option.innerHTML;
-        }
-        this.$selection = $option;
-        this.$selection.setAttribute('selected', '');
+
+        this._setButtonText(optionsValid);
+
+        this.selections = optionsValid;
+        this.selections.forEach($el => {
+            $el.setAttribute('selected', '');
+        });
 
         if (!this.disabled) {
             this.internals.setFormValue(this.value);
