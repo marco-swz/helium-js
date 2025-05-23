@@ -302,9 +302,12 @@ export class HeliumSelect extends HTMLElement {
             }
         }
 
-        if (this.selections.size === 0) {
+        if (this.selections.size === 0 && !this.hasAttribute('multiple')) {
             this.select(0);
+        } else {
+            this._setButtonText(this.selections);
         }
+
 
         if (this.hasAttribute('open')) {
             this.open = true;
@@ -422,7 +425,9 @@ export class HeliumSelect extends HTMLElement {
             this.addOption(displayMapping[val] ?? val, val);
         }
 
-        this.select(0);
+        if (!this.hasAttribute('multiple')) {
+            this.select(0);
+        }
         return this;
     }
 
@@ -652,7 +657,7 @@ export class HeliumSelect extends HTMLElement {
             }
         }
 
-        if (this.selections.size === 0) {
+        if (this.selections.size === 0 && !this.hasAttribute('multiple')) {
             this.select(0);
         }
     }
