@@ -296,9 +296,17 @@ export class HeliumSelect extends HTMLElement {
             $slot.name = 'button';
             this.$button.append($slot);
         } else {
+            let isEmpty = true;
             for (let $opt of this.querySelectorAll('option')) {
                 $opt.onclick = (e) => this._handleClickOption.bind(this)(e);
                 this.$options.append($opt);
+                isEmpty = false;
+            }
+
+            if (isEmpty) {
+                this.setAttribute('empty', '');
+            } else {
+                this.removeAttribute('empty');
             }
         }
 
@@ -427,6 +435,12 @@ export class HeliumSelect extends HTMLElement {
 
         if (!this.hasAttribute('multiple')) {
             this.select(0);
+        }
+
+        if (Object.size(newOptions) === 0) {
+            this.setAttribute('empty', '');
+        } else {
+            this.removeAttribute('empty');
         }
         return this;
     }
@@ -649,9 +663,17 @@ export class HeliumSelect extends HTMLElement {
 
     _handleSlotchange() {
         let selectionsToDel = new Set(this.selections);
+        let isEmpty = true;
         for (let $opt of this.$options.children[0].assignedNodes()) {
             selectionsToDel.delete($opt);
             $opt.onclick = (e) => this._handleClickOption.bind(this)(e);
+            isEmpty = false;
+        }
+
+        if (isEmpty) {
+            this.setAttribute('empty', '');
+        } else {
+            this.removeAttribute('empty');
         }
 
         if (selectionsToDel.size > 0) {

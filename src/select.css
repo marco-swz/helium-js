@@ -48,6 +48,11 @@
     }
 }
 
+:host([empty]) {
+    cursor: default;
+    pointer-events: none;
+}
+
 #cont-button {
     height: inherit;
     width: inherit;
