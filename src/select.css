@@ -9,7 +9,7 @@
     --he-select-popover-borderRadius: 4px;
     --he-select-popover-maxHeight: 300px;
     --he-select-popover-maxWidth: 300px;
-    --he-select-popover-width: fit-content;
+    /*--he-select-popover-width: fit-content;*/
     --he-select-popover-backgroundColor: white;
     --he-select-option-hover-backgroundColor: whitesmoke;
     --he-select-option-selected-backgroundColor: whitesmoke;
@@ -194,12 +194,11 @@ slot[name=button] {
 }
 
 :host([multiple]) {
-    --he-select-padding: 3px 15px;
-
     & #cont-button {
         & #inp {
             display: flex;
             gap: 3px;
+
             & span:not(.placeholder) {
                 display: inline-table;
                 align-items: center;

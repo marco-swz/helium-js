@@ -465,6 +465,7 @@ export class HeliumSelect extends HTMLElement {
         }
 
         this._addSelection($option);
+        this.dispatchEvent(new CustomEvent('change'));
     }
 
     /**
@@ -537,6 +538,11 @@ export class HeliumSelect extends HTMLElement {
     }
 
     _clearSelections(updateButtonText=true, updateFormValue=true) {
+        if (!this.hasAttribute('multiple')) {
+            this.select(0);
+            return;
+        }
+
         if (this.selections.size === 0) {
             return;
         }
@@ -768,15 +774,17 @@ export class HeliumSelect extends HTMLElement {
         this.$popover.setAttribute('position', this.getAttribute('position') ?? positionDefault);
         this.$filter.value = '';
         this.showOptions();
+
+        let btnWidth = this.$contButton.getBoundingClientRect().width;
+        this.$options.style.width = `var(--he-select-popover-width, ${btnWidth}px)`;
+
         this.$popover.style.visibility = 'hidden';
         this.$popover.showPopover();
-        let width = this.$options.getBoundingClientRect().width;
-        let btnWidth = this.$contButton.getBoundingClientRect().width;
-        if (btnWidth > width) {
-            this.$options.style.width = btnWidth + 'px';
-        }
         this.$popover.style.visibility = '';
-        this.$filter.focus();
+
+        setTimeout(() => {
+            this.$filter.focus();
+        }, 20);
     }
 
     /**
@@ -794,10 +802,13 @@ export class HeliumSelect extends HTMLElement {
                 this.append($opt);
             }
         } else {
-            let html = options.size > 0
-                ? options.values()
-                    .reduce((xs, $x) => `${xs}<span>${$x.innerHTML}</span>`, '')
-                : '<span class="placeholder">' + this.getAttribute('placeholder') ?? '' + '</span>';
+            let html = options.values()
+                .reduce((xs, $x) => `${xs}<span>${$x.innerHTML}</span>`, '');
+
+            let placeholder = this.getAttribute('placeholder');
+            if (html === '' && placeholder != null) {
+                html = '<span class="placeholder">' + placeholder + '</span>';
+            }
             this.$button.innerHTML = html;
         }
     }
