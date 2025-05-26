@@ -437,7 +437,8 @@ export class HeliumSelect extends HTMLElement {
             this.select(0);
         }
 
-        if (Object.size(newOptions) === 0) {
+        console.log(newOptions);
+        if (newOptions.length === 0) {
             this.setAttribute('empty', '');
         } else {
             this.removeAttribute('empty');
@@ -471,6 +472,8 @@ export class HeliumSelect extends HTMLElement {
     select(optionIndex) {
         let options = this.getOptions();
         if (options.length === 0 && optionIndex === 0) {
+            this._setButtonText(new Set());
+            this._updateFormValue();
             return;
         }
         const $option = options[optionIndex];

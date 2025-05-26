@@ -82,6 +82,10 @@ thead th {
                 width: fit-content;
                 text-align: left;
                 width: 100%;
+                display: inline-flex;
+                width: -moz-available;          /* WebKit-based browsers will ignore this. */
+                width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
+                width: fill-available;
 
                 &::after {
                     font-family: "Font Awesome 5 Pro";
