@@ -296,14 +296,12 @@ export class HeliumSelect extends HTMLElement {
             $slot.name = 'button';
             this.$button.append($slot);
         } else {
-            let isEmpty = true;
             for (let $opt of this.querySelectorAll('option')) {
                 $opt.onclick = (e) => this._handleClickOption.bind(this)(e);
                 this.$options.append($opt);
-                isEmpty = false;
             }
 
-            if (isEmpty) {
+            if (this.$options.children.length === 0) {
                 this.setAttribute('empty', '');
             } else {
                 this.removeAttribute('empty');
@@ -437,7 +435,6 @@ export class HeliumSelect extends HTMLElement {
             this.select(0);
         }
 
-        console.log(newOptions);
         if (newOptions.length === 0) {
             this.setAttribute('empty', '');
         } else {
@@ -736,46 +733,46 @@ export class HeliumSelect extends HTMLElement {
             return;
         }
 
-        let $elem = this.$highlight;
-        if ($elem == null) {
-            let $firstElem = dir > 0 ? options[0] : options[options.length - 1];
-            if (visualOnly) {
-                this._highlight($firstElem);
-            } else {
-                this._addSelection($firstElem);
-            }
-            return;
+        let i = 0;
+        if (this.$highlight != null) {
+            i = dir + Array.prototype.indexOf.call(
+                options,
+                this.$highlight
+            );
+        } else if (dir < 0) {
+            i = options.length-1;
         }
+        let $elem = options[i];
 
-        let i = Array.prototype.indexOf.call(
-            options,
-            $elem
-        );
-        let $next = $elem;
+        let firstSearch = true;
         while (options.length > 1) {
-            i += dir;
-            $next = options[i]
-
+            let $next = options[i]
             if ($next == null) {
                 i = dir > 0
-                    ? -1
-                    : options.length;
+                    ? 0
+                    : options.length-1;
                 continue;
             }
+            i += dir;
 
-            if ($elem.isSameNode($next)) {
+            if (firstSearch) {
+                firstSearch = false;
+            } else if ($elem.isSameNode($next)) {
                 return;
             }
 
-            if ($next.style.display !== 'none') {
-                break;
+            if ($next.style.display === 'none') {
+                continue;
             }
+
+            if (visualOnly) {
+                this._highlight($next);
+                
+            } else {
+                this._addSelection($next);
+            }
+            break;
         }
-        if (visualOnly) {
-            this._highlight($next);
-            return;
-        }
-        this._addSelection($next);
     }
 
     /**
