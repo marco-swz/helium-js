@@ -311,7 +311,6 @@ class HeliumSelect extends HTMLElement {
             this._setButtonText(this.selections);
         }
 
-
         if (this.hasAttribute('open')) {
             this.open = true;
         }
@@ -476,7 +475,6 @@ class HeliumSelect extends HTMLElement {
         }
 
         this._addSelection($option);
-        this.dispatchEvent(new CustomEvent('change'));
     }
 
     /**
