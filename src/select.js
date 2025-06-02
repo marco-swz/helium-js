@@ -173,7 +173,7 @@ export class HeliumSelect extends HTMLElement {
 
         this._clearSelections(false, false);
         for (const $opt of this.getOptions()) {
-            if (val.includes($opt.getAttribute('value'))) {
+            if (val.toString().includes($opt.getAttribute('value'))) {
                 this._addSelection($opt, false, false);
             }
         }
