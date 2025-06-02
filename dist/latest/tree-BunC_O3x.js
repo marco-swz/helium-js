@@ -1,4 +1,4 @@
-const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\n    display: block;\n    overflow: auto;\n    height: 100%;\n}\n\n.cont-children {\n    padding-left: 20px;\n    position: relative;\n    overflow: hidden;\n    display: block;\n\n    &::before {\n        content: '';\n        width: 0;\n        height: 100%;\n        position: absolute;\n        border: 1px solid lightgrey;\n        top: 0;\n        left: 11px;\n    }\n\n    &:hover {\n        &::before {\n            transition: border-color 0.2s;\n            border-color: grey;\n        }\n    }\n}\n\n.list-elem {\n    padding: 8px 10px;\n    display: inline-block;\n    width: 100%;\n    width: -moz-available;          /* WebKit-based browsers will ignore this. */\n    width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */\n    width: fill-available;\n    color: black;\n    text-decoration: none;\n    border-radius: 5px;\n    text-wrap: nowrap;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    \n    &:hover {\n        background-color: whitesmoke;\n    }\n}\n\n.cont-elem[selected] {\n    .list-elem {\n        background-color: whitesmoke;\n    }\n}\n\ndiv[type=\"root\"] {\n    font-weight: 500;\n    display: flex;\n    flex-direction: column;\n\n    & > .list-elem {\n        text-transform: uppercase;\n        cursor: pointer;\n        \n        &::before {\n            transition: transform 0.1s;\n            font-family: \"Font Awesome 5 Pro\";\n            content: \"\\f105\";\n            color: grey;\n            padding-right: 5px;\n            display: inline-block;\n            transform: rotate(90deg) translate(3px, 3px);\n        }\n    }\n}\n\ndiv[type=\"leaf\"] {\n    font-weight: 400;\n    display: flex;\n}\n\ndiv[closed] {\n    & > .cont-children {\n        display: none;\n    }\n\n    & > .list-elem::before {\n        transition: transform 0.1s;\n        transform: rotate(0deg) translate(0, 0);\n    }\n}\n");
+const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\n    display: block;\n    overflow: auto;\n    height: 100%;\n}\n\n.cont-children {\n    padding-left: 20px;\n    position: relative;\n    overflow: hidden;\n    display: block;\n\n    &::before {\n        content: '';\n        width: 0;\n        height: 100%;\n        position: absolute;\n        border: 1px solid lightgrey;\n        top: 0;\n        left: 11px;\n    }\n\n    &:hover {\n        &::before {\n            transition: border-color 0.2s;\n            border-color: grey;\n        }\n    }\n}\n\n.list-elem {\n    padding: 8px 10px;\n    display: inline-block;\n    width: 100%;\n    width: -moz-available;          /* WebKit-based browsers will ignore this. */\n    width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */\n    width: fill-available;\n    color: black;\n    text-decoration: none;\n    border-radius: 5px;\n    text-wrap: nowrap;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    \n    &:hover {\n        background-color: whitesmoke;\n    }\n}\n\n.cont-elem[selected] {\n    .list-elem {\n        background-color: whitesmoke;\n    }\n}\n\ndiv[type=\"root\"] {\n    font-weight: 500;\n    display: flex;\n    flex-direction: column;\n\n    & > .list-elem {\n        text-transform: uppercase;\n        cursor: pointer;\n        \n        &::before {\n            transition: transform 0.1s;\n            font-family: \"Font Awesome 5 Pro\";\n            content: \"\\f105\";\n            color: grey;\n            padding-right: 5px;\n            display: inline-block;\n            transform: rotate(90deg) translate(3px, 3px);\n        }\n    }\n}\n\ndiv[type=\"leaf\"] {\n    font-weight: 400;\n    display: flex;\n    flex-direction: column;\n}\n\ndiv[closed] {\n    & > .cont-children {\n        display: none;\n    }\n\n    & > .list-elem::before {\n        transition: transform 0.1s;\n        transform: rotate(0deg) translate(0, 0);\n    }\n}\n");
 
 class HeliumTree extends HTMLElement {
     static observedAttributes = [
@@ -50,7 +50,9 @@ class HeliumTree extends HTMLElement {
                 $contChildren.classList.add('cont-children');
                 $contChildren.append($elem);
                 $parent.append($contChildren);
-                $parent.children[0].addEventListener('click', () => this._clickRootCallback.bind(this)($parent));
+                if (!this.hasAttribute('no-autofold')) {
+                    $parent.children[0].addEventListener('click', () => this._clickRootCallback.bind(this)($parent));
+                }
             } else {
                 $parent.children[1].append($elem);
             }
@@ -95,6 +97,9 @@ class HeliumTree extends HTMLElement {
         if (ids == null) {
             for (let $el of this.$contItems.querySelectorAll('[type=root]')) {
                 $el.setAttribute('closed', 'true');
+                if ($el.hasAttribute('slotted') || this.hasAttribute('slotted')) {
+                    $el.children[0].assignedElements()[0].setAttribute('closed', 'true');
+                }
             }
             return;
         }
@@ -106,6 +111,9 @@ class HeliumTree extends HTMLElement {
             }
 
             $el.setAttribute('closed', 'true');
+            if ($el.hasAttribute('slotted') || this.hasAttribute('slotted')) {
+                $el.children[0].assignedElements()[0].setAttribute('closed', 'true');
+            }
         }
     }
 
@@ -117,6 +125,9 @@ class HeliumTree extends HTMLElement {
         if (ids == null) {
             for (let $el of this.$contItems.querySelectorAll('[type=root]')) {
                 $el.removeAttribute('closed');
+                if ($el.hasAttribute('slotted') || this.hasAttribute('slotted')) {
+                    $el.children[0].assignedElements()[0].removeAttribute('closed');
+                }
             }
             return;
         }
@@ -127,6 +138,9 @@ class HeliumTree extends HTMLElement {
                 throw new Error('No tree node with ID ' + id);
             }
 
+            if ($el.hasAttribute('slotted') || this.hasAttribute('slotted')) {
+                $el.children[0].assignedElements()[0].removeAttribute('closed');
+            }
             $el.removeAttribute('closed');
         }
     }
@@ -219,7 +233,7 @@ class HeliumTree extends HTMLElement {
         $elem.id = '';
         $elem.classList.add('list-elem');
         $cont.setAttribute('type', 'leaf');
-        const useSlot = $elem.hasAttribute('slotted');
+        const useSlot = $elem.hasAttribute('slotted') || this.hasAttribute('slotted');
         if (useSlot) {
             let $slot = document.createElement('slot');
             $slot.name = $cont.id;
@@ -229,7 +243,6 @@ class HeliumTree extends HTMLElement {
         }
         return $cont;
     }
-
 }
 if (!customElements.get('he-tree')) {
     customElements.define("he-tree", HeliumTree);

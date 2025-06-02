@@ -54,7 +54,9 @@ export class HeliumTree extends HTMLElement {
                 $contChildren.classList.add('cont-children');
                 $contChildren.append($elem);
                 $parent.append($contChildren);
-                $parent.children[0].addEventListener('click', () => this._clickRootCallback.bind(this)($parent));
+                if (!this.hasAttribute('no-autofold')) {
+                    $parent.children[0].addEventListener('click', () => this._clickRootCallback.bind(this)($parent));
+                }
             } else {
                 $parent.children[1].append($elem);
             }
@@ -99,6 +101,9 @@ export class HeliumTree extends HTMLElement {
         if (ids == null) {
             for (let $el of this.$contItems.querySelectorAll('[type=root]')) {
                 $el.setAttribute('closed', 'true');
+                if ($el.hasAttribute('slotted') || this.hasAttribute('slotted')) {
+                    $el.children[0].assignedElements()[0].setAttribute('closed', 'true');
+                }
             }
             return;
         }
@@ -110,6 +115,9 @@ export class HeliumTree extends HTMLElement {
             }
 
             $el.setAttribute('closed', 'true');
+            if ($el.hasAttribute('slotted') || this.hasAttribute('slotted')) {
+                $el.children[0].assignedElements()[0].setAttribute('closed', 'true');
+            }
         }
     }
 
@@ -121,6 +129,9 @@ export class HeliumTree extends HTMLElement {
         if (ids == null) {
             for (let $el of this.$contItems.querySelectorAll('[type=root]')) {
                 $el.removeAttribute('closed');
+                if ($el.hasAttribute('slotted') || this.hasAttribute('slotted')) {
+                    $el.children[0].assignedElements()[0].removeAttribute('closed');
+                }
             }
             return;
         }
@@ -131,6 +142,9 @@ export class HeliumTree extends HTMLElement {
                 throw new Error('No tree node with ID ' + id);
             }
 
+            if ($el.hasAttribute('slotted') || this.hasAttribute('slotted')) {
+                $el.children[0].assignedElements()[0].removeAttribute('closed');
+            }
             $el.removeAttribute('closed');
         }
     }
@@ -223,7 +237,7 @@ export class HeliumTree extends HTMLElement {
         $elem.id = '';
         $elem.classList.add('list-elem');
         $cont.setAttribute('type', 'leaf');
-        const useSlot = $elem.hasAttribute('slotted');
+        const useSlot = $elem.hasAttribute('slotted') || this.hasAttribute('slotted');
         if (useSlot) {
             let $slot = document.createElement('slot');
             $slot.name = $cont.id;
@@ -233,7 +247,6 @@ export class HeliumTree extends HTMLElement {
         }
         return $cont;
     }
-
 }
 if (!customElements.get('he-tree')) {
     customElements.define("he-tree", HeliumTree);
