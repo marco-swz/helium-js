@@ -4,8 +4,10 @@
      --he-tabs-hover-backgroundColor: lightgrey;
      --he-tabs-unselected-backgroundColor: whitesmoke;
      --he-tabs-unselected-color: gray;
+     --he-tabs-height: fit-content;
 
      display: block;
+     height: var(--he-tabs-height);
  }
 
  :host([variant=pebble]) {
@@ -52,6 +54,10 @@
         background-color: white;
         color: black;
     }
+ }
+
+#he-tabs-content {
+     height: var(--he-tabs-height);
  }
 
 #he-tabs-nav {
