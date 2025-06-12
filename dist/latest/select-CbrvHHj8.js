@@ -274,6 +274,11 @@ class HeliumSelect extends HTMLElement {
      * This callback function is triggered once the `he-select` is attached to the document.
      */
     connectedCallback() {
+        // This guards against double connections of the same element.
+        if (this.$options.children.length > 0) {
+            return;
+        }
+
         switch (this.getAttribute('filter')) {
             case 'inline':
                 this.$contButton.append(this.$filter);
