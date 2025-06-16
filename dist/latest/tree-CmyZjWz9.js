@@ -39,23 +39,12 @@ class HeliumTree extends HTMLElement {
                 continue;
             }
 
-            const $parent = this.$contItems.querySelector('#' + selParent);
+            const $parent = this.$contItems.querySelector(`[node-id="${selParent}"]`);
             if ($parent == null) {
-                throw new Error('No parent found with selector #' + selParent);
+                throw new Error('No parent found with id: ' + selParent);
             }
 
-            if ($parent.getAttribute('type') !== 'root') {
-                $parent.setAttribute('type', 'root');
-                let $contChildren = document.createElement('div');
-                $contChildren.classList.add('cont-children');
-                $contChildren.append($elem);
-                $parent.append($contChildren);
-                if (!this.hasAttribute('no-autofold')) {
-                    $parent.children[0].addEventListener('click', () => this._clickRootCallback.bind(this)($parent));
-                }
-            } else {
-                $parent.children[1].append($elem);
-            }
+            this._setParent($elem, $parent);
         }
     }
 
@@ -105,7 +94,7 @@ class HeliumTree extends HTMLElement {
         }
 
         for (let id of ids) {
-            let $el = this.$contItems.querySelector('#' + id);
+            let $el = this.$contItems.querySelector(`[node-id="${id}"]`);
             if ($el == null) {
                 throw new Error('No tree node with ID ' + id);
             }
@@ -133,7 +122,7 @@ class HeliumTree extends HTMLElement {
         }
 
         for (let id of ids) {
-            let $el = this.$contItems.querySelector('#' + id);
+            let $el = this.$contItems.querySelector(`[node-id="${id}"]`);
             if ($el == null) {
                 throw new Error('No tree node with ID ' + id);
             }
@@ -143,6 +132,22 @@ class HeliumTree extends HTMLElement {
             }
             $el.removeAttribute('closed');
         }
+    }
+
+    setParent(nodeId, parentId) {
+        let elems = this.$contItems.querySelectorAll(`[node-id="${nodeId}"]`);
+
+        if (parentId == null) {
+            elems.forEach($el => this.$contItems.append($el));
+            return;
+        }
+
+        let parents = this.$contItems.querySelectorAll(`[node-id="${parentId}"]`);
+        parents.forEach($par => {
+            elems.forEach($el => {
+                this._setParent($el, $par);
+            });
+        });
     }
 
     _filterRecursive($item, filterText, showParent) {
@@ -202,10 +207,6 @@ class HeliumTree extends HTMLElement {
         $elem.setAttribute('closed', 'true');
     }
 
-    _showChildren($elem) {
-        $elem.removeAttribute('closed');
-    }
-
     /**
      * @param {HTMLElement} $elem 
      * @param {boolean} useSlot
@@ -227,23 +228,43 @@ class HeliumTree extends HTMLElement {
         if ($elem.getAttribute('closed') != null) {
             $cont.setAttribute('closed', true);
         }
-        $cont.id = $elem.id;
-        $elem.slot = $elem.id;
+        let nodeId = $elem.id;
+        $cont.setAttribute('node-id', nodeId);
+        $elem.slot = nodeId;
         $cont.classList.add('cont-elem');
-        $elem.id = '';
         $elem.classList.add('list-elem');
         $cont.setAttribute('type', 'leaf');
         const useSlot = $elem.hasAttribute('slotted') || this.hasAttribute('slotted');
         if (useSlot) {
             let $slot = document.createElement('slot');
-            $slot.name = $cont.id;
+            $slot.name = nodeId;
             $cont.append($slot);
         } else {
             $cont.append($elem);
         }
         return $cont;
     }
+
+    _setParent($elem, $parent) {
+        if ($parent.getAttribute('type') !== 'root') {
+            $parent.setAttribute('type', 'root');
+            let $contChildren = document.createElement('div');
+            $contChildren.classList.add('cont-children');
+            $contChildren.append($elem);
+            $parent.append($contChildren);
+            if (!this.hasAttribute('no-autofold')) {
+                $parent.children[0].addEventListener('click', () => this._clickRootCallback.bind(this)($parent));
+            }
+        } else {
+            $parent.children[1].append($elem);
+        }
+    }
+
+    _showChildren($elem) {
+        $elem.removeAttribute('closed');
+    }
 }
+
 if (!customElements.get('he-tree')) {
     customElements.define("he-tree", HeliumTree);
 }
