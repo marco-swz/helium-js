@@ -301,6 +301,9 @@ class HeliumSelect extends HTMLElement {
             for (let $opt of this.querySelectorAll('option')) {
                 $opt.onclick = (e) => this._handleClickOption.bind(this)(e);
                 this.$options.append($opt);
+                if ($opt.hasAttribute('selected')) {
+                    this._addSelection($opt);
+                }
             }
 
             if (this.$options.children.length === 0) {
