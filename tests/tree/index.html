@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang=en>
+<head>
+    <meta charset=utf-8>
+    <script src="/dist/latest/tree.js" type="module"></script>
+</head>
+
+<body>
+    <he-tree id="tree-open-closed">
+        <div id="a1">A1</div>
+        <div parent="a1">A11</div>
+        <div id="b1" closed>B1</div>
+        <div parent="b1">B11</div>
+        <div id="b12" parent="b1" closed>B12</div>
+        <div id="b121" parent="b12">B121</div>
+    </he-tree>
+</body>
+
+</html>

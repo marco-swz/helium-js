@@ -29,6 +29,11 @@ export default {
             entryFileNames: '[name]-[hash].js',
         },
         {
+            dir: 'dist/latest',
+            format: 'module',
+            entryFileNames: '[name].js',
+        },
+        {
             dir: 'dist-min/latest',
             format: 'module',
             entryFileNames: '[name]-[hash].js',
