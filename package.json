@@ -2,12 +2,15 @@
   "name": "helium-js",
   "version": "0.7.0",
   "devDependencies": {
+    "@playwright/test": "1.47.0",
     "@rollup/plugin-terser": "^0.4.4",
+    "@types/node": "^24.0.10",
     "@wwa/rollup-plugin-terser": "^1.1.2",
     "jsdoc": "^4.0.3",
     "rollup-plugin-css-only": "^4.5.2",
     "rollup-plugin-delete": "^3.0.1",
     "rollup-plugin-import-css": "^3.5.2",
     "web-component-analyzer": "^2.0.0"
-  }
+  },
+  "scripts": {}
 }
