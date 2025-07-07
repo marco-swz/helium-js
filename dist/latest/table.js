@@ -454,7 +454,7 @@ class HeliumTable extends HTMLElement {
      */
     getColumnNames() {
         const cols = this._getColumns(true);
-        const colNames = [];
+        const colNames = {};
         for (const $col of cols) {
             const colName = $col.getAttribute('column');
             if (colName == null) {

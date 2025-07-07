@@ -1,10 +1,10 @@
-import './form_dialog-jKm2PTw2.js';
+import './form_dialog-BUKXg6MF.js';
 import './check-Gn89XVO0.js';
 import './popover-DFROOrPY.js';
-import './dialog-Ku98Q2gc.js';
+import './dialog-DM15uR4A.js';
 import './toggle-AURsSxPY.js';
 import './toast-CDI5DF2B.js';
-import './button-o1PjtLCn.js';
+import './button-DqBtoM-5.js';
 import './input-DGnZ_KPx.js';
 import './select-D8oxzmug.js';
 import './utils-SP1Llz9F.js';
@@ -454,7 +454,7 @@ class HeliumTable extends HTMLElement {
      */
     getColumnNames() {
         const cols = this._getColumns(true);
-        const colNames = [];
+        const colNames = {};
         for (const $col of cols) {
             const colName = $col.getAttribute('column');
             if (colName == null) {

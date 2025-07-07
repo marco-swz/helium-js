@@ -132,6 +132,10 @@ a {
     animation: inset-anim 0.15s 1 ease-in-out;
 }
 
+:host([loading]) {
+    pointer-events: none;
+}
+
 :host([loading]) #he-button {
     opacity: 0.5;
     cursor: var(--he-button-loading-cursor);
