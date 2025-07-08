@@ -12,9 +12,10 @@ test('rendering the empty table', async ({ page }) => {
 });
 
 test('rendering a table with data in html', async ({ page }) => {
-    await expect(page.getByRole('cell', { name: '0', exact: true })).toBeVisible();
-    await expect(page.getByRole('cell', { name: '02.12.2025 20:30:00', exact: true })).toBeVisible();
-    await expect(page.getByRole('cell', { name: '10', exact: true })).toBeVisible();
+    let loc = page.locator('#tbl-test-render');
+    await expect(loc.getByRole('cell', { name: '0', exact: true })).toBeVisible();
+    await expect(loc.getByRole('cell', { name: '02.12.2025 20:30:00', exact: true })).toBeVisible();
+    await expect(loc.getByRole('cell', { name: '10', exact: true })).toBeVisible();
 
     const data = await page.evaluate(() => {
         let $tbl = document.querySelector('#tbl-test-render');
@@ -125,3 +126,129 @@ test('manipulating table data with javascript', async ({ page }) => {
     expect(data.tableData.length).toEqual(1);
 });
 
+test('filtering and sorting the table', async ({ page }) => {
+    let loc = page.locator('#tbl-test-filter-sort');
+
+    let data = await page.evaluate(() => {
+        let $tbl = document.querySelector('#tbl-test-filter-sort');
+        $tbl.filterColumn('num', '20', false);
+        $tbl.sortColumn('id', 'desc');
+
+        let tableData = $tbl.getTableData();
+        return Promise.resolve({ 
+            tableData: tableData,
+        });
+    });
+
+    await expect(loc.getByRole('cell', {name: '0', exact: true})).toBeHidden();
+    await expect(loc.getByRole('cell', {name: '1', exact: true})).toBeVisible();
+    await expect(loc.getByRole('cell', {name: '2', exact: true})).toBeVisible();
+
+    expect(data.tableData[0]).toEqual(expect.objectContaining(
+        {date: "2025-12-02 20:30:00", id: "2", num: "20", txt: 'ab'}
+    ));
+    expect(data.tableData[1]).toEqual(expect.objectContaining(
+        {date: "2025-12-02 20:30:00", id: "1", num: "200", txt: 'cd'}
+    ));
+    expect(data.tableData[2]).toEqual(expect.objectContaining(
+        {date: "2025-10-01 10:30:00", id: "0", num: "10", txt: 'ef'}
+    ));
+
+    data = await page.evaluate(() => {
+        let $tbl = document.querySelector('#tbl-test-filter-sort');
+        $tbl.filterColumn('num', '', false);
+        $tbl.sortColumn('id', 'asc');
+
+        let tableData = $tbl.getTableData();
+        return Promise.resolve({ 
+            tableData: tableData,
+        });
+    });
+
+    await expect(loc.getByRole('cell', {name: '0', exact: true})).toBeVisible();
+    await expect(loc.getByRole('cell', {name: '1', exact: true})).toBeVisible();
+    await expect(loc.getByRole('cell', {name: '2', exact: true})).toBeVisible();
+
+    expect(data.tableData[0]).toEqual(expect.objectContaining(
+        {date: "2025-10-01 10:30:00", id: "0", num: "10", txt: 'ef'}
+    ));
+    expect(data.tableData[1]).toEqual(expect.objectContaining(
+        {date: "2025-12-02 20:30:00", id: "1", num: "200", txt: 'cd'}
+    ));
+    expect(data.tableData[2]).toEqual(expect.objectContaining(
+        {date: "2025-12-02 20:30:00", id: "2", num: "20", txt: 'ab'}
+    ));
+
+    data = await loc.evaluate(($tbl) => $tbl.filterColumn('num', '20'));
+
+    await expect(loc.getByRole('cell', {name: '0', exact: true})).toBeHidden();
+    await expect(loc.getByRole('cell', {name: '1', exact: true})).toBeHidden();
+    await expect(loc.getByRole('cell', {name: '2', exact: true})).toBeVisible();
+});
+
+test('interacting with a table with checkboxes', async ({ page }) => {
+    let loc = page.locator('#tbl-test-check');
+
+    await expect(loc.getByRole('cell', {name: '0', exact: true})).toBeVisible();
+    await expect(loc.getByRole('cell', {name: '1', exact: true})).toBeVisible();
+    await expect(loc.getByRole('cell', {name: '2', exact: true})).toBeVisible();
+    await expect(loc.getByRole('row', { name: '0 10', exact: true }).locator('.check-row')).toBeVisible();
+    await expect(loc.getByRole('row', { name: '2 20', exact: true }).locator('.check-row')).toBeVisible();
+
+    let data = await loc.evaluate(($tbl) => $tbl.getCheckedData());
+
+    await page.evaluate(() => {
+        document.querySelector('#tbl-test-check').addEventListener('input', (e) => document.querySelector('#tbl-test-check').__lastEvent = e);
+    });
+
+    expect(data.length).toEqual(0);
+
+    // Click on row
+    await loc.getByRole('row', { name: '2 20', exact: true }).click();
+    // Click on checkbox
+    await loc.getByRole('row', { name: '0 10', exact: true }).locator('.check-row').click();
+
+    data = await loc.evaluate(($tbl) => $tbl.getCheckedData());
+    // let evt = await page.evaluate(($tbl) => console.log($tbl.__lastEvent ?? null));
+
+    await expect(loc.getByRole('row', { name: '0 10', exact: true }).locator('.check-row')).toHaveAttribute('checked');
+    await expect(loc.getByRole('row', { name: '2 20', exact: true }).locator('.check-row')).toHaveAttribute('checked');
+    await expect(page.locator('#check-all')).toHaveAttribute('checked');
+    expect(data.length).toEqual(2);
+    expect(data[0]).toEqual(expect.objectContaining(
+        {id: "0", num: "10"}
+    ));
+    expect(data[1]).toEqual(expect.objectContaining(
+        {id: "2", num: "20"}
+    ));
+
+    await loc.getByRole('row', { name: '1 20', exact: true }).click();
+
+    data = await loc.evaluate(($tbl) => $tbl.getCheckedData());
+
+    expect(data.length).toEqual(1);
+    expect(data[0]).toEqual(expect.objectContaining(
+        {id: "1", num: "20"}
+    ));
+    await expect(loc.getByRole('row', { name: '0 10', exact: true }).locator('.check-row')).not.toHaveAttribute('checked');
+    await expect(loc.getByRole('row', { name: '1 20', exact: true }).locator('.check-row')).toHaveAttribute('checked');
+    await expect(page.locator('#check-all')).toHaveAttribute('checked');
+
+    await page.locator('#check-all').click();
+
+    data = await loc.evaluate(($tbl) => $tbl.getCheckedData());
+
+    expect(data.length).toEqual(0);
+    await expect(loc.getByRole('row', { name: '1 20', exact: true }).locator('.check-row')).not.toHaveAttribute('checked');
+    await expect(page.locator('#check-all')).not.toHaveAttribute('checked');
+
+    await page.locator('#check-all').click();
+
+    data = await loc.evaluate(($tbl) => $tbl.getCheckedData());
+
+    expect(data.length).toEqual(3);
+    await expect(loc.getByRole('row', { name: '0 10', exact: true }).locator('.check-row')).toHaveAttribute('checked');
+    await expect(loc.getByRole('row', { name: '1 20', exact: true }).locator('.check-row')).toHaveAttribute('checked');
+    await expect(loc.getByRole('row', { name: '2 20', exact: true }).locator('.check-row')).toHaveAttribute('checked');
+    await expect(page.locator('#check-all')).toHaveAttribute('checked');
+});

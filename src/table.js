@@ -183,7 +183,7 @@ import sheet from './table.css';
  * @attr {?string} default - [th] The default value for a column
  * @attr {'asc'|'desc'} sort - [th] The direction for sorting the table by the given column
  * @attr {Object.<string, string>} row-color - [th] If a cell of the column has the given value, the background color of the row is set to the provided value. The color has to be in HSL format and is passed to the CSS `hsl()` function.
- * @attr {on|off} strict-filter - [th] If set, the filter will only show rows, which match the exact filter value, no partial matches
+ * @attr {on|off} exact-filter - [th] If set, the filter will only show rows, which match the exact filter value, no partial matches
  * @attr {?string} row-color - [th] A mapping of value to color in JSON format
  *
  * @listens HeliumFormDialog#he-dialog-show - Shows the dialog
@@ -376,12 +376,12 @@ export class HeliumTable extends HTMLElement {
      * Filters a column based on the provided value.
      * @param {string} colName The name of the column to filter (NOT the display name)
      * @param {string} filterValue The filter value
-     * @param {boolean} [partial=false] Does not filter partial matches if set to `true`
+     * @param {boolean} [exact=true] Does not filter exact matches if set to `false`
      * @returns {Self}
      */
-    filterColumn(colName, filterValue, partial = false) {
+    filterColumn(colName, filterValue, exact=true) {
         let $col = this._columnFromName(colName);
-        this._filterColumn($col, filterValue, partial);
+        this._filterColumn($col, filterValue, exact);
         return this;
     }
 
@@ -873,13 +873,13 @@ export class HeliumTable extends HTMLElement {
         let hideMask = $row.getAttribute('mask') ?? 0;
 
         for (const $col of cols) {
-            const strict = $col.getAttribute('strict-filter') != null;
+            const exact = $col.getAttribute('exact-filter') != null;
             let filterValue = $col.getAttribute('filter') ?? '';
 
             const data = $row.children[$col.cellIndex].getAttribute('data');
 
             filterValue = filterValue.toLowerCase();
-            const isMatch = strict
+            const isMatch = exact
                 ? data === filterValue
                 : data.toLowerCase().includes(filterValue);
 
@@ -941,20 +941,21 @@ export class HeliumTable extends HTMLElement {
      * Filters a column based on the provided value.
      * @param {HTMLTableCellElement} $column The column element
      * @param {string} filterValue The filter value
-     * @param {?boolean} [partial=null] Does not filter partial matches if set to `true`
+     * @param {boolean} [exact=true] Does not filter exact matches if set to `false`
      * @returns {Self}
      */
-    _filterColumn($column, filterValue, partial=null) {
+    _filterColumn($column, filterValue, exact=true) {
         const colName = $column.getAttribute('column');
         let $filter = this.$form.querySelector(`.inp-filter[name="${colName}"]`);
         if ($filter != null) {
             $filter.value = filterValue;
         }
 
-        if (partial === false) {
-            $column.removeAttribute('strict-filter');
-        } else if (partial === true) {
-            $column.setAttribute('strict-filter', '');
+        let isExact = $column.getAttribute('exact-filter');
+        if (exact) {
+            $column.setAttribute('exact-filter', '');
+        } else {
+            $column.removeAttribute('exact-filter');
         }
 
         if (filterValue === '') {
@@ -969,6 +970,13 @@ export class HeliumTable extends HTMLElement {
         }
 
         this._applyFilters([$column]);
+
+        // Restore original exact attribute
+        if (isExact) {
+            $column.setAttribute('exact-filter', '');
+        } else {
+            $column.removeAttribute('exact-filter');
+        }
     }
 
     /**
@@ -1044,8 +1052,8 @@ export class HeliumTable extends HTMLElement {
         } else {
             for (const $check of checks) {
                 $check.checked = false;
-                this._updateExternElements([]);
             }
+            this._updateExternElements([]);
         }
     }
 
@@ -1852,7 +1860,6 @@ export class HeliumTable extends HTMLElement {
         })
         this.dispatchEvent(evt);
     }
-
 }
 
 if (!customElements.get('he-table')) {
