@@ -60,7 +60,7 @@ After that, the installation processs is done.
 
 To run a local webserver for development, use:
 ```sh
-npm run
+npm start
 ```
 
 Then connect to the webserver with your browser under the URL
