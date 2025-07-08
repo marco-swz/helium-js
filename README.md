@@ -1,4 +1,6 @@
-The Helium UI library provides a collection of Javascript UI components.
+# Helium UI Library
+
+This library provides a collection of Javascript UI components.
 The components are based on the Webcomponents technology found in modern browsers.
 
 # Repository Structure
@@ -76,6 +78,12 @@ Playwright also provides a graphical interface to work with tests:
 npx playwright test --ui
 ```
 
+# Development Guidelines
 
+This section lays out some basic ground rules for contributing to this project.
+This is necessary to ensure functionality and maintainability.
 
-
+1. Variable names should be camel case (e.g. `myVariableName`)
+1. Dollar signs `$` are put before variable names **only** if it contains a `HTMLElement` (e.g. `let $button = document.createElement('button')`)
+1. Callback functions are pre-fixed with `handle`, followed by the event name (e.g. `handleClickSubmit()` or `handleInputItemSearch()`)
+1. CSS variables use the following format: `--<element name>-<specifier>-<css attribute name in camel case>` (e.g. `--he-button-backgroundColor`, `--he-button-hover-backgroundColor`, `--he-dialog-title-fontSize`)
