@@ -1,10 +1,23 @@
+:host {
+    --he-backgroundColor-checked: #f38321;
+    --he-backgroundColor-unchecked: #cccccc;
+    --he-box-shadowColor: #a3ba9e;
+    --he-sliderColor: white;
+    --he-slider-translation: 26px;
+    --he-width: 60px;
+    --he-height: 34px;
+    --he-slider-width: 26px;
+    --he-slider-height: 26px;
+}
+
+
 /* The switch - the box around the slider */
 
 .switch {
     position: relative;
     display: inline-block;
-    width: 60px;
-    height: 34px;
+    width: var(--he-width);
+    height: var(--he-height);
 }
 
 
@@ -26,7 +39,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #ccc;
+    background-color: var(--he-backgroundColor-unchecked);
     -webkit-transition: .4s;
     transition: .4s;
 }
@@ -34,27 +47,27 @@
 .slider:before {
     position: absolute;
     content: "";
-    height: 26px;
-    width: 26px;
+    height: var(--he-slider-height);
+    width: var(--he-slider-width);
     left: 4px;
     bottom: 4px;
-    background-color: white;
+    background-color: var(--he-sliderColor);
     -webkit-transition: .4s;
     transition: .4s;
 }
 
 :host([checked]) .slider {
-    background-color: #2196F3;
+    background-color: var(--he-backgroundColor-checked);
 }
 
 :host(:focus) .slider {
-    box-shadow: 0 0 1px #2196F3;
+    box-shadow: 0 0 1px var(--he-box-shadowColor);
 }
 
 :host([checked]) .slider:before {
-    -webkit-transform: translateX(26px);
-    -ms-transform: translateX(26px);
-    transform: translateX(26px);
+    -webkit-transform: translateX(var(--he-slider-translation));
+    -ms-transform: translateX(var(--he-slider-translation));
+    transform: translateX(var(--he-slider-translation));
 }
 
 

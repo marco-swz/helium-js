@@ -25,3 +25,15 @@ test("Should toggle the switch on click", async({ page }) => {
     await element.click();
     await expect(element).toHaveAttribute("checked");
 });
+
+test("The internals should have checked when the switch is activated", async({ page }) => {
+
+    const element = page.locator("#switch-test-click");
+    await element.click();
+    await expect(element).toHaveAttribute("checked");
+
+    const hasChecked = await page.$eval("#switch-test-click", (el) => {
+        return el.$internals.states.has("checked");
+    });
+    expect(hasChecked).toBe(true);
+});
