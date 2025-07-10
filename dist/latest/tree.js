@@ -23,6 +23,29 @@ class HeliumTree extends HTMLElement {
      */
     attributeChangedCallback(name, _oldValue, newValue) {
     }
+    
+    /**
+     * 
+     * @param {HTMLElement} $elem
+     * @param {null|string|Array<string>} parentId
+     * @param {boolean} [asRootNode=false]
+     * @returns {void}
+     */
+    addNode($elem, parentId, asRootNode=false) {
+        $elem = this._renderLeaf($elem);
+        if (asRootNode) {
+            $elem = this._toRootNode($elem);
+        }
+
+        if (!Array.isArray(parentId)) {
+            parentId = [parentId];
+        }
+
+        for (const id of parentId) {
+            this.$contItems.querySelectorAll(`.cont-elem[node-id="${id}"]`)
+                .forEach($el => this._setParent($elem.cloneNode(true), $el));
+        }
+    }
 
     connectedCallback() {
         let items = [];
@@ -50,14 +73,15 @@ class HeliumTree extends HTMLElement {
 
     /**
      * @param {string} filterText
+     * @param {boolean} [includeRoots=false]
      * @returns {Self}
      */
-    filter(filterText) {
+    filter(filterText, includeRoots=false) {
         if (filterText != null) {
             filterText = filterText.toLowerCase();
         }
         for(const $elem of this.$contItems.children) {
-            this._filterRecursive($elem, filterText, false);
+            this._filterRecursive($elem, filterText, false, includeRoots);
         }
 
         return this;
@@ -68,7 +92,7 @@ class HeliumTree extends HTMLElement {
      */
     getOpen() {
         return Array.from(this.$contItems.querySelectorAll('[type=root]:not([closed])'))
-            .map($el => $el.id);
+            .map($el => $el.getAttribute('node-id'));
     }
 
     /**
@@ -76,64 +100,28 @@ class HeliumTree extends HTMLElement {
      */
     getClosed() {
         return Array.from(this.$contItems.querySelectorAll('[type=root][closed]'))
-            .map($el => $el.id);
+            .map($el => $el.getAttribute('node-id'));
     }
 
     /**
-     * @param {?Array.<string>} ids
+     * @param {null|string|Array<string>} selector
+     * @returns {Self}
      */
-    setClosed(ids=null) {
-        if (ids == null) {
-            for (let $el of this.$contItems.querySelectorAll('[type=root]')) {
-                $el.setAttribute('closed', 'true');
-                if ($el.hasAttribute('slotted') || this.hasAttribute('slotted')) {
-                    $el.children[0].assignedElements()[0].setAttribute('closed', 'true');
-                }
-            }
-            return;
-        }
-
-        for (let id of ids) {
-            let $el = this.$contItems.querySelector(`[node-id="${id}"]`);
-            if ($el == null) {
-                throw new Error('No tree node with ID ' + id);
-            }
-
-            $el.setAttribute('closed', 'true');
-            if ($el.hasAttribute('slotted') || this.hasAttribute('slotted')) {
-                $el.children[0].assignedElements()[0].setAttribute('closed', 'true');
-            }
-        }
+    setClosed(id=null) {
+        this.setClosed(id, true);
+        return this;
     }
 
 
     /**
-     * @param {?Array.<string>} ids
+     * @param {null|string|Array<string>} id
+     * @returns {Self}
      */
-    setOpen(ids) {
-        if (ids == null) {
-            for (let $el of this.$contItems.querySelectorAll('[type=root]')) {
-                $el.removeAttribute('closed');
-                if ($el.hasAttribute('slotted') || this.hasAttribute('slotted')) {
-                    $el.children[0].assignedElements()[0].removeAttribute('closed');
-                }
-            }
-            return;
-        }
-
-        for (let id of ids) {
-            let $el = this.$contItems.querySelector(`[node-id="${id}"]`);
-            if ($el == null) {
-                throw new Error('No tree node with ID ' + id);
-            }
-
-            if ($el.hasAttribute('slotted') || this.hasAttribute('slotted')) {
-                $el.children[0].assignedElements()[0].removeAttribute('closed');
-            }
-            $el.removeAttribute('closed');
-        }
+    setOpen(id=null) {
+        this._setClosed(id, false);
+        return this;
     }
-
+    
     setParent(nodeId, parentId) {
         let elems = this.$contItems.querySelectorAll(`[node-id="${nodeId}"]`);
 
@@ -150,24 +138,43 @@ class HeliumTree extends HTMLElement {
         });
     }
 
-    _filterRecursive($item, filterText, showParent) {
-        let showSelf = filterText == null;
+    /**
+     * Converts the selected leaf items to a root items
+     * @param {string|Array<string>} id
+     * @returns {Self}
+     */
+    toRootNode(id) {
+        let items = this._queryIds(id);
+        for (const $item of items) {
+            this._toRootNode($item);
+        }
 
-        let textContent = $item.getAttribute('filter-text');
+        return this;
+    }
+
+    _filterRecursive($item, filterText, showParent, includeRoots, exact) {
+        let showSelf = filterText == null;
+        const isRoot = $item.getAttribute('type') === 'root';
+
+        let itemText = $item.hasAttribute('filter-text')
+            ? $item.getAttribute('filter-text')
+            : $item.children[0].innerHTML;
+
+        itemText = itemText.toLowerCase();
+
         let isMatch = false;
-        if (textContent != null && textContent !== '') {
-            isMatch = textContent.toLowerCase().includes(filterText);
-        } else {
-            isMatch = $item.children[0].innerHTML.toLowerCase().includes(filterText);
+        if (!isRoot || (isRoot && includeRoots)) {
+            isMatch = exact 
+                ? itemText === filterText
+                : itemText.includes(filterText);
         }
         showSelf ||= isMatch;
-        let showChild = false;
 
-        const isRoot = $item.getAttribute('type') === 'root';
+        let showChild = false;
         if (isRoot) {
             let $contChildren = $item.children[1];
             for(const $elem of $contChildren.children) {
-                let ret = this._filterRecursive($elem, filterText, showSelf || showParent);
+                let ret = this._filterRecursive($elem, filterText, showSelf || showParent, includeRoots);
                 showChild = showChild || ret;
             }
         }
@@ -178,14 +185,14 @@ class HeliumTree extends HTMLElement {
 
         } else if (showSelf) {
             $item.style.display = '';
-            $item.setAttribute('closed', 'true');
+            $item.setAttribute('closed', '');
 
         } else if (showParent) {
             $item.style.display = '';
 
         } else {
             $item.style.display = 'none';
-            $item.setAttribute('closed', 'true');
+            $item.setAttribute('closed', '');
         }
 
         return showSelf || showChild;
@@ -228,7 +235,7 @@ class HeliumTree extends HTMLElement {
         if ($elem.getAttribute('closed') != null) {
             $cont.setAttribute('closed', true);
         }
-        let nodeId = $elem.id;
+        let nodeId = $elem.getAttribute('node-id') ?? $elem.id;
         $cont.setAttribute('node-id', nodeId);
         $elem.slot = nodeId;
         $cont.classList.add('cont-elem');
@@ -245,23 +252,78 @@ class HeliumTree extends HTMLElement {
         return $cont;
     }
 
-    _setParent($elem, $parent) {
-        if ($parent.getAttribute('type') !== 'root') {
-            $parent.setAttribute('type', 'root');
-            let $contChildren = document.createElement('div');
-            $contChildren.classList.add('cont-children');
-            $contChildren.append($elem);
-            $parent.append($contChildren);
-            if (!this.hasAttribute('no-autofold')) {
-                $parent.children[0].addEventListener('click', () => this._clickRootCallback.bind(this)($parent));
+    /**
+     * @param {?string} [selector=null]
+     * @param {boolean} [closed=true]
+     */
+    _setClosed(ids=null, closed=true) {
+        if (ids == null) {
+            for (let $el of this.$contItems.querySelectorAll('[type=root]')) {
+                if (closed) {
+                    $el.setAttribute('closed', '');
+                } else {
+                    $el.removeAttribute('closed');
+                }
             }
-        } else {
-            $parent.children[1].append($elem);
+            return;
         }
+
+        for (let $el of this._queryIds(ids)) {
+            if (closed) {
+                $el.setAttribute('closed', '');
+            } else {
+                $el.removeAttribute('closed');
+            }
+        }
+    };
+
+
+    /**
+     * 
+     * @param {HTMLDivElement} $elem
+     * @returns {HTMLDivElement}
+     */
+    _toRootNode($elem) {
+        if ($elem.getAttribute('type') === 'root') {
+            return $elem;
+        }
+
+        $elem.setAttribute('type', 'root');
+        let $contChildren = document.createElement('div');
+        $contChildren.classList.add('cont-children');
+        $elem.append($contChildren);
+
+        if (this.getAttribute('fold') === 'click') {
+            $elem.children[0].addEventListener('click', () => this._clickRootCallback.bind(this)($elem));
+        }
+
+        return $elem;
+    }
+
+    _setParent($elem, $parent) {
+        this._toRootNode($parent);
+        $parent.children[1].append($elem);
     }
 
     _showChildren($elem) {
         $elem.removeAttribute('closed');
+    }
+
+    /**
+     * 
+     * @param {Array<string>} ids
+     * @returns {Array<HTMLElement>}
+     */
+    _queryIds(ids) {
+        if (!Array.isArray(ids)) {
+            ids = [ids];
+        }
+
+        let elements = [];
+        for (let id of ids) {
+            this.$contItems.querySelectorAll(`.cont-elem[node-id="${id}"]`).forEach($el => elements.push($el));
+        }
+        return elements;
     }
 }
 

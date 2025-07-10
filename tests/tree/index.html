@@ -7,13 +7,44 @@
 </head>
 
 <body>
-    <he-tree id="tree-open-closed">
+    <he-tree id="tree-open-closed" fold="click">
         <div id="a1">A1</div>
         <div parent="a1">A11</div>
         <div id="b1" closed>B1</div>
         <div parent="b1">B11</div>
         <div id="b12" parent="b1" closed>B12</div>
         <div id="b121" parent="b12">B121</div>
+    </he-tree>
+    <he-tree id="tree-open-closed-node-id" fold="click">
+        <div node-id="a1">A1</div>
+        <div parent="a1">A11</div>
+        <div node-id="b1" closed>B1</div>
+        <div parent="b1" slotted>B11</div>
+        <div node-id="b12" parent="b1" closed>B12</div>
+        <div node-id="b121" parent="b12">B121</div>
+    </he-tree>
+    <he-tree id="tree-filter" fold="click">
+        <div node-id="a1">A1</div>
+        <div parent="a1">A11</div>
+        <div node-id="b1" closed>B1</div>
+        <div parent="b1">B11</div>
+        <div node-id="b12" parent="b1" closed>B12</div>
+        <div node-id="bx121" parent="b12">Bx121</div>
+    </he-tree>
+    <he-tree id="tree-filter-slotted" slotted fold="click">
+        <div node-id="a1" filter-text="A1">A1</div>
+        <div parent="a1" filter-text="A11">A11</div>
+        <div node-id="b1" closed filter-text="B1">B1</div>
+        <div parent="b1" filter-text="B11">B11</div>
+        <div node-id="b12" parent="b1" closed filter-text="B12">B12</div>
+        <div node-id="b121" parent="b12" filter-text="Bx121">Bx121</div>
+    </he-tree>
+    <he-tree id="tree-manipulate" fold="click">
+        <div node-id="a1">A1</div>
+        <div node-id="a11" parent="a1">A11</div>
+        <div node-id="b1">B1</div>
+        <div node-id="b11" parent="b1">B11</div>
+        <div node-id="b12" parent="b1">B12</div>
     </he-tree>
 </body>
 
