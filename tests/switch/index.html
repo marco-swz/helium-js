@@ -11,16 +11,21 @@
     <he-switch id="switch-test-click">
 
     </he-switch>
+    <style>
+        switch-test-click {
+            transform: scale(0.5);
+        }
+    </style>
 
     <form action="/tests/switch" method="get" onsubmit="updateHiddenInput()">
 
         <he-switch name="switch">
 
         </he-switch>
+
         <button type="submit">Absenden</button>
 
     </form>
-
 
 </body>
 
