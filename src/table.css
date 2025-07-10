@@ -8,7 +8,6 @@
     --he-table-tableLayout: auto;
     --he-table-width: fit-content;
     --he-table-row-borderBottomColor: hsl(from var(--he-table-row-backgroundColor) h s calc(l - 20));
-    --he-table-row-hover-backgroundColor: hsl(from var(--he-table-row-backgroundColor) h s calc(l - 5));
 
     overflow: auto;
     display: inline-block;
@@ -374,7 +373,7 @@ tbody tr {
 }
 
 tbody tr:hover {
-    background-color: var(--he-table-row-hover-backgroundColor);
+    background-color: var(--he-table-row-hover-backgroundColor, hsl(from var(--he-table-row-backgroundColor) h s calc(l - 5)));
 }
 
 /*tbody tr[selected] {*/

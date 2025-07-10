@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang=en>
+<head>
+    <meta charset=utf-8>
+    <script src="/dist/latest/table.js" type="module"></script>
+</head>
+
+<body>
+    <he-table id="tbl-test-render-empty">
+        <table>
+            <th column="id">ID</th>
+            <th column="num">Num</th>
+            <th column="date" type="datetime">Date</th>
+            <th column="hidden" type="hidden">Hidden</th>
+        </table>
+    </he-table>
+    <he-table id="tbl-test-render">
+        <table>
+            <thead>
+                <tr>
+                    <th column="id">ID</th>
+                    <th column="num">Num</th>
+                    <th column="date" type="datetime">Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>0</td><td>10</td><td>2025-10-01 10:30:00</td><tr>
+                <tr><td>1</td><td>20</td><td>2025-12-02 20:30:00</td><tr>
+            </tbody>
+        </table>
+    </he-table>
+    <he-table id="tbl-test-js-data">
+        <table>
+            <thead>
+                <tr>
+                    <th column="id">ID</th>
+                    <th column="num">Num</th>
+                    <th column="date" type="datetime">Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>0</td><td>10</td><td>2025-10-01 10:30:00</td><tr>
+            </tbody>
+        </table>
+    </he-table>
+    <he-table id="tbl-test-filter-sort">
+        <table>
+            <thead>
+                <tr>
+                    <th column="id">ID</th>
+                    <th column="num">Num</th>
+                    <th column="txt" exact-filter>Txt</th>
+                    <th column="date" type="datetime">Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>0</td><td>10</td><td>ef</td><td>2025-10-01 10:30:00</td><tr>
+                <tr><td>1</td><td>200</td><td>cd</td><td>2025-12-02 20:30:00</td><tr>
+                <tr><td>2</td><td>20</td><td>ab</td><td>2025-12-02 20:30:00</td><tr>
+            </tbody>
+        </table>
+    </he-table>
+    <he-table id="tbl-test-check">
+        <table>
+            <thead>
+                <tr>
+                    <th type="check"></th>
+                    <th column="id">ID</th>
+                    <th column="num">Num</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>0</td><td>10</td><tr>
+                <tr><td>1</td><td>20</td><tr>
+                <tr><td>2</td><td>20</td><tr>
+            </tbody>
+        </table>
+    </he-table>
+</body>
+
+</html>
