@@ -299,14 +299,15 @@ export class HeliumTree extends HTMLElement {
         }
         let nodeId = $node.getAttribute('node-id') ?? $node.id;
         $cont.setAttribute('node-id', nodeId);
-        $node.slot = nodeId;
         $cont.classList.add('node');
         $node.classList.add('node-content');
         $cont.setAttribute('type', 'leaf');
         const useSlot = this._isSlotted($node);
         if (useSlot) {
+            let slotName = 'slot' + Math.floor(Math.random() * (9999999 - 1000000 + 9999999) + 1000000).toString()
             let $slot = document.createElement('slot');
-            $slot.name = nodeId;
+            $node.slot = slotName;
+            $slot.name = slotName;
             $cont.append($slot);
         } else {
             $cont.append($node);
