@@ -28,7 +28,7 @@
     }
 }
 
-.list-elem {
+.node-content {
     padding: 8px 10px;
     display: inline-block;
     width: 100%;
@@ -47,8 +47,8 @@
     }
 }
 
-.cont-elem[selected] {
-    .list-elem {
+.node[selected] {
+    .node-content {
         background-color: whitesmoke;
     }
 }
@@ -58,7 +58,7 @@ div[type="root"] {
     display: flex;
     flex-direction: column;
 
-    & > .list-elem {
+    & > .node-content {
         text-transform: uppercase;
         cursor: pointer;
         
@@ -85,7 +85,7 @@ div[closed] {
         display: none;
     }
 
-    & > .list-elem::before {
+    & > .node-content::before {
         transition: transform 0.1s;
         transform: rotate(0deg) translate(0, 0);
     }

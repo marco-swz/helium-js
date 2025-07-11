@@ -59,16 +59,16 @@ test('filtering the tree', async ({ page }) => {
     }
 });
 
-test('manipulating tree items', async ({ page }) => {
+test('adding and removing tree nodes', async ({ page }) => {
     let locs = [
-        page.locator('#tree-manipulate'),
-        // page.locator('#tree-manipulate-slotted'),
+        [page.locator('#tree-manipulate'), false],
+        [page.locator('#tree-manipulate-slotted'), true],
     ];
     
-    for (const loc of locs) {
+    for (const [loc, isSlotted] of locs) {
         await loc.evaluate($tree => $tree.toRootNode(['b11', 'b12']));
-        await expect(loc.locator('.cont-elem[node-id="b11"]')).toHaveAttribute('type', 'root');
-        await expect(loc.locator('.cont-elem[node-id="b12"]')).toHaveAttribute('type', 'root');
+        await expect(loc.locator('.node[node-id="b11"]')).toHaveAttribute('type', 'root');
+        await expect(loc.locator('.node[node-id="b12"]')).toHaveAttribute('type', 'root');
 
         await loc.evaluate($tree => {
             let $el = document.createElement('div');
@@ -92,13 +92,44 @@ test('manipulating tree items', async ({ page }) => {
             $tree.addNode($el, null);
         });
 
-        await expect(loc.locator('.cont-elem[node-id="b11"]').getByText('B111', {exact: true})).toBeVisible();
-        await expect(loc.locator('.cont-elem[node-id="a11"]').getByText('X1', {exact: true})).toBeVisible();
-        await expect(loc.locator('.cont-elem[node-id="b12"]').getByText('X1', {exact: true})).toBeVisible();
-        await expect(loc.locator('.cont-elem[node-id="b12"]').locator('.cont-elem[node-id="x1"]').getByText('X11', {exact: true})).toBeVisible();
-        await expect(loc.locator('.cont-elem[node-id="a11"]').locator('.cont-elem[node-id="x1"]').getByText('X11', {exact: true})).toBeVisible();
-        await expect(loc.getByText('X1X11').first()).toHaveAttribute('type', 'root');
-        await expect(loc.locator('.cont-elem[node-id="b12"]')).toHaveAttribute('type', 'root');
-        await expect(loc.locator('.cont-elem[node-id="b111"]')).toHaveAttribute('type', 'leaf');
+        await expect(loc.getByText('C1', {exact: true})).toBeVisible();
+        if (isSlotted) {
+            await expect(loc.getByText('B111', {exact: true})).toBeVisible();
+            await expect(loc.getByText('B111', {exact: true})).toHaveAttribute('slot', 'b111');
+            await expect(loc.locator('.node[node-id="b11"]').locator('.node[node-id="b111"]')).toBeVisible();
+            await expect(loc.locator('.node[node-id="b11"]').locator('.node[node-id="b111"]').locator('slot')).toHaveAttribute('name', 'b111');
+            await expect(loc.locator('.node[node-id="a11"]').locator('.node[node-id="x1"]').locator('.node[node-id="x11"]')).toHaveAttribute('type', 'root');
+        } else {
+            await expect(loc.getByText('X1X11').first()).toHaveAttribute('type', 'root');
+            await expect(loc.locator('.node[node-id="b11"]').getByText('B111', {exact: true})).toBeVisible();
+            await expect(loc.locator('.node[node-id="a11"]').getByText('X1', {exact: true})).toBeVisible();
+            await expect(loc.locator('.node[node-id="b12"]').getByText('X1', {exact: true})).toBeVisible();
+            await expect(loc.locator('.node[node-id="b12"]').locator('.node[node-id="x1"]').getByText('X11', {exact: true})).toBeVisible();
+            await expect(loc.locator('.node[node-id="a11"]').locator('.node[node-id="x1"]').getByText('X11', {exact: true})).toBeVisible();
+            await expect(loc.locator('.node[node-id="b12"]')).toHaveAttribute('type', 'root');
+            await expect(loc.locator('.node[node-id="b111"]')).toHaveAttribute('type', 'leaf');
+        }
+
+        await loc.evaluate($tree => {
+            $tree.removeNode('c1');
+            $tree.removeNode('b11');
+            let $el = $tree.removeNode('x1');
+            document.querySelector('body').append($el);
+        });
+
+        await expect(loc.getByText('C1', {exact: true})).toBeHidden();
+        await expect(loc.getByText('B111', {exact: true})).toBeHidden();
+        await expect(page.getByText('X1', {exact: true})).toBeVisible();
+        if (isSlotted) {
+            await expect(loc.getByText('B11', {exact: true})).toBeHidden();
+        } else {
+            await expect(loc.locator('.node[node-id="b1"]').getByText('B11', {exact: true})).toBeHidden();
+            await expect(loc.locator('.node[node-id="b12"]').getByText('X1', {exact: true})).toBeHidden();
+            await expect(loc.locator('.node[node-id="b12"]').locator('.node[node-id="x1"]').getByText('X11', {exact: true})).toBeHidden();
+            await expect(loc.locator('.node[node-id="a11"]').getByText('X1', {exact: true})).toBeHidden();
+            await expect(loc.locator('.node[node-id="b12"]')).toBeVisible()
+        }
+
+        await page.evaluate(() => document.querySelector('body > [node-id="x1"]').remove());
     }
 });

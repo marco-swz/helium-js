@@ -1,17 +1,21 @@
 import sheet from './tree.css';
 
+/**
+ * @typedef {HTMLDivElement} HTMLNode
+ */
+
 export class HeliumTree extends HTMLElement {
     static observedAttributes = [
     ];
     /** @type {HTMLDivElement} */
-    $contItems;
+    $contNodes;
 
     constructor() {
         super();
         let shadow = this.attachShadow({ mode: "open" });
-        this.$contItems = document.createElement('div');
-        this.$contItems.id = 'cont-items';
-        shadow.append(this.$contItems);
+        this.$contNodes = document.createElement('div');
+        this.$contNodes.id = 'cont-nodes';
+        shadow.append(this.$contNodes);
         shadow.adoptedStyleSheets = [sheet];
     }
 
@@ -30,48 +34,55 @@ export class HeliumTree extends HTMLElement {
     
     /**
      * 
-     * @param {HTMLElement} $elem
+     * @param {HTMLElement} $node
      * @param {null|string|Array<string>} parentId
      * @param {boolean} [asRootNode=false]
      * @returns {void}
      */
     addNode($elem, parentId, asRootNode=false) {
-        $elem = this._renderLeaf($elem);
+        if (this._isSlotted($elem)) {
+            this.append($elem);
+        }
+        let $node = this._nodeToLeaf($elem, true);
         if (asRootNode) {
-            $elem = this._toRootNode($elem);
+            $node = this._nodeToRoot($node);
         }
 
         if (!Array.isArray(parentId)) {
             parentId = [parentId];
         }
 
-        for (const id of parentId) {
-            this.$contItems.querySelectorAll(`.cont-elem[node-id="${id}"]`)
-                .forEach($el => this._setParent($elem.cloneNode(true), $el));
+        for (const pId of parentId) {
+            if (pId == null) {
+                this._setParent($node.cloneNode(true), null);
+            }
         }
+
+        this._queryIds(parentId)
+            .forEach($parent => this._setParent($node.cloneNode(true), $parent));
     }
 
     connectedCallback() {
-        let items = [];
+        let $$nodes = [];
         for (let $elem of Array.from(this.children)) {
-            let $item = this._renderLeaf($elem);
-            this.$contItems.append($item);
-            items.push($item)
+            let $node = this._nodeToLeaf($elem, true);
+            this.$contNodes.append($node);
+            $$nodes.push($node)
         }
 
-        for (let $elem of items) {
-            const selParent = $elem.getAttribute('parent');
+        for (let $node of $$nodes) {
+            const selParent = $node.getAttribute('parent');
             if (selParent == null) {
-                this.$contItems.append($elem);
+                this.$contNodes.append($node);
                 continue;
             }
 
-            const $parent = this.$contItems.querySelector(`[node-id="${selParent}"]`);
+            const $parent = this.$contNodes.querySelector(`[node-id="${selParent}"]`);
             if ($parent == null) {
                 throw new Error('No parent found with id: ' + selParent);
             }
 
-            this._setParent($elem, $parent);
+            this._setParent($node, $parent);
         }
     }
 
@@ -84,8 +95,8 @@ export class HeliumTree extends HTMLElement {
         if (filterText != null) {
             filterText = filterText.toLowerCase();
         }
-        for(const $elem of this.$contItems.children) {
-            this._filterRecursive($elem, filterText, false, includeRoots);
+        for(const $node of this.$contNodes.children) {
+            this._filterRecursive($node, filterText, false, includeRoots);
         }
 
         return this;
@@ -95,7 +106,7 @@ export class HeliumTree extends HTMLElement {
      * @returns Array.<string>
      */
     getOpen() {
-        return Array.from(this.$contItems.querySelectorAll('[type=root]:not([closed])'))
+        return Array.from(this.$contNodes.querySelectorAll('[type=root]:not([closed])'))
             .map($el => $el.getAttribute('node-id'));
     }
 
@@ -103,8 +114,56 @@ export class HeliumTree extends HTMLElement {
      * @returns Array.<string>
      */
     getClosed() {
-        return Array.from(this.$contItems.querySelectorAll('[type=root][closed]'))
+        return Array.from(this.$contNodes.querySelectorAll('[type=root][closed]'))
             .map($el => $el.getAttribute('node-id'));
+    }
+
+    /**
+     * 
+     * @param {'before'|'after'|'inside'} location
+     * @param {string} 
+     * @returns {Self}
+     */
+    moveNode(location, nodeId, referenceId) {
+        // TODO(marco): Finish implementation
+        switch (location) {
+            case 'inside':
+                return this.setParent(nodeId, referenceId);
+        }
+
+        let $$nodes = this._queryIds(nodeId);
+
+        if ($$nodes[0] == null) {
+            throw new Error(`Node with ID ${nodeId} not found!`);
+        }
+
+        let refElems = this.$contNodes.querySelectorAll(`[node-id="${parentId}"]`);
+        refElems.forEach($par => {
+            elems.forEach($el => {
+                this._setParent($el, $par);
+            })
+        })
+    }
+
+    /**
+     * 
+     * @param {string} nodeId
+     * @returns {HTMLElement}
+     */
+    removeNode(nodeId) {
+        let $$nodes = this._queryIds(nodeId);
+
+        if ($$nodes[0] == null) {
+            throw new Error(`Node with ID ${nodeId} not found!`);
+        }
+
+       let $inner = this._nodeToInner($$nodes[0]);
+
+        for (let $node of $$nodes) {
+            $node.remove();
+        }
+
+        return $inner;
     }
 
     /**
@@ -127,56 +186,58 @@ export class HeliumTree extends HTMLElement {
     }
     
     setParent(nodeId, parentId) {
-        let elems = this.$contItems.querySelectorAll(`[node-id="${nodeId}"]`);
+        let $$nodes = this._queryIds(nodeId);
 
         if (parentId == null) {
-            elems.forEach($el => this.$contItems.append($el));
-            return;
+            $$nodes.forEach($el => this.$contNodes.append($el));
+            return this;
         }
 
-        let parents = this.$contItems.querySelectorAll(`[node-id="${parentId}"]`);
+        let parents = this._queryIds(parentId);
         parents.forEach($par => {
-            elems.forEach($el => {
+            $$nodes.forEach($el => {
                 this._setParent($el, $par);
             })
         })
+
+        return this;
     }
 
     /**
-     * Converts the selected leaf items to a root items
+     * Converts the selected leaf nodes to a root nodes
      * @param {string|Array<string>} id
      * @returns {Self}
      */
     toRootNode(id) {
-        let items = this._queryIds(id);
-        for (const $item of items) {
-            this._toRootNode($item);
+        let $$nodes = this._queryIds(id);
+        for (const $node of $$nodes) {
+            this._nodeToRoot($node);
         }
 
         return this;
     }
 
-    _filterRecursive($item, filterText, showParent, includeRoots, exact) {
+    _filterRecursive($node, filterText, showParent, includeRoots, exact) {
         let showSelf = filterText == null;
-        const isRoot = $item.getAttribute('type') === 'root';
+        const isRoot = $node.getAttribute('type') === 'root';
 
-        let itemText = $item.hasAttribute('filter-text')
-            ? $item.getAttribute('filter-text')
-            : $item.children[0].innerHTML;
+        let nodeText = $node.hasAttribute('filter-text')
+            ? $node.getAttribute('filter-text')
+            : $node.children[0].innerHTML;
 
-        itemText = itemText.toLowerCase();
+        nodeText = nodeText.toLowerCase();
 
         let isMatch = false;
         if (!isRoot || (isRoot && includeRoots)) {
             isMatch = exact 
-                ? itemText === filterText
-                : itemText.includes(filterText);
+                ? nodeText === filterText
+                : nodeText.includes(filterText);
         }
         showSelf ||= isMatch;
 
         let showChild = false;
         if (isRoot) {
-            let $contChildren = $item.children[1]
+            let $contChildren = $node.children[1]
             for(const $elem of $contChildren.children) {
                 let ret = this._filterRecursive($elem, filterText, showSelf || showParent, includeRoots);
                 showChild = showChild || ret;
@@ -184,76 +245,77 @@ export class HeliumTree extends HTMLElement {
         }
 
         if (showChild) {
-            $item.style.display = '';
-            $item.removeAttribute('closed');
+            $node.style.display = '';
+            $node.removeAttribute('closed');
 
         } else if (showSelf) {
-            $item.style.display = '';
-            $item.setAttribute('closed', '');
+            $node.style.display = '';
+            $node.setAttribute('closed', '');
 
         } else if (showParent) {
-            $item.style.display = '';
+            $node.style.display = '';
 
         } else {
-            $item.style.display = 'none';
-            $item.setAttribute('closed', '');
+            $node.style.display = 'none';
+            $node.setAttribute('closed', '');
         }
 
         return showSelf || showChild;
     }
 
-    _clickRootCallback($elem) {
-        this._toggleChildren($elem);
+    _clickRootCallback($node) {
+        this._toggleChildren($node);
     }
 
-    _toggleChildren($elem) {
-        if ($elem.getAttribute('closed')) {
-            this._showChildren($elem);
-        } else {
-            this._hideChildren($elem);
-        }
-    }
-
-    _hideChildren($elem) {
-        $elem.setAttribute('closed', 'true');
+    _hideChildren($node) {
+        $node.setAttribute('closed', 'true');
     }
 
     /**
-     * @param {HTMLElement} $elem 
-     * @param {boolean} useSlot
+     * @param {HTMLNode|HTMLElement} $node 
+     * @param {boolean} [fromInner=false]
+     * @return {HTMLNode}
      */
-    _renderLeaf($elem) {
-        let $cont = document.createElement('div');
-        const parent = $elem.getAttribute('parent');
-        if (parent != null) {
-            $cont.setAttribute('parent', parent);
+    _nodeToLeaf($node, fromInner=false) {
+        if (!fromInner) {
+            throw new Error('Not implemented'); // TODO(marco)
         }
-        if ($elem.getAttribute('selected') != null) {
+
+        let $cont = document.createElement('div');
+        const parentId = $node.getAttribute('parent');
+        if (parentId != null) {
+            $cont.setAttribute('parent', parentId);
+        }
+        if ($node.getAttribute('selected') != null) {
             $cont.setAttribute('selected', '');
         }
 
-        let filterText = $elem.getAttribute('filter-text');
+        let filterText = $node.getAttribute('filter-text');
         if (filterText != null) {
             $cont.setAttribute('filter-text', filterText);
         }
-        if ($elem.getAttribute('closed') != null) {
+        if ($node.getAttribute('closed') != null) {
             $cont.setAttribute('closed', true);
         }
-        let nodeId = $elem.getAttribute('node-id') ?? $elem.id;
+        let nodeId = $node.getAttribute('node-id') ?? $node.id;
         $cont.setAttribute('node-id', nodeId);
-        $elem.slot = nodeId;
-        $cont.classList.add('cont-elem');
-        $elem.classList.add('list-elem');
+        $node.slot = nodeId;
+        $cont.classList.add('node');
+        $node.classList.add('node-content');
         $cont.setAttribute('type', 'leaf');
-        const useSlot = $elem.hasAttribute('slotted') || this.hasAttribute('slotted');
+        const useSlot = this._isSlotted($node);
         if (useSlot) {
             let $slot = document.createElement('slot');
             $slot.name = nodeId;
             $cont.append($slot);
         } else {
-            $cont.append($elem);
+            $cont.append($node);
         }
         return $cont;
+    }
+
+    _showChildren($node) {
+        $node.removeAttribute('closed');
     }
 
     /**
@@ -262,72 +324,110 @@ export class HeliumTree extends HTMLElement {
      */
     _setClosed(ids=null, closed=true) {
         if (ids == null) {
-            for (let $el of this.$contItems.querySelectorAll('[type=root]')) {
+            for (let $node of this.$contNodes.querySelectorAll('[type=root]')) {
                 if (closed) {
-                    $el.setAttribute('closed', '');
+                    $node.setAttribute('closed', '');
                 } else {
-                    $el.removeAttribute('closed');
+                    $node.removeAttribute('closed');
                 }
             }
             return;
         }
 
-        for (let $el of this._queryIds(ids)) {
+        for (let $node of this._queryIds(ids)) {
             if (closed) {
-                $el.setAttribute('closed', '');
+                $node.setAttribute('closed', '');
             } else {
-                $el.removeAttribute('closed');
+                $node.removeAttribute('closed');
             }
         }
     };
 
+    /**
+     * 
+     * @param {HTMLNode} $node
+     * @param {?HTMLNode} $parent
+     * @returns {void}
+     */
+    _setParent($node, $parent) {
+        if ($parent == null) {
+            this.$contNodes.append($node);
+            return;
+        }
+        this._nodeToRoot($parent);
+        $parent.children[1].append($node);
+    }
+
+
+    _toggleChildren($node) {
+        if ($node.getAttribute('closed')) {
+            this._showChildren($node);
+        } else {
+            this._hideChildren($node);
+        }
+    }
 
     /**
      * 
-     * @param {HTMLDivElement} $elem
-     * @returns {HTMLDivElement}
+     * @param {HTMLNode} $node
+     * @returns {HTMLNode}
      */
-    _toRootNode($elem) {
-        if ($elem.getAttribute('type') === 'root') {
-            return $elem;
+    _nodeToRoot($node) {
+        if ($node.getAttribute('type') === 'root') {
+            return $node;
         }
 
-        $elem.setAttribute('type', 'root');
+        $node.setAttribute('type', 'root');
         let $contChildren = document.createElement('div');
         $contChildren.classList.add('cont-children');
-        $elem.append($contChildren);
+        $node.append($contChildren);
 
         if (this.getAttribute('fold') === 'click') {
-            $elem.children[0].addEventListener('click', () => this._clickRootCallback.bind(this)($elem));
+            $node.children[0].addEventListener('click', () => this._clickRootCallback.bind(this)($node));
         }
 
-        return $elem;
+        return $node;
     }
 
-    _setParent($elem, $parent) {
-        this._toRootNode($parent);
-        $parent.children[1].append($elem);
-    }
 
-    _showChildren($elem) {
-        $elem.removeAttribute('closed');
+    /**
+     * 
+     * @param {HTMLNode} $node
+     * @returns {HTMLElement}
+     */
+    _nodeToInner($node) {
+        if (this._isSlotted($node)) {
+            return $node.children[0].assignedElements()[0];
+        }
+
+        return $node.children[0];
     }
 
     /**
      * 
-     * @param {Array<string>} ids
-     * @returns {Array<HTMLElement>}
+     * @param {HTMLNode} $node
+     * @returns {boolean}
+     */
+    _isSlotted($node) {
+        return $node.hasAttribute('slotted') || this.hasAttribute('slotted');
+    }
+
+    /**
+     * 
+     * @param {string|Array<string>} ids
+     * @returns {Array<HTMLNode>}
      */
     _queryIds(ids) {
         if (!Array.isArray(ids)) {
             ids = [ids];
         }
 
-        let elements = [];
+        let $$nodes = [];
         for (let id of ids) {
-            this.$contItems.querySelectorAll(`.cont-elem[node-id="${id}"]`).forEach($el => elements.push($el));
+            this.$contNodes.querySelectorAll(`.node[node-id="${id}"]`)
+                .forEach($node => $$nodes.push($node));
         }
-        return elements;
+        return $$nodes;
     }
 }
 

@@ -21,6 +21,7 @@ export default {
         'src/tree.js',
         'src/sidebar.js',
         'src/menubar.js',
+        'src/switch.js',
     ],
     output: [
         {
