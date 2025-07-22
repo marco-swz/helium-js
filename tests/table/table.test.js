@@ -209,11 +209,12 @@ test('interacting with a table with checkboxes', async ({ page }) => {
     await loc.getByRole('row', { name: '0 10', exact: true }).locator('.check-row').click();
 
     data = await loc.evaluate(($tbl) => $tbl.getCheckedData());
+    // TODO(marco): Find a way to check events
     // let evt = await page.evaluate(($tbl) => console.log($tbl.__lastEvent ?? null));
 
     await expect(loc.getByRole('row', { name: '0 10', exact: true }).locator('.check-row')).toHaveAttribute('checked');
     await expect(loc.getByRole('row', { name: '2 20', exact: true }).locator('.check-row')).toHaveAttribute('checked');
-    await expect(page.locator('#check-all')).toHaveAttribute('checked');
+    await expect(loc.locator('#check-all')).toHaveAttribute('checked');
     expect(data.length).toEqual(2);
     expect(data[0]).toEqual(expect.objectContaining(
         {id: "0", num: "10"}
@@ -232,17 +233,17 @@ test('interacting with a table with checkboxes', async ({ page }) => {
     ));
     await expect(loc.getByRole('row', { name: '0 10', exact: true }).locator('.check-row')).not.toHaveAttribute('checked');
     await expect(loc.getByRole('row', { name: '1 20', exact: true }).locator('.check-row')).toHaveAttribute('checked');
-    await expect(page.locator('#check-all')).toHaveAttribute('checked');
+    await expect(loc.locator('#check-all')).toHaveAttribute('checked');
 
-    await page.locator('#check-all').click();
+    await loc.locator('#check-all').click();
 
     data = await loc.evaluate(($tbl) => $tbl.getCheckedData());
 
     expect(data.length).toEqual(0);
     await expect(loc.getByRole('row', { name: '1 20', exact: true }).locator('.check-row')).not.toHaveAttribute('checked');
-    await expect(page.locator('#check-all')).not.toHaveAttribute('checked');
+    await expect(loc.locator('#check-all')).not.toHaveAttribute('checked');
 
-    await page.locator('#check-all').click();
+    await loc.locator('#check-all').click();
 
     data = await loc.evaluate(($tbl) => $tbl.getCheckedData());
 
@@ -250,5 +251,53 @@ test('interacting with a table with checkboxes', async ({ page }) => {
     await expect(loc.getByRole('row', { name: '0 10', exact: true }).locator('.check-row')).toHaveAttribute('checked');
     await expect(loc.getByRole('row', { name: '1 20', exact: true }).locator('.check-row')).toHaveAttribute('checked');
     await expect(loc.getByRole('row', { name: '2 20', exact: true }).locator('.check-row')).toHaveAttribute('checked');
-    await expect(page.locator('#check-all')).toHaveAttribute('checked');
+    await expect(loc.locator('#check-all')).toHaveAttribute('checked');
+});
+
+test('Filtering and sorting the table via menu', async ({ page }) => {
+    let loc = page.locator('#tbl-test-menu');
+    await expect(loc.getByRole('cell', { name: 'ID ' }).locator('span')).toBeVisible();
+    await expect(loc.getByText('Anwenden').first()).toBeHidden();
+
+    await loc.getByRole('cell', { name: 'ID ' }).locator('span').click();
+    await expect(loc.getByText('Aufsteigend sortieren').first()).toBeVisible();
+    await expect(loc.getByText('Absteigend sortieren').first()).toBeVisible();
+    await expect(loc.getByText('Anwenden').first()).toBeVisible();
+    await expect(loc.locator('.column-filter').first()).toBeVisible();
+
+    await loc.locator('.column-filter').first().locator('input').fill('1');
+    await loc.getByText('Anwenden').first().click();
+    await expect(loc.getByText('Anwenden').first()).toBeHidden();
+    await expect(loc.getByRole('row', { name: '0 10', exact: true }).locator('.check-row')).toBeHidden();
+    await expect(loc.getByRole('row', { name: '1 20', exact: true }).locator('.check-row')).toBeVisible();
+    await expect(loc.getByRole('row', { name: '2 20', exact: true }).locator('.check-row')).toBeHidden();
+
+    await loc.locator('#form-tbl').getByText('Num').click();
+    await expect(loc.getByText('Anwenden').nth(1)).toBeVisible();
+
+    await loc.locator('.column-filter').nth(1).click();
+    await loc.locator('.column-filter').nth(1).getByText('20').click();
+    await loc.getByText('Anwenden').nth(1).click();
+    await expect(loc.getByText('Anwenden').nth(1)).toBeHidden();
+    await expect(loc.getByRole('row', { name: '0 10', exact: true }).locator('.check-row')).toBeHidden();
+    await expect(loc.getByRole('row', { name: '1 20', exact: true }).locator('.check-row')).toBeVisible();
+    await expect(loc.getByRole('row', { name: '2 20', exact: true }).locator('.check-row')).toBeHidden();
+
+    await loc.locator('#form-tbl').getByText('ID').click();
+    // TODO(marco): Check if filter is still visible after menu reopen
+    // await expect(loc.locator('.column-filter').first().locator('input')).toHaveText('1');
+
+    await loc.locator('.column-filter').first().press('Backspace');
+    await loc.locator('.column-filter').first().press('Enter');
+    await expect(loc.getByRole('row', { name: '0 10', exact: true }).locator('.check-row')).toBeHidden();
+    await expect(loc.getByRole('row', { name: '1 20', exact: true }).locator('.check-row')).toBeVisible();
+    await expect(loc.getByRole('row', { name: '2 20', exact: true }).locator('.check-row')).toBeVisible();
+
+    await loc.locator('#form-tbl').getByText('Num').click();
+    await loc.locator('.column-filter').nth(1).click();
+    await loc.locator('.column-filter').nth(1).locator('option').first().click();
+    await loc.getByText('Anwenden').nth(1).click();
+    await expect(loc.getByRole('row', { name: '0 10', exact: true }).locator('.check-row')).toBeVisible();
+    await expect(loc.getByRole('row', { name: '1 20', exact: true }).locator('.check-row')).toBeVisible();
+    await expect(loc.getByRole('row', { name: '2 20', exact: true }).locator('.check-row')).toBeVisible();
 });

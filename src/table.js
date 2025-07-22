@@ -1033,7 +1033,7 @@ export class HeliumTable extends HTMLElement {
         const filterValue = e.currentTarget.value;
         const idx = e.currentTarget.closest('td').cellIndex;
         const $col = this._getColumns(false)[idx];
-        this._filterColumn($col, filterValue);
+        this._filterColumn($col, filterValue, false);
     }
 
     /**
@@ -1061,7 +1061,7 @@ export class HeliumTable extends HTMLElement {
         e.preventDefault();
         const filterVal = $col.querySelector('.column-filter').value;
         this.disableRequest = true;
-        this._filterColumn($col, filterVal);
+        this._filterColumn($col, filterVal, false);
         this.disableRequest = false;
         const asc = $col.querySelector('.btn-sort-asc').hasAttribute('selected');
         const desc = $col.querySelector('.btn-sort-desc').hasAttribute('selected');

@@ -70,12 +70,12 @@ http://localhost:8080/<path to index.html>
 
 To run all test cases, use:
 ```sh
-npx playwright test
+npm run test
 ```
 
 Playwright also provides a graphical interface to work with tests:
 ```sh
-npx playwright test --ui
+npm run test-ui
 ```
 
 # Development Guidelines
