@@ -22,6 +22,7 @@ export default {
         'src/sidebar.js',
         'src/menubar.js',
         'src/switch.js',
+        'src/radio.js',
     ],
     output: [
         {
