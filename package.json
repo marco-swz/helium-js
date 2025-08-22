@@ -11,11 +11,13 @@
     "rollup-plugin-css-only": "^4.5.2",
     "rollup-plugin-delete": "^3.0.1",
     "rollup-plugin-import-css": "^3.5.2",
+    "rollup": "^4.47.1",
     "web-component-analyzer": "^2.0.0"
   },
   "scripts": {
-        "start": "http-server",
-        "test": "npx playwright test",
-        "test-ui": "npx playwright test --ui"
-    }
+    "start": "http-server",
+    "test": "npx playwright test",
+    "test-ui": "npx playwright test --ui",
+    "watch": "npx rollup -c -w"
+  }
 }
