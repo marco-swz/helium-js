@@ -116,8 +116,18 @@ class HeliumTree extends HTMLElement {
 
     /**
      * 
+     * @param {string} nodeId
+     * @returns {boolean}
+     */
+    hasChildren(nodeId) {
+        let $node = this._queryIds(nodeId)[0];
+        return $node.querySelector('.cont-children').children.length > 0;
+    }
+
+    /**
+     * 
      * @param {'before'|'after'|'inside'} location
-     * @param {string} 
+     * @param {string} nodeId
      * @returns {Self}
      */
     moveNode(location, nodeId, referenceId) {
@@ -321,20 +331,26 @@ class HeliumTree extends HTMLElement {
     _setClosed(ids=null, closed=true) {
         if (ids == null) {
             for (let $node of this.$contNodes.querySelectorAll('[type=root]')) {
+                let $content = this._nodeToInner($node);
                 if (closed) {
                     $node.setAttribute('closed', '');
+                    $content.setAttribute('closed', '');
                 } else {
                     $node.removeAttribute('closed');
+                    $content.removeAttribute('closed');
                 }
             }
             return;
         }
 
         for (let $node of this._queryIds(ids)) {
+            let $content = this._nodeToInner($node);
             if (closed) {
                 $node.setAttribute('closed', '');
+                $content.setAttribute('closed', '');
             } else {
                 $node.removeAttribute('closed');
+                $content.removeAttribute('closed');
             }
         }
     };
