@@ -171,10 +171,9 @@ export class HeliumTree extends HTMLElement {
      * @returns {Self}
      */
     setClosed(id=null) {
-        this.setClosed(id, true);
+        this._setClosed(id, true);
         return this;
     }
-
 
     /**
      * @param {null|string|Array<string>} id
