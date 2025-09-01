@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang=en>
+<head>
+    <meta charset=utf-8>
+    <script src="/dist/latest/tabs.js" type="module"></script>
+</head>
+
+<body>
+    <he-tabs id="test-render" tab=1>
+        <div slot=tab>
+            <span>A</span>
+        </div>
+        <div slot=tab title-text="Title B" >
+            <span>B</span>
+        </div>
+        <div slot=tab hidden>
+            <span>C</span>
+        </div>
+        <div slot=tab title-slot="title-slot1" >
+            <span>D</span>
+        </div>
+        <span slot="title-slot1">Title D</span>
+    </he-tabs>
+</body>
+
+</html>

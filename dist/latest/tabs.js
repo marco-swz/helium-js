@@ -6,6 +6,8 @@ class HeliumTabs extends HTMLElement {
     ];
     /** @type {HTMLElement} */
     $navBar;
+    /** @type {HTMLSlotElement} */
+    $slotContent;
     /** @type {Number} The index of the currently selected tab */
     tabNrSelected;
 
@@ -23,6 +25,7 @@ class HeliumTabs extends HTMLElement {
         `;
 
         this.$navBar = shadow.querySelector('#he-tabs-nav');
+        this.$slotContent = shadow.querySelector('slot[name=tab]');
         shadow.addEventListener('slotchange', e => this.slotChangeCallback(e, this));
     }
 
@@ -44,14 +47,11 @@ class HeliumTabs extends HTMLElement {
     }
 
     hideTab(tabNr) {
-        const id = '#he-tabs-check' + tabNr;
-        let check = this.$navBar.querySelector(id);
-        if (check == null) {
-            throw new Error(`Invalid tab number: ${tabNr}`);
+        let $nav = this._getTabNav(tabNr);
+        $nav.style.display = 'none';
+        if (this.tabNrSelected === tabNr) {
+            this._selectFirstVisible();
         }
-
-        let tabTitle = check.parentElement;
-        tabTitle.style.display = 'none';
     }
 
     /**
@@ -64,9 +64,12 @@ class HeliumTabs extends HTMLElement {
         /** @type {HTMLSlotElement} */
         const slot = event.target;
         let tabNr = 0;
+        let firstVisible = null;
 
         for (const $elem of slot.assignedElements()) {
             if ($elem.slot === 'tab') {
+                let isHidden = $elem.hasAttribute('hidden');
+
                 /** @type {HTMLSpanElement} */
                 let $span = document.createElement('span');
 
@@ -84,6 +87,11 @@ class HeliumTabs extends HTMLElement {
                 /** @type {HTMLLabelElement} */
                 let $label = document.createElement('label');
                 $label.for = checkId;
+                if (isHidden) {
+                    $label.style.display = 'none';
+                } else if (firstVisible == null) {
+                    firstVisible = tabNr;
+                }
 
                 /** @type {HTMLInputElement} */
                 let $check = document.createElement('input');
@@ -106,7 +114,11 @@ class HeliumTabs extends HTMLElement {
             }
         }
 
-        self.showTab(self.getAttribute('tab') ?? 0);
+        if (firstVisible == null) {
+            return;
+        }
+
+        self.showTab(self.getAttribute('tab') ?? firstVisible);
     }
 
     /**
@@ -139,6 +151,52 @@ class HeliumTabs extends HTMLElement {
 
         this.tabNrSelected = tabNrNew;
         this.dispatchEvent(new CustomEvent('change'));
+    }
+
+    unhideTab(tabNr) {
+        let $nav = this._getTabNav(tabNr);
+        $nav.style.display = '';
+    }
+
+    /**
+     * 
+     * @param {number} tabNr
+     * @returns {HTMLLabelElement}
+     * @throws {Error} If the tab number does not exist
+     */
+    _getTabContent(tabNr) {
+        debugger;
+        const id = '#he-tabs-check' + tabNr;
+        /** @type {HTMLInputElement} */
+        let $check = this.$navBar.querySelector(id);
+        if ($check == null) {
+            throw new Error(`Invalid tab number: ${tabNr}`);
+        }
+        return $check.parentElement;
+    }
+
+    _getTabNav(tabNr) {
+        const id = '#he-tabs-check' + tabNr;
+        /** @type {HTMLInputElement} */
+        let $check = this.$navBar.querySelector(id);
+        if ($check == null) {
+            throw new Error(`Invalid tab number: ${tabNr}`);
+        }
+        return $check.parentElement;
+    }
+
+    _getTabs() {
+        return this.$slotContent.assignedElements();
+    }
+
+    _selectFirstVisible() {
+        for (let [i, $tab] of this._getTabs().entries()) {
+            if (!$tab.hasAttribute('hidden')) {
+                this.showTab(i);
+                return;
+            }
+        }
+        throw new Error('No tabs visible');
     }
 
 }
