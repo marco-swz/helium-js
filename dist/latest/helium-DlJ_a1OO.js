@@ -4,7 +4,7 @@ import './dialog-DM15uR4A.js';
 import './form_dialog-BUKXg6MF.js';
 import './table-nQfGQlQr.js';
 import './menu-DtEDCG1z.js';
-import './tabs-uvm7kHW9.js';
+import './tabs-plJ-JFnf.js';
 import './select-D8oxzmug.js';
 import './check-Gn89XVO0.js';
 import './toast-CDI5DF2B.js';

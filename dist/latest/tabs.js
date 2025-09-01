@@ -5,9 +5,9 @@ class HeliumTabs extends HTMLElement {
         "tab",
     ];
     /** @type {HTMLElement} */
-    navBar;
-    /** @type {Number} The index of the currently visible tab */
-    tabNrVisible;
+    $navBar;
+    /** @type {Number} The index of the currently selected tab */
+    tabNrSelected;
 
     constructor() {
         super();
@@ -22,7 +22,7 @@ class HeliumTabs extends HTMLElement {
             </div>
         `;
 
-        this.navBar = shadow.querySelector('#he-tabs-nav');
+        this.$navBar = shadow.querySelector('#he-tabs-nav');
         shadow.addEventListener('slotchange', e => this.slotChangeCallback(e, this));
     }
 
@@ -41,6 +41,17 @@ class HeliumTabs extends HTMLElement {
                 this.showTab(Number(newValue));
                 break;
         }
+    }
+
+    hideTab(tabNr) {
+        const id = '#he-tabs-check' + tabNr;
+        let check = this.$navBar.querySelector(id);
+        if (check == null) {
+            throw new Error(`Invalid tab number: ${tabNr}`);
+        }
+
+        let tabTitle = check.parentElement;
+        tabTitle.style.display = 'none';
     }
 
     /**
@@ -89,13 +100,26 @@ class HeliumTabs extends HTMLElement {
 
                 $label.append($check);
                 $label.append($span);
-                self.navBar.append($label);
+                self.$navBar.append($label);
 
                 tabNr++;
             }
         }
 
         self.showTab(self.getAttribute('tab') ?? 0);
+    }
+
+    /**
+     * Shows the tab with the provided index.
+     * @param {Number} tabNr The index of the tab
+     */
+    showTab(tabNr) {
+        const id = '#he-tabs-check' + tabNr;
+        /** @type {HTMLInputElement} */
+        let check = this.$navBar.querySelector(id);
+        if (check !== null) {
+            check.click();
+        }
     }
 
     /**
@@ -107,28 +131,16 @@ class HeliumTabs extends HTMLElement {
         /** @type {HTMLInputElement} */
         const check = e.target;
         const tabNrNew = Number(check.value);
-        const contentOld = this.children.item(this.tabNrVisible);
+        const contentOld = this.children.item(this.tabNrSelected);
         contentOld.style.display = 'none';
 
         const contentNew = this.children.item(tabNrNew);
         contentNew.style.display = '';
 
-        this.tabNrVisible = tabNrNew;
+        this.tabNrSelected = tabNrNew;
         this.dispatchEvent(new CustomEvent('change'));
     }
 
-    /**
-     * Shows the tab with the provided index.
-     * @param {Number} tabNr The index of the tab
-     */
-    showTab(tabNr) {
-        const id = '#he-tabs-check' + tabNr;
-        /** @type {HTMLInputElement} */
-        let check = this.navBar.querySelector(id);
-        if (check !== null) {
-            check.click();
-        }
-    }
 }
 
 document.addEventListener("DOMContentLoaded", function() {
