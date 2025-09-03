@@ -156,6 +156,8 @@ class HeliumTabs extends HTMLElement {
     unhideTab(tabNr) {
         let $nav = this._getTabNav(tabNr);
         $nav.style.display = '';
+        let $tab = this._getTabContent(tabNr);
+        $tab.removeAttribute('hidden');
     }
 
     /**
@@ -165,14 +167,7 @@ class HeliumTabs extends HTMLElement {
      * @throws {Error} If the tab number does not exist
      */
     _getTabContent(tabNr) {
-        debugger;
-        const id = '#he-tabs-check' + tabNr;
-        /** @type {HTMLInputElement} */
-        let $check = this.$navBar.querySelector(id);
-        if ($check == null) {
-            throw new Error(`Invalid tab number: ${tabNr}`);
-        }
-        return $check.parentElement;
+        return this.$slotContent.assignedElements()[tabNr];
     }
 
     _getTabNav(tabNr) {
