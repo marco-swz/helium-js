@@ -186,13 +186,16 @@ class HeliumSelect extends HTMLElement {
     get value() {
         let selVals = [];
         this.selections.forEach($sel => selVals.push($sel.value ?? $sel.getAttribute('value')));
+        if (this.hasAttribute('multiple')) {
+            return selVals;
+        }
+
         switch (selVals.length) {
             case 0:
                 return '';
             case 1:
                 return selVals[0];
         }
-        return selVals;
     }
 
     /**

@@ -1,7 +1,7 @@
 import './button-DqBtoM-5.js';
 import './input-DGnZ_KPx.js';
 import './dialog-DM15uR4A.js';
-import './select-D8oxzmug.js';
+import './select-CObt3Xqv.js';
 import './popover-DFROOrPY.js';
 import './utils-SP1Llz9F.js';
 
