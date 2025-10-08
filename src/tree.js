@@ -62,6 +62,12 @@ export class HeliumTree extends HTMLElement {
             .forEach($parent => this._setParent($node.cloneNode(true), $parent));
     }
 
+    clearNodes() {
+        for (let $node of Array.from(this.$contNodes.children)) {
+            $node.remove();
+        }
+    }
+
     connectedCallback() {
         let $$nodes = [];
         for (let $elem of Array.from(this.children)) {
@@ -175,6 +181,7 @@ export class HeliumTree extends HTMLElement {
 
         return $inner;
     }
+
 
     /**
      * @param {null|string|Array<string>} selector

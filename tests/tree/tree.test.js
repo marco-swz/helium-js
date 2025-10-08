@@ -130,6 +130,16 @@ test('adding and removing tree nodes', async ({ page }) => {
             await expect(loc.locator('.node[node-id="b12"]')).toBeVisible()
         }
 
+        // Cleanup of node
         await page.evaluate(() => document.querySelector('body > [node-id="x1"]').remove());
+
+        await loc.evaluate($tree => $tree.clearNodes());
+
+        await expect(loc.getByText('A11', {exact: true})).toBeHidden();
+        await expect(loc.getByText('A1', {exact: true})).toBeHidden();
+        await expect(loc.getByText('B1', {exact: true})).toBeHidden();
+        await expect(loc.getByText('B11', {exact: true})).toBeHidden();
+        await expect(loc.getByText('B12', {exact: true})).toBeHidden();
+        await expect(loc.getByText('Bx121', {exact: true})).toBeHidden();
     }
 });
