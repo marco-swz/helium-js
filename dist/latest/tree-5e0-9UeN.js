@@ -60,6 +60,8 @@ class HeliumTree extends HTMLElement {
 
     clearNodes() {
         for (let $node of Array.from(this.$contNodes.children)) {
+            let $inner = this._nodeToInner($node);
+            $inner.remove();
             $node.remove();
         }
     }
