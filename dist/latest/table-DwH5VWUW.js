@@ -2,7 +2,7 @@ import './form_dialog-2m2D99Eu.js';
 import './check-Gn89XVO0.js';
 import './popover-DFROOrPY.js';
 import './dialog-_3Lpjzw9.js';
-import './toggle-DjXbjwqi.js';
+import './toggle-CekqniSB.js';
 import './toast-CDI5DF2B.js';
 import './button-CJVU6V2V.js';
 import './input-DGnZ_KPx.js';

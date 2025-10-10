@@ -163,7 +163,7 @@ export class HeliumToggle extends HTMLElement {
                 this.$inner.append($elem);
             }
         }
-        this.onclick = () => this._clickCallback.bind(this)();
+        this.addEventListener('click', () => this._clickCallback.bind(this)());
     }
 
     /**
