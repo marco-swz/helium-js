@@ -188,7 +188,7 @@ class HeliumButton extends HTMLElement {
                 const slotName = `slot${this.slotCount++}`;
                 $elem.slot = slotName;
                 $slot.name = slotName;
-                this.button.append($slot);
+                this.$button.append($slot);
             } else {
                 this.$button.append($elem);
             }
