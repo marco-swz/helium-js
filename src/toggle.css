@@ -5,7 +5,7 @@
     --he-toggle-checked-color: black;
     --he-toggle-checked-backgroundColor: hsl(from var(--he-toggle-backgroundColor) h s calc(l - 10));
     --he-toggle-height: 35px;
-    --he-toggle-minWidth: var(--he-toggle-height);
+    --he-toggle-width: fit-content;
     --he-toggle-cursor: pointer;
     --bg-color: var(--he-toggle-backgroundColor);
 
@@ -16,7 +16,7 @@
     justify-content: center;
     border-radius: 3px;
     height: var(--he-toggle-height);
-    min-width: var(--he-toggle-minWidth);
+    width: var(--he-toggle-width);
     cursor: var(--he-toggle-cursor);
     font-weight: 600;
     padding: 0 10px;
