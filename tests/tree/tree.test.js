@@ -143,3 +143,35 @@ test('adding and removing tree nodes', async ({ page }) => {
         await expect(loc.getByText('Bx121', {exact: true})).toBeHidden();
     }
 });
+
+test('replacing nodes', async ({ page }) => {
+    let locs = [
+        [page.locator('#tree-replace'), false],
+        [page.locator('#tree-replace-slotted'), true],
+    ];
+    
+    for (const [loc, isSlotted] of locs) {
+        await loc.evaluate($tree => {
+            let $new = document.createElement('span');
+            $new.innerHTML = 'A1*';
+            $tree.replaceNode('a1', $new);
+
+            let $new2 = document.createElement('span');
+            $new2.innerHTML = 'B1*';
+            $tree.replaceNode('b1', $new2);
+
+            let $new3 = document.createElement('span');
+            $new3.innerHTML = 'B11*';
+            $tree.replaceNode('b11', $new3);
+
+            let $new4 = document.createElement('span');
+            $new4.innerHTML = 'B12*';
+            $tree.replaceNode('b12', $new4);
+        });
+
+        await expect(loc.getByText('A1*', {exact: true})).toBeVisible();
+        await expect(loc.getByText('B1*', {exact: true})).toBeVisible();
+        await expect(loc.getByText('B11*', {exact: true})).toBeVisible();
+        await expect(loc.getByText('B12*', {exact: true})).toBeVisible();
+    }
+});

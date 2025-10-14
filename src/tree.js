@@ -62,6 +62,20 @@ export class HeliumTree extends HTMLElement {
             .forEach($parent => this._setParent($node.cloneNode(true), $parent));
     }
 
+    /**
+     * 
+     * @param {string} nodeId
+     * @param {HTMLElement} $newElem
+     * @returns {void}
+     */
+    replaceNode(nodeId, $newElem) {
+        let $$nodes = this._queryIds(nodeId);
+        for (let $node of $$nodes) {
+            let $inner = this._nodeToInner($node);
+            $inner.innerHTML = $newElem.innerHTML;
+        }
+    }
+
     clearNodes() {
         for (let $node of Array.from(this.$contNodes.children)) {
             let $inner = this._nodeToInner($node);
