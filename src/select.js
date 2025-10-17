@@ -646,26 +646,33 @@ export class HeliumSelect extends HTMLElement {
             case 'Enter':
                 if (this.open) {
                     e.preventDefault();
-                    let $option = this.$highlight ?? this.getOptions()[0];
+                    const filterVal = this.$filter.value;
+                    const $$options = this.getOptions();
+                    let $option = this.$highlight ?? $$options.find(o => o.innerHTML === filterVal);
 
-                    let filterVal = this.$filter.value;
-                    let attrCreate = this.getAttribute('create');
-                    if (attrCreate != null && filterVal !== '' && this.$highlight == null) {
+                    const attrCreate = this.getAttribute('create');
+                    let $createOption = $option;
+                    if ($option == null && attrCreate != null && filterVal !== '' && this.$highlight == null) {
                         $option = this.addOption(filterVal, filterVal, ($el, $new) => $new.innerText.localeCompare($el.innerText) < 0);
                         const createCallback = this.createCallback ?? window[this.getAttribute('create-callback')];
                         if (createCallback) {
-                            $option = await createCallback.bind(this)($option, filterVal);
+                            $createOption = await createCallback.bind(this)($option, filterVal);
                         }
-                        if ($option) {
-                            let evt = new CustomEvent('create', { detail: { text: filterVal } });
+                        if ($createOption) {
+                            const evt = new CustomEvent('create', { detail: { text: filterVal } });
                             this.dispatchEvent(evt);
                         }
                     }
 
                     // The user can intercept the option and set it to null.
                     // In this case, we want to skip.
-                    if ($option == null) {
+                    if ($createOption == null) {
                         return;
+                    }
+
+                    $option = $createOption;
+                    if ($option == null) {
+                        $option = $$options[0];
                     }
 
                     if (this.hasAttribute('multiple')) {

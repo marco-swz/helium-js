@@ -30,11 +30,13 @@ test('having multi-select enabled', async ({ page }) => {
     }
 });
 
-test('multi-select with creation', async ({ page }) => {
+test('multi-select with option creation', async ({ page }) => {
     await page.evaluate(() => {
         window.createCallback = async function($option, text) {
-            this.setAttribute('option-value', 'C');
-            $option.setAttribute('value', text.toLowerCase());
+            if (text === 'D') {
+                return null;
+            }
+            this.setAttribute('option-value', text);
             return $option;
         }
 
@@ -47,6 +49,7 @@ test('multi-select with creation', async ({ page }) => {
         $sel.createCallback = window.createCallback;
         document.body.append($sel);
     });
+
     let locs = [
         page.locator('#test-multiple-create'),
         page.locator('#test-multiple-create-js'),
@@ -58,6 +61,7 @@ test('multi-select with creation', async ({ page }) => {
             // Making sure, the create event is triggered
             $el.addEventListener('create', (e) => {
                 const $sel = e.currentTarget;
+                console.log($sel);
                 const val = e.detail.text;
                 $sel.setAttribute('create-value', val);
             });
@@ -68,10 +72,27 @@ test('multi-select with creation', async ({ page }) => {
             });
         });
         await loc.getByRole('button', { name: 'A', exact: true }).click();
-        // await page.waitForTimeout(500);
         await loc.getByRole('textbox').fill('C');
         await loc.getByRole('textbox').press('Enter');
+        // These attributes get set by the event callbacks
         await expect(loc).toHaveAttribute('create-value', 'C');
-        await expect(loc).toHaveAttribute('change-value', 'a,c');
+        await expect(loc).toHaveAttribute('change-value', 'a,C');
+        await expect(loc).toHaveAttribute('option-value', 'C');
+
+        // Pressing double enter should NOT create another entry
+        await loc.getByRole('textbox').press('Enter');
+        // The create callback attributes should be unchanged
+        await expect(loc).toHaveAttribute('create-value', 'C');
+        await expect(loc).toHaveAttribute('option-value', 'C');
+        // But the change callback should be triggered, since C was deselected
+        await expect(loc).toHaveAttribute('change-value', 'a');
+
+        // This creation should be stopped by the `createCallback`
+        await loc.getByRole('textbox').fill('D');
+        await loc.getByRole('textbox').press('Enter');
+        // The attributes should be unchanged
+        await expect(loc).toHaveAttribute('create-value', 'C');
+        await expect(loc).toHaveAttribute('change-value', 'a');
+        await expect(loc).toHaveAttribute('option-value', 'C');
     }
 });
