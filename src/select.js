@@ -1,6 +1,7 @@
 import sheet from './select.css';
 import { heSpaceBelow, heCallOnOutsideClick } from "./utils.js";
 import { HeliumPopover } from "./popover.js";
+import { HeliumInput } from "./input.js";
 
 export class HeliumSelect extends HTMLElement {
     static formAssociated = true;
@@ -26,6 +27,8 @@ export class HeliumSelect extends HTMLElement {
     $contButton;
     /** @type {ElementInternals} */
     internals;
+    /** @type {?function(HTMLOptionElement, string) -> Promise<?HTMLOptionElement>} */
+    createCallback;
     /** @type {function(string, HtmlElement): boolean} */
     onfilterelement = this._onFilterelementDefault;
     /** @type {number | TimerHandler} */
@@ -69,7 +72,7 @@ export class HeliumSelect extends HTMLElement {
         this.$options.id = 'cont-options';
         this.$popoverContent.append(this.$options);
 
-        this.onkeydown = (e) => this._handleKeydown(e);
+        this.onkeydown = async (e) => await this._handleKeydown(e);
 
         shadow.append(this.$popover);
         shadow.adoptedStyleSheets = [sheet];
@@ -229,6 +232,9 @@ export class HeliumSelect extends HTMLElement {
                 return $opt;
             }
         }
+
+        $contInsert.append($opt);
+        return $opt;
     }
 
     /**
@@ -624,7 +630,7 @@ export class HeliumSelect extends HTMLElement {
      * This callback handles all shortcuts.
      * @param {KeyboardEvent} e
      */
-    _handleKeydown(e) {
+    async _handleKeydown(e) {
         switch (e.key) {
             case 'ArrowDown':
                 e.preventDefault();
@@ -643,8 +649,20 @@ export class HeliumSelect extends HTMLElement {
                     let attrCreate = this.getAttribute('create');
                     if (attrCreate != null && filterVal !== '' && this.$highlight == null) {
                         $option = this.addOption(filterVal, filterVal, ($el, $new) => $new.innerText.localeCompare($el.innerText) < 0);
-                        let evt = new CustomEvent('create', { detail: { text: filterVal } });
-                        this.dispatchEvent(evt);
+                        const createCallback = this.createCallback ?? window[this.getAttribute('create-callback')];
+                        if (createCallback) {
+                            $option = await createCallback.bind(this)($option, filterVal);
+                        }
+                        if ($option) {
+                            let evt = new CustomEvent('create', { detail: { text: filterVal } });
+                            this.dispatchEvent(evt);
+                        }
+                    }
+
+                    // The user can intercept the option and set it to null.
+                    // In this case, we want to skip.
+                    if ($option == null) {
+                        return;
                     }
 
                     if (this.hasAttribute('multiple')) {

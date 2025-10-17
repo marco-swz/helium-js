@@ -1,7 +1,247 @@
-import './popover-DFROOrPY.js';
-import './utils-SP1Llz9F.js';
+import { h as heSpaceBelow, b as hePositionRelative, c as heEnableBodyScroll } from './utils-SP1Llz9F.js';
 
-const sheet = new CSSStyleSheet();sheet.replaceSync(":host {\n    --he-input-borderColor: lightgrey;\n    --he-input-borderWidth: 1px;\n    --he-input-borderStyle: solid;\n    --he-input-color: black;\n    --he-input-fontSize: 14px;\n    --he-input-backgroundColor: whitesmoke;\n    --he-input-hover-borderColor: grey;\n    --he-input-loading-spinner-color: black;\n    --he-input-padding: 0.3rem 0.4rem;\n\n    display: inline-block;\n    position: relative;\n    border-radius: 3px;\n    background-color: var(--he-input-backgroundColor);\n    width: 100%;\n    height: 1.6rem;\n    font-size: var(--he-input-fontSize);\n    border-style: var(--he-input-borderStyle);\n    border-color: var(--he-input-borderColor);\n    border-width: var(--he-input-borderWidth);\n    color: var(--he-input-color);\n    cursor: text;\n}\n\n#cont-inp {\n    display: inline-flex;\n    width: 100%;\n    height: 100%;\n}\n\n:host(:hover), :host([variant=\"underline\"]:hover) {\n    transition:\n        border-color 0.2s;\n    border-color: var(--he-input-hover-borderColor);\n}\n\n:host([variant=\"underline\"]) {\n    border-top: 0;\n    border-left: 0;\n    border-right: 0;\n    border-radius: 0;\n    border-bottom-color: var(--he-input-borderColor);\n\n}\n\n:host([invalid]) {\n    transition:\n        border-color 0.2s;\n    border-color: indianred;\n}\n\n:host([invalid]:hover) {\n    border-color: indianred;\n}\n\n:host([loading])::after {\n    content: \"\";\n    position: absolute;\n    width: 12px;\n    height: 12px;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    margin: auto 10px auto auto;\n    border: 3px solid darkgrey;\n    border-radius: 50%;\n    border-bottom-color: var(--he-input-loading-spinner-color);\n    animation: button-loading-spinner 1s ease infinite;\n}\n\n:host([ok]) {\n    border-color: green;\n}\n\n:host([ok])::after {\n    content: \"✔\";\n    position: absolute;\n    width: 10px;\n    height: 15px;\n    color: green;\n    top: 1px;\n    right: 8px;\n    font-weight: 700;\n}\n\n#inp-main {\n    font-family: inherit;\n    outline: none;\n    background-color: inherit;\n    width: 100%;\n    font-size:inherit;\n    border-radius: inherit;\n    border: none;\n    padding: var(--he-input-padding);\n    cursor: inherit;\n    color: inherit;\n}\n\n:host([readonly]:hover),\n:host([disabled]:hover) {\n    border-color: var(--he-input-borderColor);\n}\n\n:host([readonly]), :host([disabled]) {\n    cursor: default;\n    color: hsl(from var(--he-input-color) h s calc(l + 50))\n}\n\ndiv[slot=content] {\n    max-height: 200px;\n}\n\n#cont-options {\n    display: flex;\n    flex-direction: column;\n}\n\nhe-popover {\n    --he-popover-borderRadius: 5px;\n}\n\n::slotted(*) {\n    cursor: pointer;\n    padding: 5px 10px;\n    border-radius: 3px;\n}\n\n::slotted(*:hover) {\n    background-color: hsl(from white h s calc(l - 10));\n}\n\n@keyframes button-loading-spinner {\n    from {\n        transform: rotate(0turn);\n    }\n\n    to {\n        transform: rotate(1turn);\n    }\n}\n\n");
+const sheet$1 = new CSSStyleSheet();sheet$1.replaceSync(":host {\n    --he-input-borderColor: lightgrey;\n    --he-input-borderWidth: 1px;\n    --he-input-borderStyle: solid;\n    --he-input-color: black;\n    --he-input-fontSize: 14px;\n    --he-input-backgroundColor: whitesmoke;\n    --he-input-hover-borderColor: grey;\n    --he-input-loading-spinner-color: black;\n    --he-input-padding: 0.3rem 0.4rem;\n\n    display: inline-block;\n    position: relative;\n    border-radius: 3px;\n    background-color: var(--he-input-backgroundColor);\n    width: 100%;\n    height: 1.6rem;\n    font-size: var(--he-input-fontSize);\n    border-style: var(--he-input-borderStyle);\n    border-color: var(--he-input-borderColor);\n    border-width: var(--he-input-borderWidth);\n    color: var(--he-input-color);\n    cursor: text;\n}\n\n#cont-inp {\n    display: inline-flex;\n    width: 100%;\n    height: 100%;\n}\n\n:host(:hover), :host([variant=\"underline\"]:hover) {\n    transition:\n        border-color 0.2s;\n    border-color: var(--he-input-hover-borderColor);\n}\n\n:host([variant=\"underline\"]) {\n    border-top: 0;\n    border-left: 0;\n    border-right: 0;\n    border-radius: 0;\n    border-bottom-color: var(--he-input-borderColor);\n\n}\n\n:host([invalid]) {\n    transition:\n        border-color 0.2s;\n    border-color: indianred;\n}\n\n:host([invalid]:hover) {\n    border-color: indianred;\n}\n\n:host([loading])::after {\n    content: \"\";\n    position: absolute;\n    width: 12px;\n    height: 12px;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    margin: auto 10px auto auto;\n    border: 3px solid darkgrey;\n    border-radius: 50%;\n    border-bottom-color: var(--he-input-loading-spinner-color);\n    animation: button-loading-spinner 1s ease infinite;\n}\n\n:host([ok]) {\n    border-color: green;\n}\n\n:host([ok])::after {\n    content: \"✔\";\n    position: absolute;\n    width: 10px;\n    height: 15px;\n    color: green;\n    top: 1px;\n    right: 8px;\n    font-weight: 700;\n}\n\n#inp-main {\n    font-family: inherit;\n    outline: none;\n    background-color: inherit;\n    width: 100%;\n    font-size:inherit;\n    border-radius: inherit;\n    border: none;\n    padding: var(--he-input-padding);\n    cursor: inherit;\n    color: inherit;\n}\n\n:host([readonly]:hover),\n:host([disabled]:hover) {\n    border-color: var(--he-input-borderColor);\n}\n\n:host([readonly]), :host([disabled]) {\n    cursor: default;\n    color: hsl(from var(--he-input-color) h s calc(l + 50))\n}\n\ndiv[slot=content] {\n    max-height: 200px;\n}\n\n#cont-options {\n    display: flex;\n    flex-direction: column;\n}\n\nhe-popover {\n    --he-popover-borderRadius: 5px;\n}\n\n::slotted(*) {\n    cursor: pointer;\n    padding: 5px 10px;\n    border-radius: 3px;\n}\n\n::slotted(*:hover) {\n    background-color: hsl(from white h s calc(l - 10));\n}\n\n@keyframes button-loading-spinner {\n    from {\n        transform: rotate(0turn);\n    }\n\n    to {\n        transform: rotate(1turn);\n    }\n}\n\n");
+
+const sheet = new CSSStyleSheet();sheet.replaceSync("#popover {\n    --he-popover-borderColor: hsl(240 5.9% 90%);\n    --he-popover-borderRadius: 3px;\n\n    padding: 0;\n    inset: unset;\n    outline: none;\n    border: 1px solid var(--he-popover-borderColor);\n    border-radius: var(--he-popover-borderRadius);\n    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);\n}\n\n");
+
+class HeliumPopover extends HTMLElement {
+    static observedAttributes = [
+        'attach',
+        'position',
+        'open',
+        'trigger',
+        'anchor',
+        'dismiss',
+    ];
+    /** @type {HTMLDivElement} */
+    $popover;
+    /** @type {?HTMLElement} */
+    $attach;
+    /** @type {?HTMLElement} */
+    $anchor;
+    /** @type {ElementInternals} */
+    internals;
+
+    constructor() {
+        super();
+        let shadow = this.attachShadow({ mode: "open" });
+
+        this.$popover = document.createElement('div');
+        this.$popover.id = 'popover';
+        this.$popover.popover = '';
+        //this.$popover.style.display = 'none';
+
+        const $slot = document.createElement('slot');
+        $slot.name = 'content';
+        this.$popover.append($slot);
+
+        shadow.append(this.$popover);
+        shadow.adoptedStyleSheets = [sheet];
+
+        this.internals = this.attachInternals();
+    }
+
+    /** 
+     * Gets or sets the anchor element of the popover.
+     * The `position` is used relative to this reference.
+     * @type {string} 
+     */
+    set anchor(val) {
+        if (val) {
+            this.setAttribute('anchor', val);
+        } else {
+            this.removeAttribute('anchor');
+        }
+    }
+
+    get anchor() {
+        return this.getAttribute('anchor');
+    }
+
+    /** 
+     * Gets or sets the dismiss action for the popover.
+     * @type {'manual'|'auto'} 
+     */
+    set dismiss(val) {
+        if (val) {
+            this.setAttribute('dismiss', val);
+        } else {
+            this.removeAttribute('dismiss');
+        }
+    }
+
+    get dismiss() {
+        return this.getAttribute('dismiss');
+    }
+
+    /** 
+     * Gets or sets the `open` state of the element.
+     * If `open` is set, the options are shown to the user.
+     * @type {HTMLElement} 
+     */
+    set anchorElement(val) {
+        this.$anchor = val;
+    }
+
+    get anchorElement() {
+        return this.$anchor;
+    }
+
+    /** 
+     * Gets or sets the `open` state of the element.
+     * If `open` is set, the options are shown to the user.
+     * @type {boolean} 
+     */
+    set open(val) {
+        if (val) {
+            this.setAttribute('open', '');
+        } else {
+            this.removeAttribute('open');
+        }
+    }
+
+    get open() {
+        return this.getAttribute('open') !== null;
+    }
+
+    /**
+     * Callback for attribute changes of the web component.
+     * @param {string} name The attribute name
+     * @param {string} _oldValue The previous attribute value
+     * @param {string} newValue The new attribute value
+     */
+    attributeChangedCallback(name, _oldValue, newValue) {
+        switch (name) {
+            case 'open':
+                if (newValue != null) {
+                    this.$popover.showPopover();
+                } else {
+                    if (this.$popover.matches(':popover-open')) {
+                        this.$popover.hidePopover();
+                    }
+                }
+                break;
+            case 'attach': 
+                let $attach = document.querySelector(newValue);
+                if ($attach == null) {
+                    throw new Error('Attachment element not found!');
+                }
+
+                this._attachToElement($attach);
+                break;
+            case 'anchor': 
+                const $anchor = document.querySelector(newValue);
+                if ($anchor == null) {
+                    throw new Error(`Anchor element "${newValue}" not found!`);
+                }
+
+                this.$anchor = $anchor;
+                break;
+            case 'dismiss':
+                if (newValue) {
+                    this.$popover.popover = newValue;
+                } else {
+                    this.$popover.popover = '';
+                }
+                break;
+        }
+    }
+
+    connectedCallback() {
+        this.$popover.addEventListener("beforetoggle", (e) => this._handleBeforeToggledPopover.bind(this)(e));
+        this.$popover.addEventListener("toggle", (e) => this._handleToggledPopover.bind(this)(e));
+    }
+
+    /**
+     * Returns the width and height of the popover.
+     * Also works if the popover is hidden.
+     * @returns {Array<number, number>}
+     */
+    getSize() {
+        if (this.open) {
+            let rect = this.$popover.getBoundingClientRect();
+            return [rect.width, rect.height];
+        }
+        let pos = this.getAttribute('position');
+        this.setAttribute('position', 'offscreen');
+        this.open = true;
+        let rect = this.$popover.getBoundingClientRect();
+        let width = rect.width;
+        let height = rect.height;
+        this.open = false;
+        this.setAttribute('position', pos);
+        return [width, height];
+    }
+
+    hidePopover() {
+        this.open = false;
+    }
+
+    showPopover() {
+        this.open = true;
+    }
+
+    /**
+     * 
+     * @returns {Self}
+     */
+    toggle() {
+        this.togglePopover();
+        return this;
+    }
+
+    /**
+     * 
+     * @returns {Self}
+     */
+    togglePopover() {
+        this.open = !this.open;
+        return this;
+    }
+
+    /**
+     * 
+     * @param {HTMLElement} $elem
+     */
+    _attachToElement($elem) {
+        const trigger = this.getAttribute('trigger') ?? 'click';
+        $elem.addEventListener(trigger, (e) => this.triggeredCallback.bind(this)(e));
+        this.$attach = $elem;
+    }
+
+    _handleBeforeToggledPopover(e) {
+        if (e.newState === "open") {
+            this.$popover.style.visibility = 'hidden';
+        }
+    }
+
+    _handleToggledPopover(e) {
+        if (e.newState === "open") {
+            if (this.$anchor) {
+                let positionDefault = 'bottom-left';
+                if (heSpaceBelow(this) < this.$popover.offsetHeight + 20) {
+                    positionDefault = 'top-left';
+                }
+                const position = this.getAttribute('position') ?? positionDefault;
+                hePositionRelative(this.$popover, this.$anchor, position, 3);
+                // Manually compensate for the margins with the number
+                //const compensation = 7;
+                //if (this.$popover.offsetWidth < this.$anchor.offsetWidth - compensation) {
+                //    this.$popover.style.width = this.$anchor.offsetWidth - 7 + 'px';
+                //}
+            }
+            this.$popover.style.visibility = '';
+
+        } else {
+            heEnableBodyScroll();
+            this.removeAttribute('open');
+        }
+    }
+}
+
+if (!customElements.get('he-popover')) {
+    customElements.define("he-popover", HeliumPopover);
+}
 
 /**
  * An input element with additional features.
@@ -116,7 +356,7 @@ class HeliumInput extends HTMLElement {
         $contInp.append(this.$input);
         shadow.append($contInp);
         shadow.append(this.$popover);
-        shadow.adoptedStyleSheets = [sheet];
+        shadow.adoptedStyleSheets = [sheet$1];
         this.internals = this.attachInternals();
         this.internals.setFormValue('');
     }

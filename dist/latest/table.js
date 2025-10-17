@@ -1,11 +1,10 @@
 import './form_dialog.js';
 import './check.js';
-import './popover-DFROOrPY.js';
+import './input.js';
 import './dialog.js';
 import './toggle.js';
 import './toast.js';
 import './button.js';
-import './input.js';
 import './select.js';
 import './utils-SP1Llz9F.js';
 

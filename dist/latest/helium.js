@@ -12,5 +12,4 @@ import './tree.js';
 import './sidebar.js';
 import './menubar.js';
 import './toggle.js';
-import './popover-DFROOrPY.js';
 import './utils-SP1Llz9F.js';
