@@ -31,8 +31,25 @@ test('having multi-select enabled', async ({ page }) => {
 });
 
 test('multi-select with creation', async ({ page }) => {
+    await page.evaluate(() => {
+        window.createCallback = async function($option, text) {
+            this.setAttribute('option-value', 'C');
+            $option.setAttribute('value', text.toLowerCase());
+            return $option;
+        }
+
+        const $sel = document.createElement('he-select');
+        $sel.id = 'test-multiple-create-js'
+        $sel.replaceOptions(['a','b'], {a: 'A', b: 'B'});
+        $sel.setAttribute('filter', '');
+        $sel.setAttribute('multiple', '');
+        $sel.setAttribute('create', '');
+        $sel.createCallback = window.createCallback;
+        document.body.append($sel);
+    });
     let locs = [
         page.locator('#test-multiple-create'),
+        page.locator('#test-multiple-create-js'),
     ];
 
     for (const loc of locs) {
@@ -49,12 +66,6 @@ test('multi-select with creation', async ({ page }) => {
             $el.addEventListener('change', (e) => {
                 e.currentTarget.setAttribute('change-value', e.currentTarget.value.join(','))
             });
-
-            window.createCallback = async function($option, text) {
-                this.setAttribute('option-value', 'C');
-                $option.setAttribute('value', text.toLowerCase());
-                return $option;
-            }
         });
         await loc.getByRole('button', { name: 'A', exact: true }).click();
         // await page.waitForTimeout(500);

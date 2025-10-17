@@ -1,11 +1,11 @@
 import './button-CJVU6V2V.js';
 import './input-BywreRul.js';
 import './dialog-_3Lpjzw9.js';
-import './form_dialog-BG8BHNz4.js';
-import './table-mKSwTpJx.js';
+import './form_dialog-ChEy0-j2.js';
+import './table-BKR0WJIP.js';
 import './menu-DtEDCG1z.js';
 import './tabs-VhvGnKYJ.js';
-import './select-D2-ST_80.js';
+import './select-BNhzipdu.js';
 import './check-Gn89XVO0.js';
 import './toast-CDI5DF2B.js';
 import './tree-DL_RTBdG.js';

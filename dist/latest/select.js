@@ -33,6 +33,8 @@ class HeliumSelect extends HTMLElement {
     onfilterelement = this._onFilterelementDefault;
     /** @type {number | TimerHandler} */
     _filterTimeout = 0;
+    /** @type {boolean} A flag to know, if the connectedCallback has already been called */
+    _isInit = false;
     /** @type {function(InputEvent): void} The click handler to detect outside clicks. This should be cleaned up when closing */
     _handleClickDocument;
 
@@ -283,9 +285,10 @@ class HeliumSelect extends HTMLElement {
      */
     connectedCallback() {
         // This guards against double connections of the same element.
-        if (this.$options.children.length > 0) {
+        if (this._isInit) {
             return;
         }
+        this._isInit = true;
 
         switch (this.getAttribute('filter')) {
             case 'inline':
