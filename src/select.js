@@ -210,33 +210,8 @@ export class HeliumSelect extends HTMLElement {
      * @returns {HTMLOptionElement} The inserted option element
      */
     addOption(text, value, fnInsertBeforeTrigger = null) {
-        let $opt = document.createElement('option');
-        $opt.value = value;
-        $opt.innerHTML = text;
-
-        let $contInsert = this;
-        if (this.hasAttribute('slotted')) {
-            $opt.slot = 'option';
-            //$opt.onclick = (e) => this._handleClickOption.bind(this)(e);
-        } else {
-            $contInsert = this.$options;
-            $opt.onclick = (e) => this._handleClickOption.bind(this)(e);
-        }
-
-        if (fnInsertBeforeTrigger == null) {
-            $contInsert.append($opt);
-            return $opt;
-        }
-
-        for (const $el of $contInsert.children) {
-            if (fnInsertBeforeTrigger($el, $opt)) {
-                $contInsert.insertBefore($opt, $el);
-                return $opt;
-            }
-        }
-
-        $contInsert.append($opt);
-        return $opt;
+        let $option = this._renderOption(text, value);
+        return this._addOption($option, fnInsertBeforeTrigger);
     }
 
     /**
@@ -569,7 +544,7 @@ export class HeliumSelect extends HTMLElement {
         this.dispatchEvent(new CustomEvent('change'));
     }
 
-    _clearSelections(updateButtonText=true, updateFormValue=true) {
+    _clearSelections(updateButtonText = true, updateFormValue = true) {
         if (!this.hasAttribute('multiple')) {
             this.select(0);
             return;
@@ -590,12 +565,39 @@ export class HeliumSelect extends HTMLElement {
         }
     }
 
+    _addOption($option, fnInsertBeforeTrigger = null) {
+        let $contInsert = this;
+        if (this.hasAttribute('slotted')) {
+            $option.slot = 'option';
+            //$opt.onclick = (e) => this._handleClickOption.bind(this)(e);
+        } else {
+            $contInsert = this.$options;
+            $option.onclick = (e) => this._handleClickOption.bind(this)(e);
+        }
+
+        if (fnInsertBeforeTrigger == null) {
+            $contInsert.append($option);
+            return $option;
+        }
+
+        for (const $el of $contInsert.children) {
+            if (fnInsertBeforeTrigger($el, $option)) {
+                $contInsert.insertBefore($option, $el);
+                return $option;
+            }
+        }
+
+        $contInsert.append($option);
+        return $option;
+    }
+
+
     /**
      * 
      * @param {} 
      * @returns {void}
      */
-    _addSelection($option, updateButtonText=true, updateFormValue=true) {
+    _addSelection($option, updateButtonText = true, updateFormValue = true) {
         if (this.selections.has($option)) {
             return;
         }
@@ -613,8 +615,8 @@ export class HeliumSelect extends HTMLElement {
             this._updateFormValue();
         }
     }
-    
-    _removeSelection($option, updateButtonText=true, updateFormValue=true) {
+
+    _removeSelection($option, updateButtonText = true, updateFormValue = true) {
         if (!this.selections.has($option)) {
             return;
         }
@@ -627,6 +629,13 @@ export class HeliumSelect extends HTMLElement {
         if (updateFormValue) {
             this._updateFormValue();
         }
+    }
+
+    _renderOption(text, value = null) {
+        let $opt = document.createElement('option');
+        $opt.value = value ?? text;
+        $opt.innerHTML = text;
+        return $opt;
     }
 
     /**
@@ -653,7 +662,7 @@ export class HeliumSelect extends HTMLElement {
                     const attrCreate = this.getAttribute('create');
                     let $createOption = $option;
                     if ($option == null && attrCreate != null && filterVal !== '' && this.$highlight == null) {
-                        $option = this.addOption(filterVal, filterVal, ($el, $new) => $new.innerText.localeCompare($el.innerText) < 0);
+                        $option = this._renderOption(filterVal, filterVal);
                         const createCallback = this.createCallback ?? window[this.getAttribute('create-callback')];
                         if (createCallback) {
                             $createOption = await createCallback.bind(this)($option, filterVal);
@@ -665,9 +674,11 @@ export class HeliumSelect extends HTMLElement {
                     }
 
                     // The user can intercept the option and set it to null.
-                    // In this case, we want to skip.
+                    // In this case, it should not be created.
                     if ($createOption == null) {
                         return;
+                    } else {
+                        this._addOption($createOption, ($el, $new) => $new.innerText.localeCompare($el.innerText) < 0);
                     }
 
                     $option = $createOption;
@@ -777,7 +788,7 @@ export class HeliumSelect extends HTMLElement {
                 this.$highlight
             );
         } else if (dir < 0) {
-            i = options.length-1;
+            i = options.length - 1;
         }
         let $elem = options[i];
 
@@ -787,7 +798,7 @@ export class HeliumSelect extends HTMLElement {
             if ($next == null) {
                 i = dir > 0
                     ? 0
-                    : options.length-1;
+                    : options.length - 1;
                 continue;
             }
             i += dir;
@@ -804,7 +815,7 @@ export class HeliumSelect extends HTMLElement {
 
             if (visualOnly) {
                 this._highlight($next);
-                
+
             } else {
                 this._addSelection($next);
             }

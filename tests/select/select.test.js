@@ -78,6 +78,8 @@ test('multi-select with option creation', async ({ page }) => {
         await expect(loc).toHaveAttribute('create-value', 'C');
         await expect(loc).toHaveAttribute('change-value', 'a,C');
         await expect(loc).toHaveAttribute('option-value', 'C');
+        // The option should also be created and visible
+        await expect(loc.getByRole('option', {name: 'C'})).toBeVisible();
 
         // Pressing double enter should NOT create another entry
         await loc.getByRole('textbox').press('Enter');
@@ -86,6 +88,8 @@ test('multi-select with option creation', async ({ page }) => {
         await expect(loc).toHaveAttribute('option-value', 'C');
         // But the change callback should be triggered, since C was deselected
         await expect(loc).toHaveAttribute('change-value', 'a');
+        // This would fail if a second option for `C` was created
+        await expect(loc.getByRole('option', {name: 'C'})).toBeVisible();
 
         // This creation should be stopped by the `createCallback`
         await loc.getByRole('textbox').fill('D');
@@ -94,5 +98,13 @@ test('multi-select with option creation', async ({ page }) => {
         await expect(loc).toHaveAttribute('create-value', 'C');
         await expect(loc).toHaveAttribute('change-value', 'a');
         await expect(loc).toHaveAttribute('option-value', 'C');
+
+        await loc.getByRole('textbox').fill('');
+        // The old options should still be there
+        await expect(loc.getByRole('option', {name: 'A'})).toBeVisible();
+        await expect(loc.getByRole('option', {name: 'B'})).toBeVisible();
+        await expect(loc.getByRole('option', {name: 'C'})).toBeVisible();
+        // The new option should NOT be added
+        await expect(loc.getByRole('option', {name: 'D'})).toBeHidden();
     }
 });
