@@ -118,7 +118,7 @@ export class HeliumDialog extends HTMLElement {
             this.close();
         })
 
-        this.$dialog.addEventListener('close', () => this._handleCloseDialog.bind(this)());
+        this.$dialog.addEventListener('close', (e) => this._handleCloseDialog.bind(this)(e));
 
         if (this.hasAttribute('outside-close')) {
             this.addEventListener('click', e => {
@@ -168,7 +168,7 @@ export class HeliumDialog extends HTMLElement {
      * @returns Promise
      */
     show() {
-        this.$dialog.showModal();
+        this.showModal();
         let promise = new Promise((resolve, reject) => {
             this.resolve = resolve;
             this.reject = reject;
@@ -182,6 +182,8 @@ export class HeliumDialog extends HTMLElement {
      */
     showModal() {
         this.$dialog.showModal();
+        const evt = new CustomEvent('open');
+        this.dispatchEvent(evt);
         return this;
     }
 
@@ -206,7 +208,12 @@ export class HeliumDialog extends HTMLElement {
         return this;
     }
 
-    _handleCloseDialog() {
+    _handleCloseDialog(e) {
+        e.stopPropagation();
+
+        const evt = new CustomEvent('close');
+        this.dispatchEvent(evt);
+
         if (this.resolve) {
             this.resolve();
         }

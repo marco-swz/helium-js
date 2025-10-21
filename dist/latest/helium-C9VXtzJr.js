@@ -1,8 +1,8 @@
 import './button-CJVU6V2V.js';
 import './input-BywreRul.js';
-import './dialog-_3Lpjzw9.js';
-import './form_dialog-CMSjLZls.js';
-import './table-C2yrPvWR.js';
+import './dialog-IESgkeOX.js';
+import './form_dialog-CNZqUCvu.js';
+import './table-DnoqWcJM.js';
 import './menu-DtEDCG1z.js';
 import './tabs-VhvGnKYJ.js';
 import './select-DjMMsvIx.js';
