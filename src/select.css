@@ -19,6 +19,7 @@
     --he-select-after-display: block;
     --he-select-after-padding: 0px 2px 0px 5px;
     --he-select-disabled-color: hsl(from var(--he-select-color) h s calc(l + 50));
+    --he-select-readonly-color: var(--he-select-color);
     --he-select-before-color: black;
     --he-select-before-content: '';
     --he-select-before-fontFamily: 'Font Awesome 5 Pro';
@@ -31,6 +32,12 @@
     min-width: 150px;
     width: 150px;
     display: inline-block;
+}
+
+:host([readonly]), 
+:host([readonly])::slotted([slot=button]) {
+    pointer-events: none;
+    color: var(--he-select-readonly-color);
 }
 
 :host([disabled]), 

@@ -108,3 +108,29 @@ test('multi-select with option creation', async ({ page }) => {
         await expect(loc.getByRole('option', {name: 'D'})).toBeHidden();
     }
 });
+
+test('readonly attribute is set', async ({ page }) => {
+    await page.evaluate(() => {
+        const $sel = document.createElement('he-select');
+        $sel.id = 'test-readonly-js';
+        $sel.readonly = true;
+
+        $sel.innerHTML = `
+            <option value="a">A</option>
+            <option value="b">B</option>
+        `;
+
+        document.body.append($sel);
+    })
+
+    let locs = [
+        page.locator('#test-readonly'),
+        page.locator('#test-readonly-js'),
+    ];
+
+    for (const loc of locs) {
+        await loc.getByRole('button', { name: 'A' }).click({force: true});
+        await expect(loc.getByRole('option', {name: 'B'})).toBeHidden();
+    }
+});
+

@@ -10,6 +10,7 @@ export class HeliumSelect extends HTMLElement {
         'filter',
         'disabled',
         'placeholder',
+        'readonly',
     ];
     /** @type {HeliumPopover} */
     $popover;
@@ -161,6 +162,22 @@ export class HeliumSelect extends HTMLElement {
 
     get placeholder() {
         return this.getAttribute('placeholder');
+    }
+
+    /**
+     * Disables or enables the select.
+     * @type {boolean}
+     */
+    set readonly(val) {
+        if (val) {
+            this.setAttribute('readonly', '');
+        } else {
+            this.removeAttribute('readonly');
+        }
+    }
+
+    get readonly() {
+        return this.getAttribute('readonly') !== null;
     }
 
     set value(val) {
@@ -664,8 +681,11 @@ export class HeliumSelect extends HTMLElement {
                     if ($option == null && attrCreate != null && filterVal !== '' && this.$highlight == null) {
                         $option = this._renderOption(filterVal, filterVal);
                         const createCallback = this.createCallback ?? window[this.getAttribute('create-callback')];
+
                         if (createCallback) {
                             $createOption = await createCallback.bind(this)($option, filterVal);
+                        } else {
+                            $createOption = $option;
                         }
                         if ($createOption) {
                             const evt = new CustomEvent('create', { detail: { text: filterVal } });
