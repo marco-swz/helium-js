@@ -1,11 +1,12 @@
 import terser from '@rollup/plugin-terser';
 import css from "rollup-plugin-import-css";
 import del from 'rollup-plugin-delete'
+import typescript from '@rollup/plugin-typescript';
 
 export default {
     input: [
         'src/table.js',
-        'src/button.js',
+        'src/button.ts',
         'src/dialog.js',
         'src/menu.js',
         'src/input.js',
@@ -41,5 +42,9 @@ export default {
             plugins: [terser()]
         },
     ],
-    plugins: [css({ modules: true, alwaysOutput: true }), del({ targets: ['dist/latest', 'dist-min/latest'] })],
+    plugins: [
+        css({ modules: true, alwaysOutput: true }), 
+        del({ targets: ['dist/latest', 'dist-min/latest'] }),
+        typescript(),
+    ],
 };

@@ -12,4 +12,7 @@ import './tree.js';
 import './sidebar.js';
 import './menubar.js';
 import './toggle.js';
+import 'lit-element';
+import 'lit';
+import 'lit/decorators.js';
 import './utils-SP1Llz9F.js';

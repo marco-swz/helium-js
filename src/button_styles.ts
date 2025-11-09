@@ -1,3 +1,6 @@
+import { css } from 'lit-element';
+
+export const styles = css`
 :host {
     --he-button-loading-cursor: default;
     --he-button-hover-cursor: pointer;
@@ -194,3 +197,4 @@ a {
         box-shadow: inset 0 0 0 0 hsl(from var(--he-button-hover-backgroundColor) h s l);
     }
 }
+`
