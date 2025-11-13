@@ -2,6 +2,7 @@ import terser from '@rollup/plugin-terser';
 import css from "rollup-plugin-import-css";
 import del from 'rollup-plugin-delete'
 import typescript from '@rollup/plugin-typescript';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 
 export default {
     input: [
@@ -46,5 +47,6 @@ export default {
         css({ modules: true, alwaysOutput: true }), 
         del({ targets: ['dist/latest', 'dist-min/latest'] }),
         typescript(),
+        nodeResolve(),
     ],
 };

@@ -1,6 +1,6 @@
 import { styles } from './button_styles.ts';
 import {LitElement, html } from 'lit';
-import {customElement, property, state} from 'lit/decorators.js';
+import {customElement, property } from 'lit/decorators.js';
 
 @customElement('he-button')
 export class HeliumButton extends LitElement {
@@ -10,34 +10,31 @@ export class HeliumButton extends LitElement {
         ];
     }
 
-    @property() 
+    @property({ type: Boolean, reflect: true }) 
     disabled = false;
-    @property() 
+    @property({ type: Boolean, reflect: true }) 
     loading = false;
-    @property() 
+    @property({ reflect: true }) 
     submit = null;
-    @property() 
+    @property({ reflect: true }) 
     href = null;
-    //@property() 
-    //theme: 'danger'|'warning'|'success'|null = null;
-    //@property() 
-    //variant: 'primary'|'ghost'|'outline' = 'outline';
-    @state() 
-    private _text = '';
-
+    @property({ reflect: true }) 
+    theme: 'danger'|'warning'|'success'|null = null;
+    @property({ reflect: true }) 
+    variant: 'primary'|'ghost'|'outline'|null = null;
 
     render() {
         return html`
-            <a .href=${this.href}>
+            <a ${this.href}>
                 <button id="he-button" @click=${() => this._handleClickButton()}>
-                    ${this._text}
+                    <slot></slot>
                 </button>
             </a>
         `;
     }
 
     setText(newText: string): HeliumButton {
-        this._text = newText;
+        this.innerHTML = newText;
         return this;
     }
 

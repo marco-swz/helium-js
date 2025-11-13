@@ -5,9 +5,6 @@ import './dialog.js';
 import './toggle.js';
 import './toast.js';
 import './button.js';
-import 'lit-element';
-import 'lit';
-import 'lit/decorators.js';
 import './select.js';
 import './utils-SP1Llz9F.js';
 
