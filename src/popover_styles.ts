@@ -1,3 +1,6 @@
+import { css } from 'lit-element';
+
+export const styles = css`
 #popover {
     --he-popover-borderColor: hsl(240 5.9% 90%);
     --he-popover-borderRadius: 3px;
@@ -9,4 +12,4 @@
     border-radius: var(--he-popover-borderRadius);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
-
+`;

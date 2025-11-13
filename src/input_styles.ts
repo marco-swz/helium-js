@@ -1,3 +1,6 @@
+import { css } from 'lit-element';
+
+export const styles = css`
 :host {
     --he-input-borderColor: lightgrey;
     --he-input-borderWidth: 1px;
@@ -140,4 +143,4 @@ he-popover {
         transform: rotate(1turn);
     }
 }
-
+`

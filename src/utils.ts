@@ -1,24 +1,38 @@
+export type RelativePosition = 'bottom' | 'bottom-center' | 'bottom-right' | 'bottom-left' | 'top' | 'top-center' | 'top-right' | 'top-left' | 'offscreen';
+
+export function t(text: string): string {
+    return text
+}
+
+//export function preventDefaultForScrollKeys(e: KeyboardEvent) {
+//    // left: 37, up: 38, right: 39, down: 40,
+//    // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
+//    var keys = { 37: 1, 38: 1, 39: 1, 40: 1 };
+//    if (keys[e.keyCode]) {
+//        e.preventDefault();
+//        return false;
+//    }
+//}
+
 /**
  * Returns the amount of pixels between the element and
  * the bottom of the screen.
- * @param {HTMLElement} element
- * @returns number
  */
-function heSpaceBelow(element) {
+export function heSpaceBelow(element: HTMLElement): number {
     const elementRect = element.getBoundingClientRect();
     const spaceBelow = window.innerHeight - elementRect.bottom;
     return spaceBelow;
 }
 
 /**
- * 
- * @param {HTMLElement} $elem
- * @param {HTMLElement} $target
- * @param {string} position
- * @param {number} offset
- * @returns void
+ * Positions the `$element` relative to the `$target`.
  */
-function hePositionRelative($elem, $target, position, offset = 0) {
+export function hePositionRelative(
+    $elem: HTMLElement,
+    $target: HTMLElement,
+    position: RelativePosition,
+    offset: number = 0
+): void {
     const rect = $target.getBoundingClientRect();
 
     switch (position) {
@@ -58,7 +72,22 @@ function hePositionRelative($elem, $target, position, offset = 0) {
     }
 }
 
-function heEnableBodyScroll() {
+export function heDisableBodyScroll() {
+    //const isScrollYVisible = document.body.scrollHeight > document.body.clientHeight;
+    //if (isScrollYVisible) {
+    //    document.body.style.position = 'fixed';
+    //    document.body.style.overflowY = 'scroll';
+    //}
+
+    //const isScrollXVisible = document.body.scrollWidth > document.body.clientWidth;
+    //if (isScrollXVisible) {
+    //    document.body.style.position = 'fixed';
+    //    document.body.style.overflowX = 'scroll';
+    //}
+    //document.body.style.overflowX = 'scroll';
+}
+
+export function heEnableBodyScroll() {
     document.body.style.position = 'static';
     document.body.style.overflowY = 'auto';
     document.body.style.overflowX = 'auto';
@@ -67,12 +96,13 @@ function heEnableBodyScroll() {
 
 /**
  * Calls the provided callback if the a click occurs outside of the elements.
- * @param {Array<HTMLElement>} elements
- * @param {function(): void} callback
- * @returns {function(InputEvent): void} The listener callback to clean up manually
+ * @returns The listener callback to clean up manually
  */
-function heCallOnOutsideClick(elements, callback) {
-    const outsideClickListener = event => {
+export function heCallOnOutsideClick(
+    elements: Array<HTMLElement>, 
+    callback: () => void
+): (a: MouseEvent) => void {
+    const outsideClickListener = (event: MouseEvent) => {
         let isInside = false;
         for (const $element of elements) {
             if (heIsInside($element, event.clientX, event.clientY)) {
@@ -86,30 +116,43 @@ function heCallOnOutsideClick(elements, callback) {
             removeClickListener();
             callback();
         }
-    };
+    }
 
     const removeClickListener = () => {
         document.removeEventListener('click', outsideClickListener);
-    };
+    }
 
     document.removeEventListener('click', outsideClickListener);
     document.addEventListener('click', outsideClickListener, true);
     return outsideClickListener;
 }
 
+export function heIsVisible(elem: HTMLElement) {
+    return !!elem && !!(elem.offsetWidth || elem.offsetHeight || elem.getClientRects().length);
+}
+
+export function heHash(str: string, seed = 0) {
+    let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+    for (let i = 0, ch; i < str.length; i++) {
+        ch = str.charCodeAt(i);
+        h1 = Math.imul(h1 ^ ch, 2654435761);
+        h2 = Math.imul(h2 ^ ch, 1597334677);
+    }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
+    h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
+    h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+
+    return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+}
+
 /**
  * Checks if the coordinates are within the elements borders
- * @param {number} x
- * @param {number} y
- * @param {HTMLElement} $elem
- * @returns {boolean}
  */
-function heIsInside($elem, x, y) {
+export function heIsInside($elem: HTMLElement, x: number, y: number): boolean {
     const rect = $elem.getBoundingClientRect();
 
     let isInside = x > rect.left && x < rect.left + rect.width;
     isInside = isInside && y > rect.top && y < rect.top + rect.height;
     return isInside;
 }
-
-export { heCallOnOutsideClick as a, hePositionRelative as b, heEnableBodyScroll as c, heSpaceBelow as h };

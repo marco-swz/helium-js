@@ -10,7 +10,7 @@ export default {
         'src/button.ts',
         'src/dialog.js',
         'src/menu.js',
-        'src/input.js',
+        'src/input.ts',
         'src/check.js',
         'src/form_dialog.js',
         'src/select.js',
