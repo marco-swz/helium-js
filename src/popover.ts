@@ -1,7 +1,7 @@
 import { styles } from './popover_styles.ts';
-import {LitElement, html } from 'lit';
-import {customElement, property } from 'lit/decorators.js';
-import {createRef, Ref, ref} from 'lit/directives/ref.js';
+import { LitElement, html } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
+import { createRef, Ref, ref } from 'lit/directives/ref.js';
 import { heSpaceBelow, hePositionRelative, heEnableBodyScroll, heDisableBodyScroll, RelativePosition } from "./utils.ts";
 
 export type PopoverTrigger = 'click';
@@ -22,23 +22,23 @@ export class HeliumPopover extends LitElement {
         'dismiss',
     ];
     _refPopover: Ref<HTMLDivElement> = createRef();
-    _$attach: null|HTMLElement = null;
-    _$anchor: null|HTMLElement = null;
-    _anchorElement: null|HTMLElement = null;
+    _$attach: null | HTMLElement = null;
+    _$anchor: null | HTMLElement = null;
+    _anchorElement: null | HTMLElement = null;
 
     /** 
      * The anchor element of the popover.
      * The `position` is used relative to this reference.
      */
     @property({ reflect: true, type: String })
-    anchor: string|null = null;
+    anchor: string | null = null;
     /** 
      * The dismiss action for the popover.
      */
     @property({ reflect: true, type: String })
-    dismiss: 'manual'|'auto'|null = null;
+    dismiss: 'manual' | 'auto' | null = null;
     @property({ reflect: true, type: String })
-    position: null|RelativePosition = null;
+    position: null | RelativePosition = null;
     /** 
      * The `open` state of the element.
      * If `open` is set, the options are shown to the user.
@@ -46,9 +46,9 @@ export class HeliumPopover extends LitElement {
     @property({ reflect: true, type: Boolean })
     open = false;
     @property({ reflect: true, type: String })
-    trigger: null|PopoverTrigger = null;
+    trigger: null | PopoverTrigger = null;
     @property({ reflect: true, type: String })
-    attach: null|string = null;
+    attach: null | string = null;
 
     constructor() {
         super();
@@ -82,7 +82,7 @@ export class HeliumPopover extends LitElement {
                     }
                 }
                 break;
-            case 'attach': 
+            case 'attach':
                 let $attach = document.querySelector(newValue);
                 if ($attach == null) {
                     throw new Error('Attachment element not found!');
@@ -90,7 +90,7 @@ export class HeliumPopover extends LitElement {
 
                 this._attachToElement($attach);
                 break;
-            case 'anchor': 
+            case 'anchor':
                 const $anchor = document.querySelector(newValue);
                 if ($anchor == null) {
                     throw new Error(`Anchor element "${newValue}" not found!`);

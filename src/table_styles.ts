@@ -1,3 +1,6 @@
+import { css } from 'lit-element';
+
+export const styles = css`
 :host {
     --he-table-row-backgroundColor: white;
     --he-table-column-maxWidth: 300px;
@@ -505,3 +508,4 @@ table[loading] tbody::after {
 he-form-dialog {
     --he-form-dialog-width: 350px;
 }
+`;

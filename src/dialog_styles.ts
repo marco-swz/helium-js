@@ -1,3 +1,6 @@
+import { css } from 'lit-element';
+
+export const styles = css`
 #he-diag-outer {
     outline: none;
     padding: 0;
@@ -122,3 +125,4 @@
         opacity:0;
     }
 }
+`;

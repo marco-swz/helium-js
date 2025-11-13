@@ -1,10 +1,19 @@
+import { styles } from './table_styles.ts';
+import { LitElement, TemplateResult, html, nothing } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
+import { createRef, Ref, ref } from 'lit/directives/ref.js';
 import { HeliumFormDialog, HeliumFormDialogResponseEvent, HeliumFormDialogSubmitEvent } from './form_dialog.js';
 import { HeliumCheck } from './check.js';
 import { HeliumPopover } from './popover.js';
 import { HeliumDialog } from './dialog.js';
 import { HeliumToggle } from './toggle.js';
 import { HeliumToast } from './toast.js';
-import sheet from './table.css';
+
+export type ColumnType = 'check' | 'edit' | 'duplicate' | 'delete';
+
+export type TableColumn = HTMLElement & {
+    type?: ColumnType,
+}
 
 /**
  * A table supporting CRUD operations and with many additional features.
@@ -195,15 +204,15 @@ import sheet from './table.css';
  * @todo Language abstraction
  * #todo Remove multiple `oncheck` calls when unselecting all rows
  */
-export class HeliumTable extends HTMLElement {
+export class HeliumTable extends LitElement {
     static formAssociated = true;
-    static observedAttributes = [
-        'endpoint',
-        'pagination',
-    ];
 
-    /** @type {?string} */
-    endpoint;
+    @property({ reflect: true, type: String })
+    endpoint: string | null = null;
+    @property({ reflect: true, type: Boolean })
+    columnMenu: boolean = false;
+    @property({ reflect: true, type: String })
+    filter: string | null = null;
     /** @type {?HeliumCheck} */
     $checkAll;
     /** @type {HTMLFormElement} */
@@ -234,8 +243,7 @@ export class HeliumTable extends HTMLElement {
     remap = {};
     /** @type {Object.<string, Array<string>>} */
     options = {};
-    /** @type {ElementInternals} */
-    internals;
+    _internals: ElementInternals;
     /** @type {Object.<string, ?Object.<string, string>>} */
     rowColors = {};
     /** @type {Object.<string, ?Object.<string, string>>} */
@@ -245,10 +253,7 @@ export class HeliumTable extends HTMLElement {
 
     constructor() {
         super();
-        let shadow = this.attachShadow({ mode: "open" });
-        this.internals = this.attachInternals();
-
-        shadow.adoptedStyleSheets = [sheet];
+        this._internals = this.attachInternals();
     }
 
     set loading(val) {
@@ -268,34 +273,15 @@ export class HeliumTable extends HTMLElement {
     }
 
     get validationMessage() {
-        return this.internals.validationMessage;
+        return this._internals.validationMessage;
     }
 
     get validity() {
-        return this.internals.validity;
-    }
-
-    /**
-     * Callback for attribute changes of the web component.
-     * @param {string} name The attribute name
-     * @param {string} _oldValue The previous attribute value
-     * @param {string} newValue The new attribute value
-     * @returns void
-     */
-    attributeChangedCallback(name, _oldValue, newValue) {
-        switch (name) {
-            case 'endpoint':
-                this.endpoint = newValue;
-                break;
-
-            case 'pagination':
-                this.pagination = Number(newValue);
-                break;
-        }
+        return this._internals.validity;
     }
 
     checkValidity() {
-        return this.internals.checkValidity();
+        return this._internals.checkValidity();
     }
 
     connectedCallback() {
@@ -309,7 +295,7 @@ export class HeliumTable extends HTMLElement {
         this._requestRows(this.replaceBody);
         this._updateExternElements([]);
         if (this.getAttribute('submit-all')) {
-            this.internals.setFormValue(JSON.stringify(this.getTableData()));
+            this._internals.setFormValue(JSON.stringify(this.getTableData()));
         }
 
         // All internal input events are not allowed to propagate outwards.
@@ -368,7 +354,7 @@ export class HeliumTable extends HTMLElement {
         }
 
         if (this.getAttribute('submit-all')) {
-            this.internals.setFormValue(JSON.stringify(this.getTableData()));
+            this._internals.setFormValue(JSON.stringify(this.getTableData()));
         }
     }
 
@@ -596,7 +582,7 @@ export class HeliumTable extends HTMLElement {
         }
 
         if (this.getAttribute('submit-all')) {
-            this.internals.setFormValue(JSON.stringify(this.getTableData()));
+            this._internals.setFormValue(JSON.stringify(this.getTableData()));
         }
     }
 
@@ -635,12 +621,12 @@ export class HeliumTable extends HTMLElement {
         }
 
         if (this.getAttribute('submit-all')) {
-            this.internals.setFormValue(JSON.stringify(this.getTableData()));
+            this._internals.setFormValue(JSON.stringify(this.getTableData()));
         }
     }
 
     reportValidity() {
-        return this.internals.reportValidity();
+        return this._internals.reportValidity();
     }
 
 
@@ -1473,53 +1459,47 @@ export class HeliumTable extends HTMLElement {
         return $filter;
     }
 
-    /**
-     * @param {Array<HTMLTableCellElement>} columns
-     */
-    _renderHead(columns) {
-        let $rowFilters = document.createElement('tr');
-        $rowFilters.classList.add('row-filter');
-        let $rowColNames = document.createElement('tr');
-        $rowColNames.classList.add('row-colName');
-        const useColumnMenu = this.getAttribute('column-menu') != null;
-        const attrFilter = this.getAttribute('filter');
+    _renderHead(columns: Array<TableColumn>): TemplateResult<1> {
+        const colNameTemplates: Array<TemplateResult<1>> = [];
+        const colFilterTemplates: Array<TemplateResult<1>> = [];
 
         for (let $column of columns) {
             let colName = $column.getAttribute('column');
             if (colName == null) {
                 colName = $column.innerText;  
-                if (!['check', 'edit', 'duplicate', 'delete'].includes($column.getAttribute('type'))) {
+                if (!['check', 'edit', 'duplicate', 'delete'].includes(getAttribute($column, 'type') ?? '')) {
                     $column.setAttribute('column', colName);
                 }
             }
 
             try {
                 // Numbers are converted to strings to simplify sorting later on
-                this.options[colName] = JSON.parse($column.getAttribute('options'),  (_key, value, data) => typeof value === 'number' ? data.source : value);
+                this.options[colName] = JSON.parse(getAttribute($column, 'options') ?? ''),  
+                    (_key, value, data) => typeof value === 'number' ? data.source : value);
             } catch (error) {
                 throw new Error('The provided options are not valid JSON!');
             }
 
             try {
-                this.remap[colName] = JSON.parse($column.getAttribute('remap'));
+                this.remap[colName] = JSON.parse(getAttribute($column, 'remap') ?? '');
             } catch (error) {
                 throw new Error('The provided remap is not valid JSON!');
             }
 
             try {
-                this.rowColors[colName] = JSON.parse($column.getAttribute('row-color'));
+                this.rowColors[colName] = JSON.parse(getAttribute($column, 'row-color') ?? '');
             } catch (error) {
                 throw new Error('The provided row-color is not valid JSON!');
             }
 
             try {
-                this.rowStyles[colName] = JSON.parse($column.getAttribute('row-style'));
+                this.rowStyles[colName] = JSON.parse(getAttribute($column, 'row-style') ?? '');
             } catch (error) {
                 throw new Error('The provided row-style is not valid JSON!');
             }
 
             try {
-                this.cellStyles[colName] = JSON.parse($column.getAttribute('cell-style'));
+                this.cellStyles[colName] = JSON.parse(getAttribute($column, 'cell-style') ?? '');
             } catch (error) {
                 throw new Error('The provided cell-style is not valid JSON!');
             }
@@ -1592,6 +1572,10 @@ export class HeliumTable extends HTMLElement {
                 $spanName.style.position = 'unset';
             }
 
+            html`
+                <td>
+                </td>
+            `;
             $column.append($contHeaderCell);
             $rowColNames.append($column);
         }
@@ -1602,7 +1586,23 @@ export class HeliumTable extends HTMLElement {
             $tHead.append($rowFilters);
         }
 
-        return $tHead;
+        return html`
+            <thead>
+                <tr class="row-colName">
+                    ${colNameTemplates}
+                </tr>
+                ${
+                    this.columnMenu 
+                        ? nothing 
+                        : html`
+                            <tr class="row-filter">
+                                ${colFilterTemplates}
+                            </tr>
+                        `
+                }
+            </thead>
+        `;
+
     }
 
     _renderColumnMenu($column) {
@@ -1695,21 +1695,20 @@ export class HeliumTable extends HTMLElement {
         return $menu;
     }
 
+    render() {
+        html`
+            <form id="form-tbl">
+                <table>
+                    <tr></tr>
+                    <tr
+                </table>
+            </form>
+        `;
+    }
+
     _renderTable() {
         const shadow = this.shadowRoot;
         const columns = this.querySelectorAll('th');
-
-        this.id = this.id == ''
-            ? 'he-table-' + Math.floor(Math.random() * (1e10 + 1))
-            : this.id;
-
-        let $table = document.createElement('table');
-
-        this.$form = document.createElement('form');
-        this.$form.id = "form-tbl";
-        this.$form.append($table);
-
-        shadow.append(this.$form);
 
         const $tHead = this._renderHead(columns);
         $table.append($tHead);
@@ -1850,7 +1849,7 @@ export class HeliumTable extends HTMLElement {
         // The form value only needs to be set when the name is set.
         // This avoids parsing all checked rows each click.
         if (this.getAttribute('name') && this.getAttribute('submit-all') == null) {
-            this.internals.setFormValue(JSON.stringify(this.value));
+            this._internals.setFormValue(JSON.stringify(this.value));
         }
 
         const evt = new CustomEvent('input', {
@@ -1860,6 +1859,11 @@ export class HeliumTable extends HTMLElement {
         })
         this.dispatchEvent(evt);
     }
+}
+
+function getAttribute($element: HTMLElement, attr: string): null | string {
+    // @ts-ignore
+    return $element[attr] ?? $element.getAttribute(attr);
 }
 
 if (!customElements.get('he-table')) {

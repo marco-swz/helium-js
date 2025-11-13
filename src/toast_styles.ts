@@ -1,3 +1,6 @@
+import { css } from 'lit-element';
+
+export const styles = css`
 :host {
     position: fixed;
     top: unset;
@@ -120,3 +123,4 @@
     /* --circle-fill: 100%; */
     background-color: whitesmoke;
 }
+`

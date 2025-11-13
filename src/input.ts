@@ -1,7 +1,7 @@
 import { styles } from './input_styles.ts';
-import {LitElement, html } from 'lit';
-import {customElement, property } from 'lit/decorators.js';
-import {createRef, Ref, ref} from 'lit/directives/ref.js';
+import { LitElement, html } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
+import { createRef, Ref, ref } from 'lit/directives/ref.js';
 
 @customElement('he-input')
 export class HeliumInput extends LitElement {
@@ -16,7 +16,7 @@ export class HeliumInput extends LitElement {
     _refInput: Ref<HTMLInputElement> = createRef();
 
     @property({ reflect: true, type: String })
-    default: string|null = null;
+    default: string | null = null;
     @property({ reflect: true, type: Boolean })
     disabled = false;
     @property({ reflect: true, type: Boolean })
@@ -24,23 +24,23 @@ export class HeliumInput extends LitElement {
     @property({ reflect: true, type: Boolean })
     loading = false;
     @property({ reflect: true, type: String })
-    name: string|null = null;
+    name: string | null = null;
     @property({ reflect: true, type: Boolean })
     ok = false;
     @property({ reflect: true, type: String })
-    placeholder: string|null = null;
+    placeholder: string | null = null;
     @property({ reflect: true, type: Boolean })
     required = false;
     @property({ reflect: true, type: Boolean })
     readonly = false;
     @property({ reflect: true, type: String })
-    type: string|null = null;
+    type: string | null = null;
     @property({ reflect: true, type: String })
-    value: string|null = null;
+    value: string | null = null;
     @property({ reflect: true, type: Number })
-    step: number|null = null;
+    step: number | null = null;
     @property({ reflect: true, type: String })
-    pattern: string|null = null;
+    pattern: string | null = null;
 
     render() {
         return html`
@@ -85,7 +85,7 @@ export class HeliumInput extends LitElement {
                     this._internals.setFormValue(newValue);
                 }
                 break;
-            case 'value': 
+            case 'value':
                 if (!this.disabled) {
                     this._internals.setFormValue(newValue ?? '');
                 }
