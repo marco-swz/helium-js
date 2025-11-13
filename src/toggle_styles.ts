@@ -1,3 +1,6 @@
+import { css } from 'lit-element';
+
+export const styles = css`
 :host {
     --he-toggle-color: black;
     --he-toggle-backgroundColor: white;
@@ -40,3 +43,4 @@
 :host([variant=outline]) {
     border: 1px solid var(--he-toggle-outline-borderColor);
 }
+`;

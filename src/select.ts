@@ -1,9 +1,19 @@
-import sheet from './select.css';
-import { heSpaceBelow, heCallOnOutsideClick } from "./utils.js";
+import { styles } from './select_styles.ts';
+import { LitElement, html, nothing } from 'lit';
+import { customElement, property, query, queryAssignedElements } from 'lit/decorators.js';
+import { createRef, ref, Ref } from 'lit/directives/ref.js';
+
 import { HeliumPopover } from "./popover.js";
 import { HeliumInput } from "./input.js";
+import { heCallOnOutsideClick, heSpaceBelow, RelativePosition } from './utils.ts';
 
+@customElement('he-select')
 export class HeliumSelect extends HTMLElement {
+    static get styles() {
+        return [
+            styles
+        ];
+    }
     static formAssociated = true;
     static observedAttributes = [
         'open',
@@ -12,173 +22,120 @@ export class HeliumSelect extends HTMLElement {
         'placeholder',
         'readonly',
     ];
-    /** @type {HeliumPopover} */
-    $popover;
-    /** @type {HTMLDivElement} */
-    $popoverContent;
-    /** @type {HeliumInput} */
-    $filter;
-    /** @type {HTMLElement} */
-    $options;
-    /** @type {Set<HTMLElement>} */
-    selections;
-    /** @type {HTMLElement} */
-    $button;
-    /** @type {HTMLDivElement} */
-    $contButton;
-    /** @type {ElementInternals} */
-    internals;
+
+    _refPopoverContent: Ref<HTMLDivElement> = createRef();
+    _refFilter: Ref<HeliumInput> = createRef();
+    _refButton: Ref<HTMLElement> = createRef();
+    _refContButton: Ref<HTMLDivElement> = createRef();
+    _refPopover: Ref<HeliumPopover> = createRef();
+    _refOptions: Ref<HTMLElement> = createRef();
+
+    _$highlight: HTMLOptionElement | null = null;
+
+    @queryAssignedElements({ slot: '' })
+    _slottedElements!: Array<HTMLElement>
+
+    _selections: Set<HTMLElement>;
+    _internals: ElementInternals;
     /** @type {?function(HTMLOptionElement, string) -> Promise<?HTMLOptionElement>} */
     createCallback;
     /** @type {function(string, HtmlElement): boolean} */
     onfilterelement = this._onFilterelementDefault;
     /** @type {number | TimerHandler} */
     _filterTimeout = 0;
-    /** @type {boolean} A flag to know, if the connectedCallback has already been called */
-    _isInit = false;
-    /** @type {function(InputEvent): void} The click handler to detect outside clicks. This should be cleaned up when closing */
-    _handleClickDocument;
-
-    constructor() {
-        super();
-        this.selections = new Set();
-        let shadow = this.attachShadow({ mode: "open" });
-        this.internals = this.attachInternals();
-
-        this.$contButton = document.createElement('div');
-        this.$contButton.id = 'cont-button';
-        shadow.append(this.$contButton);
-
-        this.$popover = document.createElement('he-popover');
-        this.$popover.id = 'popover';
-        this.$popover.dismiss = 'manual';
-        this.$popover.$anchor = this.$contButton;
-
-        this.$popoverContent = document.createElement('div');
-        this.$popoverContent.id = 'popover-content';
-        this.$popoverContent.slot = 'content'
-        this.$popover.append(this.$popoverContent);
-
-        this.$filter = document.createElement('he-input');
-        this.$filter.id = 'filter';
-        this.$filter.style.display = 'none';
-        this.$filter.oninput = (e) => this._handleChangeFilter.bind(this)(e);
-
-        this.$button = document.createElement('button');
-        this.$button.id = 'inp';
-        this.$button.onclick = () => {
-            this.open = true;
-        };
-        this.$contButton.append(this.$button);
-
-        this.$options = document.createElement('div');
-        this.$options.id = 'cont-options';
-        this.$popoverContent.append(this.$options);
-
-        this.onkeydown = async (e) => await this._handleKeydown(e);
-
-        shadow.append(this.$popover);
-        shadow.adoptedStyleSheets = [sheet];
-    }
+    /** @type flag to know, if the connectedCallback has already been called */
+    _isInit: boolean = false;
+    /** @type The click handler to detect outside clicks. This should be cleaned up when closing */
+    _handleClickDocument?: (this: Document, ev: PointerEvent) => any;
 
     /**
      * Disables or enables the select.
-     * @type {boolean}
      */
-    set disabled(val) {
-        if (val) {
-            this.setAttribute('disabled', true);
-        } else {
-            this.removeAttribute('disabled');
-        }
-    }
-
-    get disabled() {
-        return this.getAttribute('disabled') !== null;
-    }
-
+    @property({ type: Boolean, reflect: true })
+    disabled = false;
     /**
      * Gets or sets the filter attribute.
      * The filter allows searching the options of the select.
-     * @type {boolean}
      */
-    set filter(val) {
-        if (val) {
-            this.setAttribute('filter', true);
-        } else {
-            this.removeAttribute('filter');
-        }
-    }
-
-    get filter() {
-        return this.getAttribute('filter') !== null;
-    }
-
+    @property({ type: String, reflect: true })
+    filter: 'inline' | 'popover' | null = 'popover';
     /** 
      * Gets or sets the name of the element for form submissions.
      * @type {string} 
      */
-    set name(val) {
-        if (val) {
-            this.setAttribute('name', val)
-        } else {
-            this.removeAttribute('name');
-        }
-    }
-
-    get name() {
-        return this.getAttribute('name');
-    }
-
+    @property({ type: String, reflect: true })
+    name: String | null = null;
     /** 
      * Gets or sets the `open` state of the element.
      * If `open` is set, the options are shown to the user.
-     * @type {boolean} 
      */
-    set open(val) {
-        if (val) {
-            this.setAttribute('open', '');
-        } else {
-            this.removeAttribute('open');
-        }
-    }
-
-    get open() {
-        return this.getAttribute('open') !== null;
-    }
-
+    @property({ type: Boolean, reflect: true })
+    open = false;
     /**
      * Gets or sets the placeholder.
      * This is used as hint, if the input is empty.
-     * @type {string}
      */
-    set placeholder(val) {
-        if (val) {
-            this.setAttribute('placeholder', val);
-        } else {
-            this.removeAttribute('placeholder');
-        }
-    }
-
-    get placeholder() {
-        return this.getAttribute('placeholder');
-    }
+    @property({ type: String, reflect: true })
+    placeholder: String | null = null;
 
     /**
      * Disables or enables the select.
-     * @type {boolean}
      */
-    set readonly(val) {
-        if (val) {
-            this.setAttribute('readonly', '');
-        } else {
-            this.removeAttribute('readonly');
-        }
+    @property({ type: Boolean, reflect: true })
+    readonly = false;
+    @property({ type: Boolean, reflect: true })
+    empty = false;
+    @property({ type: Boolean, reflect: true })
+    multiple = false;
+    @property({ type: String, reflect: true })
+    position: RelativePosition | null = null;
+
+    render() {
+        const filter = html`
+            <he-input
+                id="filter"
+                @input=${() => this._handleChangeFilter.bind(this)()}
+                ${ref(this._refFilter)}
+                ${this.filter === 'inline' ? html`style="display: none"` : nothing}
+            ></he-input>
+        `;
+        return html`
+            <div id="cont-button"
+                ${ref(this._refContButton)}
+            >
+                <button id="inp"
+                    ${ref(this._refButton)}
+                    @click=${() => this.open = true}
+                ></button>
+                ${this.filter === 'inline' ? filter : nothing}
+            </div>
+            <he-popover
+                id="popover"
+                dismiss="manual"
+                anchor="#cont-button"
+                ${ref(this._refPopover)}
+            >
+                <div id="popover-content"
+                    ${ref(this._refPopoverContent)}
+                >
+                    ${this.filter === 'popover' ? filter : nothing}
+                    <div id="cont-options"
+                        ${ref(this._refOptions)}
+                    >
+                        <slot @slotchange=${() => this._handleSlotchange.bind(this)()}></slot>
+                    </div>
+                </div>
+            </he-popover>
+        `
     }
 
-    get readonly() {
-        return this.getAttribute('readonly') !== null;
+    constructor() {
+        super();
+        this._selections = new Set();
+        this._internals = this.attachInternals();
+        this.onkeydown = async (e) => await this._handleKeydown(e);
     }
+
 
     set value(val) {
         if (val == null) {
@@ -200,13 +157,13 @@ export class HeliumSelect extends HTMLElement {
             }
         }
 
-        this._setButtonText(this.selections);
+        this._setButtonText(this._selections);
         this._updateFormValue();
     }
 
     get value() {
         let selVals = [];
-        this.selections.forEach($sel => selVals.push($sel.value ?? $sel.getAttribute('value')));
+        this._selections.forEach($sel => selVals.push($sel.value ?? $sel.getAttribute('value')));
         if (this.hasAttribute('multiple')) {
             return selVals;
         }
@@ -221,23 +178,27 @@ export class HeliumSelect extends HTMLElement {
 
     /**
      * 
-     * @param {string} text
-     * @param {string} value
-     * @param {function(HTMLOptionElement, HTMLOptionElement): boolean} fnInsertBeforeTrigger A callback to determine where to insert the new option. Once this callback returns `true`, it will be inserted before.
-     * @returns {HTMLOptionElement} The inserted option element
+     * @param text
+     * @param value
+     * @param fnInsertBeforeTrigger A callback to determine where to insert the new option. Once this callback returns `true`, it will be inserted before.
+     * @returns The inserted option element
      */
-    addOption(text, value, fnInsertBeforeTrigger = null) {
+    addOption(
+        text: string,
+        value: string,
+        fnInsertBeforeTrigger?: (arg0: HTMLOptionElement, arg1: HTMLOptionElement
+        ) => boolean): HTMLOptionElement {
         let $option = this._renderOption(text, value);
         return this._addOption($option, fnInsertBeforeTrigger);
     }
 
     /**
      * Callback for attribute changes of the web component.
-     * @param {string} name The attribute name
-     * @param {string} _oldValue The previous attribute value
-     * @param {string} newValue The new attribute value
+     * @param name The attribute name
+     * @param _oldValue The previous attribute value
+     * @param newValue The new attribute value
      */
-    attributeChangedCallback(name, _oldValue, newValue) {
+    attributeChangedCallback(name: string, _oldValue: string, newValue: string): void {
         switch (name) {
             case 'open':
                 if (newValue != null) {
@@ -246,18 +207,11 @@ export class HeliumSelect extends HTMLElement {
                     this._hidePopover();
                 }
                 break;
-            case 'filter':
-                if (newValue == null || newValue === 'false') {
-                    this.$filter.style.display = "none";
-                } else {
-                    this.$filter.style.display = "";
-                }
-                break;
             case 'disabled':
                 if (newValue != null) {
-                    this.internals.setFormValue(null);
+                    this._internals.setFormValue(null);
                 } else {
-                    this.internals.setFormValue(this.value);
+                    this._internals.setFormValue(this.value);
                 }
                 break;
             case 'placeholder':
@@ -270,9 +224,8 @@ export class HeliumSelect extends HTMLElement {
     /**
      * Checks if the value of the select is valid and
      * reports the validity to external elements.
-     * @returns {boolean}
      */
-    checkValidity() {
+    checkValidity(): boolean {
         return true;
     }
 
@@ -286,44 +239,12 @@ export class HeliumSelect extends HTMLElement {
         }
         this._isInit = true;
 
-        switch (this.getAttribute('filter')) {
-            case 'inline':
-                this.$contButton.append(this.$filter);
-                this.$filter.style.display = 'none';
-                break;
-            default:
-                this.$popoverContent.prepend(this.$filter);
-                break;
-        }
+        $slot.addEventListener('slotchange', (e) => this._handleSlotchange(e));
 
-        if (this.hasAttribute('slotted')) {
-            let $slot = document.createElement('slot');
-            $slot.name = 'option';
-            $slot.addEventListener('slotchange', (e) => this._handleSlotchange(e));
-            this.$options.append($slot);
-            $slot = document.createElement('slot');
-            $slot.name = 'button';
-            this.$button.append($slot);
-        } else {
-            for (let $opt of this.querySelectorAll('option')) {
-                $opt.onclick = (e) => this._handleClickOption.bind(this)(e);
-                this.$options.append($opt);
-                if ($opt.hasAttribute('selected')) {
-                    this._addSelection($opt);
-                }
-            }
-
-            if (this.$options.children.length === 0) {
-                this.setAttribute('empty', '');
-            } else {
-                this.removeAttribute('empty');
-            }
-        }
-
-        if (this.selections.size === 0 && !this.hasAttribute('multiple')) {
+        if (this._selections.size === 0 && !this.hasAttribute('multiple')) {
             this.select(0);
         } else {
-            this._setButtonText(this.selections);
+            this._setButtonText(this._selections);
         }
 
         if (this.hasAttribute('open')) {
@@ -344,8 +265,8 @@ export class HeliumSelect extends HTMLElement {
      */
     getOptions() {
         return Array.from(this.hasAttribute('slotted')
-            ? this.$options.children[0].assignedNodes()
-            : this.$options.children);
+            ? this._refOptions.children[0].assignedNodes()
+            : this._refOptions.children);
     }
 
     /**
@@ -364,7 +285,7 @@ export class HeliumSelect extends HTMLElement {
             }
         }
 
-        this._setButtonText(this.selections);
+        this._setButtonText(this._selections);
         this._updateFormValue();
 
         return this;
@@ -415,8 +336,8 @@ export class HeliumSelect extends HTMLElement {
             $replace.innerHTML = text;
         }
 
-        if (this.selections.has($replace)) {
-            this._setButtonText(this.selections);
+        if (this._selections.has($replace)) {
+            this._setButtonText(this._selections);
             this._updateFormValue();
         }
     }
@@ -432,7 +353,7 @@ export class HeliumSelect extends HTMLElement {
         if (this.hasAttribute('slotted')) {
             this.innerHTML = '';
         } else {
-            this.$options.innerHTML = '';
+            this._refOptions.innerHTML = '';
         }
 
         displayMapping = displayMapping ?? {};
@@ -494,10 +415,9 @@ export class HeliumSelect extends HTMLElement {
 
     /**
      * Opens the select element if closed, closes it if open.
-     * @returns {Self}
      */
-    toggle() {
-        this.$popover.togglePopover();
+    toggle(): HeliumSelect {
+        this._refPopover.togglePopover();
         return this;
     }
 
@@ -509,7 +429,7 @@ export class HeliumSelect extends HTMLElement {
         window.clearTimeout(this._filterTimeout);
 
         this._filterTimeout = setTimeout(() => {
-            let filterVal = this.$filter.value;
+            let filterVal = this._refFilter.value;
             if (filterVal) {
             }
 
@@ -547,7 +467,7 @@ export class HeliumSelect extends HTMLElement {
         const $target = e.currentTarget;
 
         if (this.hasAttribute('multiple')) {
-            if (this.selections.has($target)) {
+            if (this._selections.has($target)) {
                 this._removeSelection($target);
             } else {
                 this._addSelection($target);
@@ -567,29 +487,36 @@ export class HeliumSelect extends HTMLElement {
             return;
         }
 
-        if (this.selections.size === 0) {
+        if (this._selections.size === 0) {
             return;
         }
 
-        this.selections.forEach($opt => $opt.removeAttribute('selected'));
-        this.selections.clear();
+        this._selections.forEach($opt => $opt.removeAttribute('selected'));
+        this._selections.clear();
 
         if (updateButtonText) {
-            this._setButtonText(this.selections);
+            this._setButtonText(this._selections);
         }
         if (updateFormValue) {
             this._updateFormValue();
         }
     }
 
-    _addOption($option, fnInsertBeforeTrigger = null) {
-        let $contInsert = this;
+    _addOption(
+        $option: HTMLOptionElement,
+        fnInsertBeforeTrigger?: (arg0: HTMLOptionElement, arg1: HTMLOptionElement) => boolean,
+    ): HTMLOptionElement | null {
+        let $contInsert: HTMLElement | undefined = this;
         if (this.hasAttribute('slotted')) {
             $option.slot = 'option';
             //$opt.onclick = (e) => this._handleClickOption.bind(this)(e);
         } else {
-            $contInsert = this.$options;
+            $contInsert = this._refOptions.value;
             $option.onclick = (e) => this._handleClickOption.bind(this)(e);
+        }
+
+        if ($contInsert == null) {
+            return null;
         }
 
         if (fnInsertBeforeTrigger == null) {
@@ -598,7 +525,7 @@ export class HeliumSelect extends HTMLElement {
         }
 
         for (const $el of $contInsert.children) {
-            if (fnInsertBeforeTrigger($el, $option)) {
+            if (fnInsertBeforeTrigger($el as HTMLOptionElement, $option)) {
                 $contInsert.insertBefore($option, $el);
                 return $option;
             }
@@ -609,46 +536,41 @@ export class HeliumSelect extends HTMLElement {
     }
 
 
-    /**
-     * 
-     * @param {} 
-     * @returns {void}
-     */
-    _addSelection($option, updateButtonText = true, updateFormValue = true) {
-        if (this.selections.has($option)) {
+    _addSelection($option: HTMLOptionElement, updateButtonText = true, updateFormValue = true): void {
+        if (this._selections.has($option)) {
             return;
         }
 
         if (!this.hasAttribute('multiple')) {
-            this.selections.forEach($opt => $opt.removeAttribute('selected'));
-            this.selections.clear();
+            this._selections.forEach($opt => $opt.removeAttribute('selected'));
+            this._selections.clear();
         }
-        this.selections.add($option);
+        this._selections.add($option);
         $option.setAttribute('selected', '');
         if (updateButtonText) {
-            this._setButtonText(this.selections);
+            this._setButtonText(this._selections);
         }
         if (updateFormValue) {
             this._updateFormValue();
         }
     }
 
-    _removeSelection($option, updateButtonText = true, updateFormValue = true) {
-        if (!this.selections.has($option)) {
+    _removeSelection($option: HTMLOptionElement, updateButtonText = true, updateFormValue = true) {
+        if (!this._selections.has($option)) {
             return;
         }
 
-        this.selections.delete($option)
+        this._selections.delete($option)
         $option.removeAttribute('selected');
         if (updateButtonText) {
-            this._setButtonText(this.selections);
+            this._setButtonText(this._selections);
         }
         if (updateFormValue) {
             this._updateFormValue();
         }
     }
 
-    _renderOption(text, value = null) {
+    _renderOption(text: string, value?: string) {
         let $opt = document.createElement('option');
         $opt.value = value ?? text;
         $opt.innerHTML = text;
@@ -657,9 +579,8 @@ export class HeliumSelect extends HTMLElement {
 
     /**
      * This callback handles all shortcuts.
-     * @param {KeyboardEvent} e
      */
-    async _handleKeydown(e) {
+    async _handleKeydown(e: KeyboardEvent) {
         switch (e.key) {
             case 'ArrowDown':
                 e.preventDefault();
@@ -672,13 +593,13 @@ export class HeliumSelect extends HTMLElement {
             case 'Enter':
                 if (this.open) {
                     e.preventDefault();
-                    const filterVal = this.$filter.value;
+                    const filterVal = this._refFilter.value?.value ?? '';
                     const $$options = this.getOptions();
-                    let $option = this.$highlight ?? $$options.find(o => o.innerHTML === filterVal);
+                    let $option = this._$highlight ?? $$options.find((o: any) => o.innerHTML === filterVal);
 
                     const attrCreate = this.getAttribute('create');
                     let $createOption = $option;
-                    if ($option == null && attrCreate != null && filterVal !== '' && this.$highlight == null) {
+                    if ($option == null && attrCreate != null && filterVal !== '' && this._$highlight == null) {
                         $option = this._renderOption(filterVal, filterVal);
                         const createCallback = this.createCallback ?? window[this.getAttribute('create-callback')];
 
@@ -707,7 +628,7 @@ export class HeliumSelect extends HTMLElement {
                     }
 
                     if (this.hasAttribute('multiple')) {
-                        if (this.selections.has($option)) {
+                        if (this._selections.has($option)) {
                             this._removeSelection($option);
                         } else {
                             this._addSelection($option);
@@ -730,68 +651,63 @@ export class HeliumSelect extends HTMLElement {
     }
 
     _handleSlotchange() {
-        let selectionsToDel = new Set(this.selections);
+        let selectionsToDel = new Set(this._selections);
         let isEmpty = true;
-        for (let $opt of this.$options.children[0].assignedNodes()) {
+        for (let $opt of this._slottedElements) {
             selectionsToDel.delete($opt);
             $opt.onclick = (e) => this._handleClickOption.bind(this)(e);
             isEmpty = false;
         }
 
         if (isEmpty) {
-            this.setAttribute('empty', '');
+            this.empty = true;
         } else {
-            this.removeAttribute('empty');
+            this.empty = false;
         }
 
         if (selectionsToDel.size > 0) {
             selectionsToDel.forEach($opt => this._removeSelection($opt, false, false));
 
-            if (this.selections.size > 0) {
-                this._setButtonText(this.selections);
+            if (this._selections.size > 0) {
+                this._setButtonText(this._selections);
                 this._updateFormValue();
             }
         }
 
-        if (this.selections.size === 0 && !this.hasAttribute('multiple')) {
+        if (this._selections.size === 0 && !this.multiple) {
             this.select(0);
         }
     }
 
     /**
      * This callback is responsible for hiding the popover
-     * @returns {void}
      */
-    _hidePopover() {
+    _hidePopover(): void {
         this._highlight();
-        if (this.getAttribute('filter') === 'inline') {
-            this.$button.style.display = '';
-            this.$filter.style.display = 'none';
+        if (this._refFilter.value) {
+            this._refFilter.value.value = '';
         }
-        this.$filter.value = '';
-        this.$popover.hidePopover();
+        this._refPopover.value?.hidePopover();
+        // @ts-ignore
         document.removeEventListener('click', this._handleClickDocument);
     }
 
-    /**
-     * @param {?HTMLElement} $option
-     */
-    _highlight($option) {
-        if (this.$highlight) {
-            this.$highlight.removeAttribute('highlighted');
+    _highlight($option?: HTMLOptionElement) {
+        if (this._$highlight) {
+            this._$highlight.removeAttribute('highlighted');
         }
         if ($option == null) {
-            this.$highlight = null;
+            this._$highlight = null;
             return;
         }
-        this.$highlight = $option;
-        this.$highlight.setAttribute('highlighted', '');
+        this._$highlight = $option;
+        this._$highlight.setAttribute('highlighted', '');
     }
 
     /**
      * Selects the next option.
      */
-    _moveOption(visualOnly, dir) {
+    _moveOption(visualOnly: boolean, dir: -1 | 1) {
         if (!visualOnly && this.getAttribute('multiple')) {
             return;
         }
@@ -802,10 +718,10 @@ export class HeliumSelect extends HTMLElement {
         }
 
         let i = 0;
-        if (this.$highlight != null) {
+        if (this._$highlight != null) {
             i = dir + Array.prototype.indexOf.call(
                 options,
-                this.$highlight
+                this._$highlight
             );
         } else if (dir < 0) {
             i = options.length - 1;
@@ -845,35 +761,50 @@ export class HeliumSelect extends HTMLElement {
 
     /**
      * This callback is responsible for showing the popover.
-     * @returns {void}
      */
-    _showPopover() {
-        if (this.getAttribute('filter') === 'inline') {
-            this.$button.style.display = 'none';
-            this.$filter.style.display = '';
+    _showPopover(): void {
+        const $popover = this._refPopover.value;
+        const $button = this._refButton.value;
+        const $filter = this._refFilter.value;
+        const $popoverContent = this._refPopoverContent.value;
+        const $contButton = this._refContButton.value;
+        const $options = this._refOptions.value;
+        if ($popover == null 
+            || $button == null 
+            || $filter == null 
+            || $popoverContent == null
+            || $contButton == null
+            || $options == null
+        ) {
+            return
         }
 
-        let positionDefault = 'bottom-left';
-        if (heSpaceBelow(this) < this.$popover.offsetHeight + 20) {
+        if (this.getAttribute('filter') === 'inline') {
+            $button.style.display = 'none';
+            $filter.style.display = '';
+        }
+
+        let positionDefault: RelativePosition = 'bottom-left';
+        if (heSpaceBelow(this) < $popover.offsetHeight + 20) {
             positionDefault = 'top-left';
         }
-        this._handleClickDocument = heCallOnOutsideClick([this.$popoverContent, this.$contButton], () => {
+        this._handleClickDocument = heCallOnOutsideClick([$popoverContent, $contButton], () => {
             this.open = false;
         });
 
-        this.$popover.setAttribute('position', this.getAttribute('position') ?? positionDefault);
-        this.$filter.value = '';
+        $popover.position = this.position ?? positionDefault;
+        $filter.value = '';
         this.showOptions();
 
-        let btnWidth = this.$contButton.getBoundingClientRect().width;
-        this.$options.style.width = `var(--he-select-popover-width, ${btnWidth}px)`;
+        let btnWidth = $contButton.getBoundingClientRect().width;
+        $options.style.width = `var(--he-select-popover-width, ${btnWidth}px)`;
 
-        this.$popover.style.visibility = 'hidden';
-        this.$popover.showPopover();
-        this.$popover.style.visibility = '';
+        $popover.style.visibility = 'hidden';
+        $popover.showPopover();
+        $popover.style.visibility = '';
 
         setTimeout(() => {
-            this.$filter.focus();
+            $filter.focus();
         }, 20);
     }
 
@@ -899,22 +830,18 @@ export class HeliumSelect extends HTMLElement {
             if (html === '' && placeholder != null) {
                 html = '<span class="placeholder">' + placeholder + '</span>';
             }
-            this.$button.innerHTML = html;
+            this._refButton.innerHTML = html;
         }
     }
 
     _updateFormValue() {
-        if (this.selections.size === 0) {
-            this.internals.setFormValue(null);
+        if (this._selections.size === 0) {
+            this._internals.setFormValue(null);
             return;
         }
 
         if (!this.disabled) {
-            this.internals.setFormValue(this.value);
+            this._internals.setFormValue(this.value);
         }
     }
-}
-
-if (!customElements.get('he-select')) {
-    customElements.define("he-select", HeliumSelect);
 }

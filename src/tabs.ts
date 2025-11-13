@@ -1,32 +1,43 @@
-import sheet from './tabs.css';
+import { styles } from './tabs_styles.ts';
+import { LitElement, html } from 'lit';
+import { customElement, property, query, queryAssignedElements } from 'lit/decorators.js';
 
-export class HeliumTabs extends HTMLElement {
+@customElement('he-tabs')
+export class HeliumTabs extends LitElement {
+    static get styles() {
+        return [
+            styles
+        ];
+    }
     static observedAttributes = [
         "tab",
     ];
-    /** @type {HTMLElement} */
-    $navBar;
-    /** @type {HTMLSlotElement} */
-    $slotContent;
-    /** @type {Number} The index of the currently selected tab */
-    tabNrSelected;
+
+    @query('#he-tabs-nav')
+    _$navBar!: HTMLElement
+    @queryAssignedElements({ slot: 'tab' })
+    _slottedElements!: Array<HTMLElement>
+
+    @property({ type: Number, reflect: true }) 
+    tab: number | null = null;
 
     constructor() {
         super();
-        let shadow = this.attachShadow({ mode: "open" });
+    }
 
-        shadow.adoptedStyleSheets = [sheet];
-        shadow.innerHTML = `
-            <nav id="he-tabs-nav">
+    render() {
+        return html`
+            <nav 
+                id="he-tabs-nav"
+            >
             </nav>
             <div id="he-tabs-content">
-                <slot name="tab"/>
+                <slot 
+                    name="tab"
+                    @slotchange=${this._handleSlotChange}
+                ></slot>
             </div>
         `;
-
-        this.$navBar = shadow.querySelector('#he-tabs-nav');
-        this.$slotContent = shadow.querySelector('slot[name=tab]');
-        shadow.addEventListener('slotchange', e => this.slotChangeCallback(e, this));
     }
 
     connectedCallback() {
@@ -34,11 +45,11 @@ export class HeliumTabs extends HTMLElement {
 
     /**
      * Callback for attribute changes of the web component.
-     * @param {string} name The attribute name
-     * @param {string} _oldValue The previous attribute value
-     * @param {string} newValue The new attribute value
+     * @param name The attribute name
+     * @param _oldValue The previous attribute value
+     * @param newValue The new attribute value
      */
-    attributeChangedCallback(name, _oldValue, newValue) {
+    attributeChangedCallback(name: string, _oldValue: string, newValue: string) {
         switch (name) {
             case 'tab':
                 this.showTab(Number(newValue));
@@ -46,10 +57,10 @@ export class HeliumTabs extends HTMLElement {
         }
     }
 
-    hideTab(tabNr) {
+    hideTab(tabNr: number) {
         let $nav = this._getTabNav(tabNr);
         $nav.style.display = 'none';
-        if (this.tabNrSelected === tabNr) {
+        if (this.tab === tabNr) {
             this._selectFirstVisible();
         }
     }
@@ -57,12 +68,9 @@ export class HeliumTabs extends HTMLElement {
     /**
      * Callback for slot changes.
      * Rebuilds the tabs and shows the correct content.
-     * @param {Event} event 
-     * @param {HeliumTabs} self 
      */
-    slotChangeCallback(event, self) {
-        /** @type {HTMLSlotElement} */
-        const slot = event.target;
+    _handleSlotChange(event: Event, self: HeliumTabs) {
+        const slot = <HTMLSlotElement>event.target!;
         let tabNr = 0;
         let firstVisible = null;
 
@@ -70,8 +78,7 @@ export class HeliumTabs extends HTMLElement {
             if ($elem.slot === 'tab') {
                 let isHidden = $elem.hasAttribute('hidden');
 
-                /** @type {HTMLSpanElement} */
-                let $span = document.createElement('span');
+                let $span: HTMLSpanElement = document.createElement('span');
 
                 let tabSlotName = $elem.getAttribute('title-slot');
                 if (tabSlotName == null) {
@@ -84,8 +91,8 @@ export class HeliumTabs extends HTMLElement {
                 }
 
                 const checkId = 'he-tabs-check' + tabNr;
-                /** @type {HTMLLabelElement} */
-                let $label = document.createElement('label');
+                let $label: HTMLLabelElement = document.createElement('label');
+                // @ts-ignore
                 $label.for = checkId;
                 if (isHidden) {
                     $label.style.display = 'none';
@@ -93,22 +100,22 @@ export class HeliumTabs extends HTMLElement {
                     firstVisible = tabNr;
                 }
 
-                /** @type {HTMLInputElement} */
-                let $check = document.createElement('input');
+                let $check: HTMLInputElement = document.createElement('input');
                 $check.id = checkId;
                 $check.type = 'radio';
                 $check.name = 'he-tabs-idx';
-                $check.value = tabNr;
+                $check.value = String(tabNr);
                 $check.setAttribute('hidden', 'true');
-                $check.onchange = e => self.tabChangeCallback(e);
+                $check.onchange = e => self._handleChangeTab(e);
 
                 if (tabNr > 0) {
+                    // @ts-ignore
                     $elem.style.display = 'none';
                 }
 
                 $label.append($check);
                 $label.append($span);
-                self.$navBar.append($label);
+                self._$navBar.append($label);
 
                 tabNr++;
             }
@@ -118,17 +125,16 @@ export class HeliumTabs extends HTMLElement {
             return;
         }
 
-        self.showTab(self.getAttribute('tab') ?? firstVisible);
+        self.showTab(Number(self.getAttribute('tab') ?? firstVisible));
     }
 
     /**
      * Shows the tab with the provided index.
-     * @param {Number} tabNr The index of the tab
+     * @param tabNr The index of the tab
      */
-    showTab(tabNr) {
+    showTab(tabNr: number): void {
         const id = '#he-tabs-check' + tabNr;
-        /** @type {HTMLInputElement} */
-        let check = this.$navBar.querySelector(id);
+        let check = this._$navBar.querySelector<HTMLInputElement>(id);
         if (check !== null) {
             check.click();
         }
@@ -137,23 +143,27 @@ export class HeliumTabs extends HTMLElement {
     /**
      * Callback for changes of the tab bar.
      * Hides the old content and shows the new.
-     * @param {Event} e
      */
-    tabChangeCallback(e) {
-        /** @type {HTMLInputElement} */
-        const check = e.target;
+    _handleChangeTab(e: Event): void {
+        const check = e.target as HTMLInputElement;
         const tabNrNew = Number(check.value);
-        const contentOld = this.children.item(this.tabNrSelected);
-        contentOld.style.display = 'none';
+        const contentOld = this.children.item(this.tab ?? 0);
+        if (contentOld) {
+            // @ts-ignore
+            contentOld.style.display = 'none';
+        }
 
         const contentNew = this.children.item(tabNrNew);
-        contentNew.style.display = '';
+        if (contentNew) {
+            // @ts-ignore
+            contentNew.style.display = '';
+        }
 
-        this.tabNrSelected = tabNrNew;
+        this.tab = tabNrNew;
         this.dispatchEvent(new CustomEvent('change'));
     }
 
-    unhideTab(tabNr) {
+    unhideTab(tabNr: number) {
         let $nav = this._getTabNav(tabNr);
         $nav.style.display = '';
         let $tab = this._getTabContent(tabNr);
@@ -161,31 +171,23 @@ export class HeliumTabs extends HTMLElement {
     }
 
     /**
-     * 
-     * @param {number} tabNr
-     * @returns {HTMLLabelElement}
      * @throws {Error} If the tab number does not exist
      */
-    _getTabContent(tabNr) {
-        return this.$slotContent.assignedElements()[tabNr];
+    _getTabContent(tabNr: number): HTMLElement {
+        return this._slottedElements[tabNr];
     }
 
-    _getTabNav(tabNr) {
+    _getTabNav(tabNr: number): HTMLElement {
         const id = '#he-tabs-check' + tabNr;
-        /** @type {HTMLInputElement} */
-        let $check = this.$navBar.querySelector(id);
+        let $check = this._$navBar.querySelector<HTMLInputElement>(id);
         if ($check == null) {
             throw new Error(`Invalid tab number: ${tabNr}`);
         }
-        return $check.parentElement;
-    }
-
-    _getTabs() {
-        return this.$slotContent.assignedElements();
+        return $check.parentElement!;
     }
 
     _selectFirstVisible() {
-        for (let [i, $tab] of this._getTabs().entries()) {
+        for (let [i, $tab] of this._slottedElements.entries()) {
             if (!$tab.hasAttribute('hidden')) {
                 this.showTab(i);
                 return;
@@ -193,9 +195,4 @@ export class HeliumTabs extends HTMLElement {
         }
         throw new Error('No tabs visible');
     }
-
 }
-
-document.addEventListener("DOMContentLoaded", function() {
-    customElements.define("he-tabs", HeliumTabs);
-});

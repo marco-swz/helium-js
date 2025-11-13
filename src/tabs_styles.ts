@@ -1,3 +1,6 @@
+import { css } from 'lit-element';
+
+export const styles = css`
  :host {
      --he-tabs-backgroundColor: white;
      --he-tabs-color: black;
@@ -98,3 +101,4 @@
     display: flex;
     align-items: center;
 }
+`;
