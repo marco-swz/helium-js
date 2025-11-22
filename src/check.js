@@ -1,4 +1,5 @@
-import sheet from "./check.css";
+// @ts-ignore
+import sheet from "./check.css" with { type: "css" };
 
 /**
  * A custom checkbox with full form compatibility and additonal styling options.

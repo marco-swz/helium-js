@@ -1,3 +1,6 @@
+import { css } from 'lit-element';
+
+export const styles = css`
 :host {
     --he-select-backgroundColor: whitesmoke;
     --he-select-borderColor: lightgrey;
@@ -229,4 +232,4 @@ slot[name=button] {
         }
     }
 }
-
+`;

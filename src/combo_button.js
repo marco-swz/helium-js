@@ -1,5 +1,6 @@
 import { heSpaceBelow, hePositionRelative, heEnableBodyScroll, heDisableBodyScroll } from "./utils.js";
-import sheet from './combo_button.css';
+// @ts-ignore
+import sheet from "./combo_button.css" with { type: "css" };
 
 export class HeliumComboButton extends HTMLElement {
     static observedAttributes = [

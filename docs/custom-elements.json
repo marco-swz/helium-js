@@ -1,0 +1,4041 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/button.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A simple button with pre-definied variants, themes and additional states.",
+          "name": "HeliumButton",
+          "cssProperties": [
+            {
+              "description": "The default cursor type of the button",
+              "name": "--he-button-cursor",
+              "default": "pointer"
+            },
+            {
+              "description": "The cursor type when in `loading` state",
+              "name": "--he-button-loading-cursor",
+              "default": "default"
+            },
+            {
+              "description": "The cursor type when in `disabled` state",
+              "name": "--he-button-disabled-cursor",
+              "default": "not-allowed"
+            },
+            {
+              "description": "The height of the button",
+              "name": "--he-button-height",
+              "default": "35px"
+            },
+            {
+              "description": "The font size of the text",
+              "name": "--he-button-fontSize",
+              "default": "14px"
+            },
+            {
+              "description": "The button width",
+              "name": "--he-button-width",
+              "default": "fit-content"
+            },
+            {
+              "description": "The text color of the button",
+              "name": "--he-button-color",
+              "default": "black"
+            },
+            {
+              "description": "The background color of the button",
+              "name": "--he-button-backgroundColor",
+              "default": "white"
+            },
+            {
+              "description": "The border width of the button",
+              "name": "--he-button-borderWidth",
+              "default": "0.1rem"
+            },
+            {
+              "description": "The border color of the button",
+              "name": "--he-button-borderColor",
+              "default": "hsl(240 4.9% 83.9%)"
+            },
+            {
+              "description": "The background color when hovering",
+              "name": "--he-button-hover-backgroundColor",
+              "default": "hsl(240 4.8% 95.9%)"
+            },
+            {
+              "description": "The text color when hovering",
+              "name": "--he-button-hover-color",
+              "default": "black"
+            },
+            {
+              "description": "The border color when hovering",
+              "name": "--he-button-hover-borderColor",
+              "default": "var(--he-button-borderColor)"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Disables the button if set. \nClicks will no longer fire events.",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Sets the `loading` state the button.\nIt shows a loading animation and disables inputs.",
+              "attribute": "loading",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "This property can be used to assign a link to the button.\nIf it is clicked, the link is opened.",
+              "attribute": "href",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "theme",
+              "type": {
+                "text": "'danger' | 'warning' | 'success' | null"
+              },
+              "default": "null",
+              "description": "Sets the (color) theme of the button.",
+              "attribute": "theme",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'primary' | 'ghost' | 'outline' | null"
+              },
+              "default": "null",
+              "description": "Sets the style variant of the button.",
+              "attribute": "variant",
+              "reflects": true
+            }
+          ],
+          "attributes": [
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Disables the button if set. \nClicks will no longer fire events.",
+              "fieldName": "disabled"
+            },
+            {
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Sets the `loading` state the button.\nIt shows a loading animation and disables inputs.",
+              "fieldName": "loading"
+            },
+            {
+              "name": "href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "This property can be used to assign a link to the button.\nIf it is clicked, the link is opened.",
+              "fieldName": "href"
+            },
+            {
+              "name": "theme",
+              "type": {
+                "text": "'danger' | 'warning' | 'success' | null"
+              },
+              "default": "null",
+              "description": "Sets the (color) theme of the button.",
+              "fieldName": "theme"
+            },
+            {
+              "name": "variant",
+              "type": {
+                "text": "'primary' | 'ghost' | 'outline' | null"
+              },
+              "default": "null",
+              "description": "Sets the style variant of the button.",
+              "fieldName": "variant"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "he-button",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HeliumButton",
+          "declaration": {
+            "name": "HeliumButton",
+            "module": "src/button.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "he-button",
+          "declaration": {
+            "name": "HeliumButton",
+            "module": "src/button.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/dialog.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A dialog with no content.\nThe content is filled using slots.",
+          "name": "HeliumDialog",
+          "slots": [
+            {
+              "description": "The body of the dialog",
+              "name": "body"
+            },
+            {
+              "description": "The foote of the dialog. This is where buttons are commonly placed.",
+              "name": "footer"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "_refDialog",
+              "type": {
+                "text": "Ref<HTMLDialogElement>"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "open",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "open",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "titleText",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "title-text",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "outsideClose",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "outside-close",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "_resolve",
+              "type": {
+                "text": "null | ((value: any) => void)"
+              },
+              "default": "null",
+              "description": "The `resolve` callback of the promise"
+            },
+            {
+              "kind": "method",
+              "name": "close",
+              "return": {
+                "type": {
+                  "text": "HeliumDialog"
+                }
+              },
+              "description": "Closes the dialog."
+            },
+            {
+              "kind": "method",
+              "name": "fill",
+              "return": {
+                "type": {
+                  "text": "HeliumDialog"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "values",
+                  "type": {
+                    "text": "{ [k: string]: number | string }"
+                  },
+                  "description": "A mapping from `name` to value"
+                }
+              ],
+              "description": "Sets the values of all elements within the `body` slot to the provided value."
+            },
+            {
+              "kind": "method",
+              "name": "reset",
+              "return": {
+                "type": {
+                  "text": "HeliumDialog"
+                }
+              },
+              "description": "Calls `.reset()` on the body slot, if it is a `form` element."
+            },
+            {
+              "kind": "method",
+              "name": "show",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              },
+              "description": "Opens the dialog."
+            },
+            {
+              "kind": "method",
+              "name": "showModal",
+              "return": {
+                "type": {
+                  "text": "HeliumDialog"
+                }
+              },
+              "description": "Opens the dialog. Alias for `show()`."
+            },
+            {
+              "kind": "method",
+              "name": "setBody",
+              "return": {
+                "type": {
+                  "text": "HeliumDialog"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "content",
+                  "type": {
+                    "text": "string"
+                  },
+                  "description": "The new body content"
+                }
+              ],
+              "description": "Sets the body of the dialog to the provided value."
+            },
+            {
+              "kind": "method",
+              "name": "setTitle",
+              "return": {
+                "type": {
+                  "text": "HeliumDialog"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "newTitle",
+                  "type": {
+                    "text": "string"
+                  },
+                  "description": "The new title"
+                }
+              ],
+              "description": "Changes the title of the dialog."
+            },
+            {
+              "kind": "method",
+              "name": "_handleCloseDialog",
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "CloseEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleClickOutsideClose",
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "MouseEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "showDialog",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "content",
+                  "type": {
+                    "text": "string"
+                  },
+                  "description": "The body content of the dialog"
+                },
+                {
+                  "name": "type",
+                  "type": {
+                    "text": "DialogType"
+                  },
+                  "description": "The dialog type changes the title color and text"
+                },
+                {
+                  "name": "title",
+                  "optional": true,
+                  "type": {
+                    "text": "string"
+                  },
+                  "description": "The title of the dialog"
+                }
+              ],
+              "description": "Creates a temporary dialog and shows the content."
+            },
+            {
+              "kind": "method",
+              "name": "showAlert",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "content",
+                  "type": {
+                    "text": "string"
+                  },
+                  "description": "The body content of the dialog"
+                },
+                {
+                  "name": "title",
+                  "default": "'Achtung'",
+                  "description": "The title of the dialog"
+                }
+              ],
+              "description": "Creates a temporary alert dialog."
+            },
+            {
+              "kind": "method",
+              "name": "showPrompt",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              },
+              "parameters": [
+                {
+                  "name": "text",
+                  "type": {
+                    "text": "string"
+                  },
+                  "description": "The text shown above the prompt input"
+                },
+                {
+                  "name": "title",
+                  "default": "'Eingabe'",
+                  "type": {
+                    "text": "string"
+                  },
+                  "description": "The title of the dialog"
+                }
+              ],
+              "description": "Creates a temporary prompt dialog and returns the input text as promise."
+            },
+            {
+              "kind": "method",
+              "name": "showConfirm",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "Promise<boolean>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "text",
+                  "type": {
+                    "text": "string"
+                  },
+                  "description": "The dialog text"
+                },
+                {
+                  "name": "title",
+                  "default": "'Achtung'",
+                  "description": "The title of the dialog"
+                }
+              ],
+              "description": "Creates a temporary confirm dialog and returns the selection as promise."
+            }
+          ],
+          "attributes": [
+            {
+              "name": "open",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "If set, the dialog is open (will open if not)",
+              "default": "false",
+              "fieldName": "open"
+            },
+            {
+              "description": "The text in the title of the dialog",
+              "name": "title-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "fieldName": "titleText"
+            },
+            {
+              "type": {
+                "text": "on|off"
+              },
+              "description": "If set, hides the close icon in the top-right corner",
+              "name": "hide-close-icon"
+            },
+            {
+              "type": {
+                "text": "boolean"
+              },
+              "description": "If set, allows the user to close the dialog by clicking outside (on the backdrop)",
+              "name": "outside-close",
+              "default": "false",
+              "fieldName": "outsideClose"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "he-dialog",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HeliumDialog",
+          "declaration": {
+            "name": "HeliumDialog",
+            "module": "src/dialog.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "he-dialog",
+          "declaration": {
+            "name": "HeliumDialog",
+            "module": "src/dialog.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/input.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "HeliumInput",
+          "members": [
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "default": "true"
+            },
+            {
+              "kind": "field",
+              "name": "_internals",
+              "type": {
+                "text": "ElementInternals"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_refInput",
+              "type": {
+                "text": "Ref<HTMLInputElement>"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "default",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "attribute": "default",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "invalid",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "invalid",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "loading",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "attribute": "name",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "ok",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "ok",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "placeholder",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "attribute": "placeholder",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "required",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "readonly",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "readonly",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "type",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "attribute": "type",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "attribute": "value",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "step",
+              "type": {
+                "text": "number | null"
+              },
+              "default": "null",
+              "attribute": "step",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "pattern",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "attribute": "pattern",
+              "reflects": true
+            },
+            {
+              "kind": "method",
+              "name": "checkValidity",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Checks if the value of the input is valid and\nreports the validity."
+            },
+            {
+              "kind": "method",
+              "name": "focus",
+              "return": {
+                "type": {
+                  "text": "HeliumInput"
+                }
+              },
+              "description": "Sets the focus to the input."
+            },
+            {
+              "kind": "method",
+              "name": "formResetCallback",
+              "description": "The native callback function for resetting the input a part of a form."
+            },
+            {
+              "kind": "method",
+              "name": "reset",
+              "return": {
+                "type": {
+                  "text": "HeliumInput"
+                }
+              },
+              "description": "Resets the input to the default state."
+            },
+            {
+              "kind": "method",
+              "name": "select",
+              "return": {
+                "type": {
+                  "text": "HeliumInput"
+                }
+              },
+              "description": "Selects (highlights) the input text."
+            },
+            {
+              "kind": "method",
+              "name": "_handleChangeInput",
+              "description": "Callback for input changes."
+            }
+          ],
+          "events": [
+            {
+              "name": "change",
+              "type": {
+                "text": "CustomEvent"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "default",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "fieldName": "default"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "disabled"
+            },
+            {
+              "name": "invalid",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "invalid"
+            },
+            {
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "loading"
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "fieldName": "name"
+            },
+            {
+              "name": "ok",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "ok"
+            },
+            {
+              "name": "placeholder",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "fieldName": "placeholder"
+            },
+            {
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "required"
+            },
+            {
+              "name": "readonly",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "readonly"
+            },
+            {
+              "name": "type",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "fieldName": "type"
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "fieldName": "value"
+            },
+            {
+              "name": "step",
+              "type": {
+                "text": "number | null"
+              },
+              "default": "null",
+              "fieldName": "step"
+            },
+            {
+              "name": "pattern",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "fieldName": "pattern"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "he-input",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HeliumInput",
+          "declaration": {
+            "name": "HeliumInput",
+            "module": "src/input.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "he-input",
+          "declaration": {
+            "name": "HeliumInput",
+            "module": "src/input.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/popover.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "HeliumPopover",
+          "members": [
+            {
+              "kind": "field",
+              "name": "_refPopover",
+              "type": {
+                "text": "Ref<HTMLDivElement>"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_$attach",
+              "type": {
+                "text": "null | HTMLElement"
+              },
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "_$anchor",
+              "type": {
+                "text": "null | HTMLElement"
+              },
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "_anchorElement",
+              "type": {
+                "text": "null | HTMLElement"
+              },
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "anchor",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "description": "The anchor element of the popover.\nThe `position` is used relative to this reference.",
+              "attribute": "anchor",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "dismiss",
+              "type": {
+                "text": "'manual' | 'auto' | null"
+              },
+              "default": "null",
+              "description": "The dismiss action for the popover.",
+              "attribute": "dismiss",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "position",
+              "type": {
+                "text": "null | RelativePosition"
+              },
+              "default": "null",
+              "attribute": "position",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "open",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "The `open` state of the element.\nIf `open` is set, the options are shown to the user.",
+              "attribute": "open",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "trigger",
+              "type": {
+                "text": "null | PopoverTrigger"
+              },
+              "default": "null",
+              "attribute": "trigger",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "attach",
+              "type": {
+                "text": "null | string"
+              },
+              "default": "null",
+              "attribute": "attach",
+              "reflects": true
+            },
+            {
+              "kind": "method",
+              "name": "getSize",
+              "return": {
+                "type": {
+                  "text": "[number, number]"
+                }
+              },
+              "description": "Returns the width and height of the popover.\nAlso works if the popover is hidden."
+            },
+            {
+              "kind": "method",
+              "name": "hidePopover",
+              "return": {
+                "type": {
+                  "text": "HeliumPopover"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "showPopover",
+              "return": {
+                "type": {
+                  "text": "HeliumPopover"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "toggle",
+              "return": {
+                "type": {
+                  "text": "HeliumPopover"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "togglePopover",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_attachToElement",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "$elem",
+                  "type": {
+                    "text": "HTMLElement"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleBeforeToggledPopover",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "ToggleEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleToggledPopover",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "ToggleEvent"
+                  }
+                }
+              ]
+            }
+          ],
+          "attributes": [
+            {
+              "name": "attach",
+              "type": {
+                "text": "null | string"
+              },
+              "default": "null",
+              "fieldName": "attach"
+            },
+            {
+              "name": "position",
+              "type": {
+                "text": "null | RelativePosition"
+              },
+              "default": "null",
+              "fieldName": "position"
+            },
+            {
+              "name": "open",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "The `open` state of the element.\nIf `open` is set, the options are shown to the user.",
+              "fieldName": "open"
+            },
+            {
+              "name": "trigger",
+              "type": {
+                "text": "null | PopoverTrigger"
+              },
+              "default": "null",
+              "fieldName": "trigger"
+            },
+            {
+              "name": "anchor",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "description": "The anchor element of the popover.\nThe `position` is used relative to this reference.",
+              "fieldName": "anchor"
+            },
+            {
+              "name": "dismiss",
+              "type": {
+                "text": "'manual' | 'auto' | null"
+              },
+              "default": "null",
+              "description": "The dismiss action for the popover.",
+              "fieldName": "dismiss"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "he-popover",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HeliumPopover",
+          "declaration": {
+            "name": "HeliumPopover",
+            "module": "src/popover.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "he-popover",
+          "declaration": {
+            "name": "HeliumPopover",
+            "module": "src/popover.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/select.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "HeliumSelect",
+          "members": [
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "default": "true"
+            },
+            {
+              "kind": "field",
+              "name": "_refPopoverContent",
+              "type": {
+                "text": "Ref<HTMLDivElement>"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_refFilter",
+              "type": {
+                "text": "Ref<HeliumInput>"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_refButton",
+              "type": {
+                "text": "Ref<HTMLElement>"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_refContButton",
+              "type": {
+                "text": "Ref<HTMLDivElement>"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_refPopover",
+              "type": {
+                "text": "Ref<HeliumPopover>"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_refOptions",
+              "type": {
+                "text": "Ref<HTMLElement>"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_$highlight",
+              "type": {
+                "text": "HTMLOptionElement | null"
+              },
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "_slottedElements",
+              "type": {
+                "text": "Array<HTMLElement>"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_selections",
+              "type": {
+                "text": "Set<HTMLElement>"
+              },
+              "default": "new Set()"
+            },
+            {
+              "kind": "field",
+              "name": "_internals",
+              "type": {
+                "text": "ElementInternals"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "createCallback",
+              "description": "-> Promise<?HTMLOptionElement>}",
+              "type": {
+                "text": "?function(HTMLOptionElement, string)"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "onfilterelement",
+              "type": {
+                "text": "function(string, HtmlElement): boolean"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_filterTimeout",
+              "type": {
+                "text": "number | TimerHandler"
+              },
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "_isInit",
+              "type": {
+                "text": "flag"
+              },
+              "default": "false",
+              "description": "to know, if the connectedCallback has already been called"
+            },
+            {
+              "kind": "field",
+              "name": "_handleClickDocument",
+              "type": {
+                "text": "The"
+              },
+              "description": "click handler to detect outside clicks. This should be cleaned up when closing"
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Disables or enables the select.",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "filter",
+              "type": {
+                "text": "'inline' | 'popover' | null"
+              },
+              "default": "'popover'",
+              "description": "Gets or sets the filter attribute.\nThe filter allows searching the options of the select.",
+              "attribute": "filter",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "null",
+              "description": "Gets or sets the name of the element for form submissions.",
+              "attribute": "name",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "open",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Gets or sets the `open` state of the element.\nIf `open` is set, the options are shown to the user.",
+              "attribute": "open",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "placeholder",
+              "type": {
+                "text": "String | null"
+              },
+              "default": "null",
+              "description": "Gets or sets the placeholder.\nThis is used as hint, if the input is empty.",
+              "attribute": "placeholder",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "readonly",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Disables or enables the select.",
+              "attribute": "readonly",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "empty",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "empty",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "multiple",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "multiple",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "position",
+              "type": {
+                "text": "RelativePosition | null"
+              },
+              "default": "null",
+              "attribute": "position",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "value"
+            },
+            {
+              "kind": "method",
+              "name": "addOption",
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              },
+              "parameters": [
+                {
+                  "name": "text",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "fnInsertBeforeTrigger",
+                  "optional": true,
+                  "type": {
+                    "text": "(arg0: HTMLOptionElement, arg1: HTMLOptionElement\n        ) => boolean"
+                  },
+                  "description": "A callback to determine where to insert the new option. Once this callback returns `true`, it will be inserted before."
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "checkValidity",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Checks if the value of the select is valid and\nreports the validity to external elements."
+            },
+            {
+              "kind": "method",
+              "name": "formResetCallback",
+              "description": "The native callback function for resetting the input a part of a form."
+            },
+            {
+              "kind": "method",
+              "name": "getOptions",
+              "description": "Returns all option elements.",
+              "return": {
+                "type": {
+                  "text": "Array<HTMLElement>"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "hideOptions",
+              "parameters": [
+                {
+                  "name": "values",
+                  "default": "null",
+                  "description": "A list of option values to hide.",
+                  "optional": true,
+                  "type": {
+                    "text": "Array<string>"
+                  }
+                }
+              ],
+              "description": "Hides the provided options in the option list.\nHides all options if `null` passed.",
+              "return": {
+                "type": {
+                  "text": "Self"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "nextOption",
+              "parameters": [
+                {
+                  "name": "visualOnly",
+                  "default": "false"
+                }
+              ],
+              "description": "Selects the next option."
+            },
+            {
+              "kind": "method",
+              "name": "prevOption",
+              "parameters": [
+                {
+                  "name": "visualOnly",
+                  "default": "false"
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "removeOption",
+              "parameters": [
+                {
+                  "name": "value"
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "replaceOption",
+              "parameters": [
+                {
+                  "name": "valueOld",
+                  "description": "The value of the option to replace",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "text",
+                  "default": "null",
+                  "description": "The new innerHTML of the option",
+                  "type": {
+                    "text": "?string"
+                  }
+                },
+                {
+                  "name": "valueNew",
+                  "default": "null",
+                  "description": "The new value of the option",
+                  "type": {
+                    "text": "?string"
+                  }
+                }
+              ],
+              "description": "Replaces the option with the provided value.",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "replaceOptions",
+              "parameters": [
+                {
+                  "name": "newOptions",
+                  "description": "A list of options",
+                  "type": {
+                    "text": "Array<string>"
+                  }
+                },
+                {
+                  "name": "displayMapping",
+                  "default": "null",
+                  "description": "A mapping from value to text",
+                  "type": {
+                    "text": "?Object.<string, string>"
+                  }
+                }
+              ],
+              "description": "Replaces all options with the ones provided.\nIf the same value exists in the old and new options, the value is selected.",
+              "return": {
+                "type": {
+                  "text": "Self"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "reset"
+            },
+            {
+              "kind": "method",
+              "name": "showOptions",
+              "parameters": [
+                {
+                  "name": "values",
+                  "default": "null",
+                  "optional": true,
+                  "type": {
+                    "text": "?Array<string>"
+                  }
+                }
+              ],
+              "return": {
+                "type": {
+                  "text": "Self"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "select",
+              "parameters": [
+                {
+                  "name": "optionIndex",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "toggle",
+              "return": {
+                "type": {
+                  "text": "HeliumSelect"
+                }
+              },
+              "description": "Opens the select element if closed, closes it if open."
+            },
+            {
+              "kind": "method",
+              "name": "_handleChangeFilter",
+              "description": "This callback is called when the filter value changes",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_onFilterelementDefault",
+              "parameters": [
+                {
+                  "name": "filterVal",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "$option",
+                  "type": {
+                    "text": "HtmlElement"
+                  }
+                }
+              ],
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_handleClickOption",
+              "parameters": [
+                {
+                  "name": "e"
+                }
+              ],
+              "description": "This callback is called when an option is clicked.",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_clearSelections",
+              "parameters": [
+                {
+                  "name": "updateButtonText",
+                  "default": "true"
+                },
+                {
+                  "name": "updateFormValue",
+                  "default": "true"
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_addOption",
+              "return": {
+                "type": {
+                  "text": "HTMLOptionElement | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "$option",
+                  "type": {
+                    "text": "HTMLOptionElement"
+                  }
+                },
+                {
+                  "name": "fnInsertBeforeTrigger",
+                  "optional": true,
+                  "type": {
+                    "text": "(arg0: HTMLOptionElement, arg1: HTMLOptionElement) => boolean"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_addSelection",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "$option",
+                  "type": {
+                    "text": "HTMLOptionElement"
+                  }
+                },
+                {
+                  "name": "updateButtonText",
+                  "default": "true"
+                },
+                {
+                  "name": "updateFormValue",
+                  "default": "true"
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_removeSelection",
+              "parameters": [
+                {
+                  "name": "$option",
+                  "type": {
+                    "text": "HTMLOptionElement"
+                  }
+                },
+                {
+                  "name": "updateButtonText",
+                  "default": "true"
+                },
+                {
+                  "name": "updateFormValue",
+                  "default": "true"
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_renderOption",
+              "parameters": [
+                {
+                  "name": "text",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "value",
+                  "optional": true,
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleKeydown",
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "KeyboardEvent"
+                  }
+                }
+              ],
+              "description": "This callback handles all shortcuts."
+            },
+            {
+              "kind": "method",
+              "name": "_handleSlotchange"
+            },
+            {
+              "kind": "method",
+              "name": "_hidePopover",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "This callback is responsible for hiding the popover"
+            },
+            {
+              "kind": "method",
+              "name": "_highlight",
+              "parameters": [
+                {
+                  "name": "$option",
+                  "optional": true,
+                  "type": {
+                    "text": "HTMLOptionElement"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_moveOption",
+              "parameters": [
+                {
+                  "name": "visualOnly",
+                  "type": {
+                    "text": "boolean"
+                  }
+                },
+                {
+                  "name": "dir",
+                  "type": {
+                    "text": "-1 | 1"
+                  }
+                }
+              ],
+              "description": "Selects the next option."
+            },
+            {
+              "kind": "method",
+              "name": "_showPopover",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "This callback is responsible for showing the popover."
+            },
+            {
+              "kind": "method",
+              "name": "_setButtonText",
+              "parameters": [
+                {
+                  "name": "options",
+                  "type": {
+                    "text": "Set<HtmlElement>"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_updateFormValue"
+            },
+            {
+              "kind": "field",
+              "name": "onkeydown"
+            }
+          ],
+          "events": [
+            {
+              "name": "change",
+              "type": {
+                "text": "CustomEvent"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "open",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Gets or sets the `open` state of the element.\nIf `open` is set, the options are shown to the user.",
+              "fieldName": "open"
+            },
+            {
+              "name": "filter",
+              "type": {
+                "text": "'inline' | 'popover' | null"
+              },
+              "default": "'popover'",
+              "description": "Gets or sets the filter attribute.\nThe filter allows searching the options of the select.",
+              "fieldName": "filter"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Disables or enables the select.",
+              "fieldName": "disabled"
+            },
+            {
+              "name": "placeholder",
+              "type": {
+                "text": "String | null"
+              },
+              "default": "null",
+              "description": "Gets or sets the placeholder.\nThis is used as hint, if the input is empty.",
+              "fieldName": "placeholder"
+            },
+            {
+              "name": "readonly",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Disables or enables the select.",
+              "fieldName": "readonly"
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "null",
+              "description": "Gets or sets the name of the element for form submissions.",
+              "fieldName": "name"
+            },
+            {
+              "name": "empty",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "empty"
+            },
+            {
+              "name": "multiple",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "multiple"
+            },
+            {
+              "name": "position",
+              "type": {
+                "text": "RelativePosition | null"
+              },
+              "default": "null",
+              "fieldName": "position"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "he-select",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HeliumSelect",
+          "declaration": {
+            "name": "HeliumSelect",
+            "module": "src/select.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "he-select",
+          "declaration": {
+            "name": "HeliumSelect",
+            "module": "src/select.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/table.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A table supporting CRUD operations and with many additional features.\n\nFeatures:\n  - Builtin dialog to create, remove, update and duplicate rows\n  - Synchronize with backend: When an endpoint is defined, all CRUD operations, filtering and sorting are handled via the backend\n  - Sorting: Sort rows ascending or descending\n  - Filtering: Filter one or multiple rows\n  - Pagination: Don't show all rows at once\n  - Notify other elements: Events are emitted when rows are selected\n  - Form compatibility: Selected rows can be submitted as part of a form\n\n## Defintion\n\nWhen parsing the HTML of the table, the `innerHTML` is used to define the state.\nAll `th` elements in the `innerHTML` are used as column definition.\nThey are moved inside the shadow DOM after initialization and cannot be modified from the outside.\nThe same happens with `td` elements, except that they are used as the initial table data.\nSince `th` and `td` cannot exist outside a table, they need to be wrapped inside a dummy `table` element.\n\n```html\n<he-table>\n  <table>\n     <th column=\"COL1\" type>My Column 1</th>\n     <th column=\"COL2\">My Column 2</th>\n  </table>\n</he-table>\n\n```\n\n## Element notification\n\nWhen a row is selected, the `check` event is emitted.\nIt contains as detail the count of checked rows in the table.\n\n```javascript\ntable.addEventListener('check', \n  (e) => console.log('Number of checked rows:', e.detail.numRows)\n);\n```\nTODO: Document notification attribute\n\n## Column Types\n### Callback\n\nIf the column type is set to `callback`, a callback function needs to be provided on the `th` element via a `onrender` attribute.\n```html\n<th column=\"mycol\" type=\"callback\" onrender\"(data) => mycallback(data)\">Column Name</th>\n```\n\n## Backend API\n\nIf the attribute `endpoint` is set, all table operations are expected to be handled by the defined endpoint.\n\n### Retrieving Data\n\nThe table makes a `GET` request to the endpoint\nand all parameters are passed as query string in the URL.\nThese parameters are:\n  - All filter values in the form `<columnName>=<filterValue>` \n  - `offset`: The current pagination offset\n  - `count`: The amount of requested rows\n  - The column currently sorted by and direction, in the form `sort=<columnName>-<'asc'|'desc'>` (e.g. `sort=COL1-desc`)\n\nExample request:\n```\nGET https://myserver/myendpoint?COL1=1&COL2=foo&sort=COL1-asc&offset=10&count=10\n```\n\nThe table expects as response a JSON list of objects, where\neach list entry represents a row and each row is an object, with \nthe column names as keys.\n\nExample response:\n```json\n[\n { \"COL1\": 1, \"COL2\": \"foo\" },\n { \"COL1\": 2, \"COL2\": \"bar\" },\n]\n```\n\n### Creating Rows\n\nWhen inserting new rows, the table makes a `POST` request to the endpoint.\nThe request contains a JSON object in the body.\nThis has the form:\n\n```json\n{\n  data: [\n   { \"COL1\": 1, \"COL2\": \"foo\" },\n   { \"COL1\": 2, \"COL2\": \"bar\" },\n  ]\n}\n```\n\nAs response, the table expects a list of boolean values, indicating if the insertion of the\ncorresponding row was successful or not.\n\n```json\n[ true, false ]\n```\n\n### Editing Rows\n\nTo modify a row, the table sends a `PATCH` request to the endpoint.\nThe request is a JSON object of the form:\n\n```json\n{\n  data: [\n   { \"COL1\": 1, \"COL2\": \"baz\" },\n   { \"COL1\": 100, \"COL2\": \"bar\" },\n  ],\n  old: [\n   { \"COL1\": 1, \"COL2\": \"foo\" },\n   { \"COL1\": 2, \"COL2\": \"bar\" },\n  ]\n}\n```\n\nFor each modified value, the entire old and new row is submitted, even the values that are not modified.\nThe backend can use this information to make the appropriate updates.\n\nThe response is expected to return the updated entries only:\n\n```json\n[\n { \"COL1\": 1, \"COL2\": \"baz\" },\n { \"COL1\": 100, \"COL2\": \"bar\" },\n]\n```\n\n### Deleting Rows\n\nThe table makes a `DELETE` request to the specified endpoint.\nThe request is a JSON object containing a list of all rows to be deleted.\n\n```json\n{\n  data: [\n   { \"COL1\": 1, \"COL2\": \"foo\" },\n   { \"COL1\": 2, \"COL2\": \"bar\" },\n  ]\n}\n```\n\nAs response, the table expects a list of boolean values, indicating if an error occured during deletion or not.\n\n```json\n[ true, false ]\n```\n## Column Attributes\n\nThe `th` element for each column can have additional attributes, which are specific to the single column.\nThey are marked with `[th]` in font of the description.",
+          "name": "HeliumTable",
+          "members": [
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "default": "true"
+            },
+            {
+              "kind": "field",
+              "name": "endpoint",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "attribute": "endpoint",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "columnMenu",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "columnMenu",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "filter",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "attribute": "filter",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "$checkAll",
+              "type": {
+                "text": "?HeliumCheck"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "$form",
+              "type": {
+                "text": "HTMLFormElement"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "$body",
+              "type": {
+                "text": "HTMLTableSectionElement"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "$menuOpen",
+              "type": {
+                "text": "?HeliumPopover"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "$diagEdit",
+              "type": {
+                "text": "HeliumFormDialog"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "$diagColumn",
+              "type": {
+                "text": "?HeliumDialog"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "dataOld",
+              "type": {
+                "text": "?Object.<string, string>"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "editRequestType",
+              "type": {
+                "text": "?string"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "idsEdit",
+              "type": {
+                "text": "array<string>"
+              },
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "nextRowId",
+              "type": {
+                "text": "number"
+              },
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "pagination",
+              "type": {
+                "text": "?number"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "disableRequest",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "If this flag is `true`, no request is sent to the endpoint"
+            },
+            {
+              "kind": "field",
+              "name": "offset",
+              "type": {
+                "text": "number"
+              },
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "remap",
+              "type": {
+                "text": "Object.<string, Object.<string, string>>"
+              },
+              "default": "{}"
+            },
+            {
+              "kind": "field",
+              "name": "options",
+              "type": {
+                "text": "Object.<string, Array<string>>"
+              },
+              "default": "{}"
+            },
+            {
+              "kind": "field",
+              "name": "_internals",
+              "type": {
+                "text": "ElementInternals"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "rowColors",
+              "type": {
+                "text": "Object.<string, ?Object.<string, string>>"
+              },
+              "default": "{}"
+            },
+            {
+              "kind": "field",
+              "name": "rowStyles",
+              "type": {
+                "text": "Object.<string, ?Object.<string, string>>"
+              },
+              "default": "{}"
+            },
+            {
+              "kind": "field",
+              "name": "cellStyles",
+              "type": {
+                "text": "Object.<string, Object.<string, ?Object.<string, string>>>"
+              },
+              "default": "{}"
+            },
+            {
+              "kind": "field",
+              "name": "loading"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "validationMessage",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "validity",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "checkValidity"
+            },
+            {
+              "kind": "method",
+              "name": "deleteChecked",
+              "parameters": [
+                {
+                  "name": "confirm",
+                  "default": "true"
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "filterColumn",
+              "parameters": [
+                {
+                  "name": "colName",
+                  "description": "The name of the column to filter (NOT the display name)",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "filterValue",
+                  "description": "The filter value",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "exact",
+                  "default": "true",
+                  "description": "Does not filter exact matches if set to `false`",
+                  "optional": true,
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Filters a column based on the provided value.",
+              "return": {
+                "type": {
+                  "text": "Self"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formEditBeforeSubmitCallback",
+              "parameters": [
+                {
+                  "name": "evt",
+                  "type": {
+                    "text": "HeliumFormDialogSubmitEvent"
+                  }
+                },
+                {
+                  "name": "$dialog",
+                  "type": {
+                    "text": "HeliumFormDialog"
+                  }
+                }
+              ],
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formEditAfterSubmitCallback",
+              "parameters": [
+                {
+                  "name": "evt",
+                  "type": {
+                    "text": "HeliumFormDialogResponseEvent"
+                  }
+                }
+              ],
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getColumnNames",
+              "description": "Returns a mapping of column name to display name",
+              "return": {
+                "type": {
+                  "text": "<Object.<string, string>"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getCheckedData",
+              "parameters": [
+                {
+                  "name": "returnDisplayValues",
+                  "default": "false",
+                  "description": "If true, returns the displayed values, if false, the values of the `data` attribute",
+                  "optional": true,
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Returns the data for all checked rows.",
+              "return": {
+                "type": {
+                  "text": "Array<Object.<string, string>>"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getFormData",
+              "description": "Returns all form data inside the table.",
+              "return": {
+                "type": {
+                  "text": "FormData"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getTableData",
+              "parameters": [
+                {
+                  "name": "returnDisplayValues",
+                  "default": "false",
+                  "description": "If true, returns the displayed values, if false, the values of the `data` attribute",
+                  "optional": true,
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Returns the data of all rows, checked or not",
+              "return": {
+                "type": {
+                  "text": "Array<Array<Object.<string, string>>>"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "mergeData",
+              "parameters": [
+                {
+                  "name": "keyColumn",
+                  "type": {
+                    "text": "string|Array<string>"
+                  }
+                },
+                {
+                  "name": "data",
+                  "type": {
+                    "text": "Array<Object.<string, string>>"
+                  }
+                },
+                {
+                  "name": "removeOld",
+                  "default": "false"
+                }
+              ],
+              "return": {
+                "type": {
+                  "text": "Self"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "refresh"
+            },
+            {
+              "kind": "method",
+              "name": "replaceBody",
+              "parameters": [
+                {
+                  "name": "data",
+                  "type": {
+                    "text": "Array<Object.<string, string>>"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "reset"
+            },
+            {
+              "kind": "method",
+              "name": "replaceRowData",
+              "parameters": [
+                {
+                  "name": "rowId",
+                  "description": "The HTML id of the row to update",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "newData"
+                }
+              ],
+              "description": "Replaces the row with the provided ID with new data."
+            },
+            {
+              "kind": "method",
+              "name": "reportValidity"
+            },
+            {
+              "kind": "method",
+              "name": "selectRows",
+              "parameters": [
+                {
+                  "name": "where",
+                  "type": {
+                    "text": "Object.<string, string> | Array<Object.<string, string>>"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "setRowData",
+              "parameters": [
+                {
+                  "name": "where",
+                  "description": "A mapping of column name to value, to filter which row is modified.",
+                  "type": {
+                    "text": "Object.<string, string>"
+                  }
+                },
+                {
+                  "name": "to",
+                  "description": "A mappig from column name to new value.",
+                  "type": {
+                    "text": "Object.<string, string>"
+                  }
+                }
+              ],
+              "description": "Changes values of a table row selected by the `where` argument.",
+              "return": {
+                "type": {
+                  "text": "Self"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "showDialogEdit"
+            },
+            {
+              "kind": "method",
+              "name": "showDialogDuplicate"
+            },
+            {
+              "kind": "method",
+              "name": "showDialogNew"
+            },
+            {
+              "kind": "method",
+              "name": "sortColumn",
+              "parameters": [
+                {
+                  "name": "colName",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "dir",
+                  "type": {
+                    "text": "null|'desc'|'asc'"
+                  }
+                }
+              ],
+              "return": {
+                "type": {
+                  "text": "Self"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_appendRows",
+              "parameters": [
+                {
+                  "name": "rowData",
+                  "type": {
+                    "text": "array<Object<string, string>>"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_applyCellStyles",
+              "parameters": [
+                {
+                  "name": "$cell"
+                },
+                {
+                  "name": "colName"
+                },
+                {
+                  "name": "val",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "$row",
+                  "type": {
+                    "text": "HTMLTableRowElement"
+                  }
+                },
+                {
+                  "name": "$colName",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_applyRowStyles",
+              "parameters": [
+                {
+                  "name": "$row",
+                  "type": {
+                    "text": "HTMLTableRowElement"
+                  }
+                },
+                {
+                  "name": "colName"
+                },
+                {
+                  "name": "val",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "$colName",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_applyFilters",
+              "parameters": [
+                {
+                  "name": "cols",
+                  "type": {
+                    "text": "Array<HTMLTableCellElement>"
+                  }
+                }
+              ],
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_applyRowFilter",
+              "parameters": [
+                {
+                  "name": "$row",
+                  "type": {
+                    "text": "HTMLTableRowElement"
+                  }
+                },
+                {
+                  "name": "cols",
+                  "type": {
+                    "text": "Array<HTMLTableCellElement>"
+                  }
+                }
+              ],
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_closeColumnMenu",
+              "parameters": [
+                {
+                  "name": "$menu",
+                  "type": {
+                    "text": "HTMLDivElement"
+                  }
+                }
+              ],
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_columnFromName",
+              "parameters": [
+                {
+                  "name": "colName",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "return": {
+                "type": {
+                  "text": "HTMLTableCellElement"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_filterColumn",
+              "parameters": [
+                {
+                  "name": "$column",
+                  "description": "The column element",
+                  "type": {
+                    "text": "HTMLTableCellElement"
+                  }
+                },
+                {
+                  "name": "filterValue",
+                  "description": "The filter value",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "exact",
+                  "default": "true",
+                  "description": "Does not filter exact matches if set to `false`",
+                  "optional": true,
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Filters a column based on the provided value.",
+              "return": {
+                "type": {
+                  "text": "Self"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_getColumns",
+              "parameters": [
+                {
+                  "name": "dataOnly",
+                  "default": "false",
+                  "description": "Also includes non-data column like check cols if `true`",
+                  "optional": true,
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "return": {
+                "type": {
+                  "text": "NodeListOf<HTMLTableCellElement>"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_getRowData",
+              "parameters": [
+                {
+                  "name": "$row",
+                  "description": "The table row to get the values from",
+                  "type": {
+                    "text": "HTMLTableRowElement"
+                  }
+                },
+                {
+                  "name": "returnDisplayValues",
+                  "default": "false",
+                  "description": "If `true`, returns the visible values instead of the `data` values",
+                  "optional": true,
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "return": {
+                "type": {
+                  "text": "Object.<string, string>"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_getTableData",
+              "parameters": [
+                {
+                  "name": "returnDisplayValues",
+                  "default": "false",
+                  "description": "If `true`, returns the visible values instead of the `data` values",
+                  "optional": true,
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "return": {
+                "type": {
+                  "text": "Arra<Object.<string, string>>"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_handleChangeFilter",
+              "parameters": [
+                {
+                  "name": "e"
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleCheckAll",
+              "description": "Callback when the checkbox on top has changed.",
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_handleClickApplyColumn",
+              "parameters": [
+                {
+                  "name": "e"
+                },
+                {
+                  "name": "$col"
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleClickColumn",
+              "parameters": [
+                {
+                  "name": "e"
+                },
+                {
+                  "name": "$column",
+                  "type": {
+                    "text": "HTMLTableCellElement"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleClickPagination"
+            },
+            {
+              "kind": "method",
+              "name": "_handleClickRow",
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "InputEvent"
+                  }
+                }
+              ],
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_handleClickSort",
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "InputEvent"
+                  }
+                },
+                {
+                  "name": "isDesc",
+                  "type": {
+                    "text": "bool"
+                  }
+                }
+              ],
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_handleClickWindow"
+            },
+            {
+              "kind": "method",
+              "name": "_renderButtonMore",
+              "description": "Creates and returns the `show more` button for pagination.",
+              "return": {
+                "type": {
+                  "text": "HTMLTableRowElement"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_renderDialogEdit"
+            },
+            {
+              "kind": "method",
+              "name": "_renderRow",
+              "parameters": [
+                {
+                  "name": "data",
+                  "type": {
+                    "text": "Object.<string, string>"
+                  }
+                }
+              ],
+              "return": {
+                "type": {
+                  "text": "HTMLTableRowElement"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_renderRowEmpty"
+            },
+            {
+              "kind": "method",
+              "name": "_requestRows",
+              "parameters": [
+                {
+                  "name": "callback",
+                  "type": {
+                    "text": "function(array<Object<string, string>>): void"
+                  }
+                }
+              ],
+              "description": "Sends a new `GET` request to update all rows.\nOnly if an endpoint is defined!",
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_renderSorters",
+              "parameters": [
+                {
+                  "name": "colName",
+                  "description": "The name of column for the sorters",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "checked",
+                  "description": "Sets the corresponding sorter to `checked`",
+                  "type": {
+                    "text": "'asc'|'desc'"
+                  }
+                }
+              ],
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_renderText",
+              "parameters": [
+                {
+                  "name": "$column",
+                  "type": {
+                    "text": "HTMLTableCellElement"
+                  }
+                },
+                {
+                  "name": "val",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Returns the *text* representation of a value depending on the data type.",
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_renderFilter",
+              "parameters": [
+                {
+                  "name": "$column",
+                  "type": {
+                    "text": "HTMLTableCellElement"
+                  }
+                },
+                {
+                  "name": "colName"
+                }
+              ],
+              "return": {
+                "type": {
+                  "text": "HTMLElement"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_renderHead",
+              "return": {
+                "type": {
+                  "text": "TemplateResult<1>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "columns",
+                  "type": {
+                    "text": "Array<TableColumn>"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_renderColumnMenu",
+              "parameters": [
+                {
+                  "name": "$column"
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_renderTable"
+            },
+            {
+              "kind": "method",
+              "name": "_showDialogEdit",
+              "parameters": [
+                {
+                  "name": "$row"
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_sortColumn",
+              "parameters": [
+                {
+                  "name": "$column"
+                },
+                {
+                  "name": "dir",
+                  "type": {
+                    "text": "null|'desc'|'asc'"
+                  }
+                },
+                {
+                  "name": "column",
+                  "type": {
+                    "text": "HTMLTableCellElement"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_updateCheckAll",
+              "parameters": [
+                {
+                  "name": "checked",
+                  "type": {
+                    "text": "Array<HeliumCheck>"
+                  }
+                }
+              ],
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_updateExternElements",
+              "parameters": [
+                {
+                  "name": "checked",
+                  "type": {
+                    "text": "Array<HeliumCheck>"
+                  }
+                }
+              ],
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "type": {
+                "text": "string | null"
+              },
+              "description": "The endpoint for table operations.",
+              "name": "endpoint",
+              "default": "null",
+              "fieldName": "endpoint"
+            },
+            {
+              "type": {
+                "text": "?string"
+              },
+              "description": "The amount rows for each pagination step",
+              "name": "pagination"
+            },
+            {
+              "type": {
+                "text": "on|off"
+              },
+              "description": "If set, all rows of the table are passed on to forms, instead of checked one.",
+              "name": "submit-all"
+            },
+            {
+              "type": {
+                "text": "on|off"
+              },
+              "description": "If set, show a sorting button for all columns.",
+              "name": "sorter"
+            },
+            {
+              "type": {
+                "text": "string | null"
+              },
+              "description": "[th] The filter value for a given column",
+              "name": "filter",
+              "default": "null",
+              "fieldName": "filter"
+            },
+            {
+              "type": {
+                "text": "on|off"
+              },
+              "description": "Shows a menu when a column name is clicked. This menu controls the filter and sorting.",
+              "name": "column-menu"
+            },
+            {
+              "type": {
+                "text": "on|off"
+              },
+              "description": "If set, at least one filter value has to be applied, otherwise no data is requested. This can be used to improve performance for time intensive queries.",
+              "name": "require-filter"
+            },
+            {
+              "type": {
+                "text": "string"
+              },
+              "description": "[th] The internal name of the column. This name needs to be unique for each column",
+              "name": "column"
+            },
+            {
+              "type": {
+                "text": "?string"
+              },
+              "description": "[th] The regex pattern to determine if the input for a given column is valid",
+              "name": "pattern"
+            },
+            {
+              "type": {
+                "text": "'hidden'|'check'|'edit'|'number'|'date'|'datetime'|'text'|'callback'|null"
+              },
+              "description": "[th] The type of the column",
+              "name": "type"
+            },
+            {
+              "type": {
+                "text": "?string"
+              },
+              "description": "[th] A mapping of old value to new value, in JSON format",
+              "name": "remap"
+            },
+            {
+              "type": {
+                "text": "?string"
+              },
+              "description": "[th] A JSON list of allowed values. The selection is enforced via `select` elements",
+              "name": "options"
+            },
+            {
+              "type": {
+                "text": "on|off"
+              },
+              "description": "[th] If set, the input field is hidden when editing a row",
+              "name": "no-edit"
+            },
+            {
+              "type": {
+                "text": "?string"
+              },
+              "description": "[th] The default value for a column",
+              "name": "default"
+            },
+            {
+              "type": {
+                "text": "'asc'|'desc'"
+              },
+              "description": "[th] The direction for sorting the table by the given column",
+              "name": "sort"
+            },
+            {
+              "type": {
+                "text": "?string"
+              },
+              "description": "[th] A mapping of value to color in JSON format",
+              "name": "row-color"
+            },
+            {
+              "type": {
+                "text": "on|off"
+              },
+              "description": "[th] If set, the filter will only show rows, which match the exact filter value, no partial matches",
+              "name": "exact-filter"
+            },
+            {
+              "name": "columnMenu",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "columnMenu"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "he-table",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HeliumTable",
+          "declaration": {
+            "name": "HeliumTable",
+            "module": "src/table.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "he-table",
+          "declaration": {
+            "name": "HeliumTable",
+            "module": "src/table.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/tabs.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "HeliumTabs",
+          "members": [
+            {
+              "kind": "field",
+              "name": "_$navBar",
+              "type": {
+                "text": "HTMLElement"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_slottedElements",
+              "type": {
+                "text": "Array<HTMLElement>"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "tab",
+              "type": {
+                "text": "number | null"
+              },
+              "default": "null",
+              "attribute": "tab",
+              "reflects": true
+            },
+            {
+              "kind": "method",
+              "name": "hideTab",
+              "parameters": [
+                {
+                  "name": "tabNr",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleSlotChange",
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                },
+                {
+                  "name": "self",
+                  "type": {
+                    "text": "HeliumTabs"
+                  }
+                }
+              ],
+              "description": "Callback for slot changes.\nRebuilds the tabs and shows the correct content."
+            },
+            {
+              "kind": "method",
+              "name": "showTab",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "tabNr",
+                  "type": {
+                    "text": "number"
+                  },
+                  "description": "The index of the tab"
+                }
+              ],
+              "description": "Shows the tab with the provided index."
+            },
+            {
+              "kind": "method",
+              "name": "_handleChangeTab",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ],
+              "description": "Callback for changes of the tab bar.\nHides the old content and shows the new."
+            },
+            {
+              "kind": "method",
+              "name": "unhideTab",
+              "parameters": [
+                {
+                  "name": "tabNr",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_getTabContent",
+              "return": {
+                "type": {
+                  "text": "HTMLElement"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "tabNr",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_getTabNav",
+              "return": {
+                "type": {
+                  "text": "HTMLElement"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "tabNr",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_selectFirstVisible"
+            }
+          ],
+          "events": [
+            {
+              "name": "change",
+              "type": {
+                "text": "CustomEvent"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "tab",
+              "type": {
+                "text": "number | null"
+              },
+              "default": "null",
+              "fieldName": "tab"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "he-tabs",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HeliumTabs",
+          "declaration": {
+            "name": "HeliumTabs",
+            "module": "src/tabs.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "he-tabs",
+          "declaration": {
+            "name": "HeliumTabs",
+            "module": "src/tabs.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/toast.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A toast element for quick notification.",
+          "name": "HeliumToast",
+          "cssProperties": [
+            {
+              "description": "The accent color for success notifications",
+              "name": "--he-toast-clr-success",
+              "default": "seagreen"
+            },
+            {
+              "description": "The accent color for warning notifications",
+              "name": "--he-toast-clr-warn",
+              "default": "orange"
+            },
+            {
+              "description": "The accent color for error notifications",
+              "name": "--he-toast-clr-error",
+              "default": "indianred"
+            },
+            {
+              "description": "The border radius of the toast",
+              "name": "--he-toast-radius",
+              "default": "3px"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "_refContToasts",
+              "type": {
+                "text": "Ref<HTMLDivElement>"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "position",
+              "type": {
+                "text": "null | ToastPosition"
+              },
+              "default": "null",
+              "description": "The position of the toast on the screen.",
+              "attribute": "position",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "timeout",
+              "type": {
+                "text": "null | number"
+              },
+              "default": "null",
+              "description": "The duration the toast is visible in milliseconds.",
+              "attribute": "timeout",
+              "reflects": true
+            },
+            {
+              "kind": "method",
+              "name": "hideToast",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "$toast",
+                  "type": {
+                    "text": "HTMLDivElement"
+                  }
+                }
+              ],
+              "description": "Starts the hide animation and deletes the toast."
+            },
+            {
+              "kind": "method",
+              "name": "_showToast",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "message",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "type",
+                  "optional": true,
+                  "type": {
+                    "text": "ToastType"
+                  }
+                }
+              ],
+              "description": "Shows a toast with the given message and of given type."
+            },
+            {
+              "kind": "method",
+              "name": "_renderToast",
+              "parameters": [
+                {
+                  "name": "content",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "type",
+                  "default": "'info'",
+                  "type": {
+                    "text": "ToastType"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "showToast",
+              "static": true,
+              "parameters": [
+                {
+                  "name": "text",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "type",
+                  "optional": true,
+                  "type": {
+                    "text": "ToastType"
+                  }
+                },
+                {
+                  "name": "duration",
+                  "default": "5000"
+                }
+              ]
+            }
+          ],
+          "attributes": [
+            {
+              "name": "position",
+              "type": {
+                "text": "null | ToastPosition"
+              },
+              "default": "null",
+              "description": "The position of the toast on the screen.",
+              "fieldName": "position"
+            },
+            {
+              "name": "timeout",
+              "type": {
+                "text": "null | number"
+              },
+              "default": "null",
+              "description": "The duration the toast is visible in milliseconds.",
+              "fieldName": "timeout"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "he-toast",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HeliumToast",
+          "declaration": {
+            "name": "HeliumToast",
+            "module": "src/toast.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "he-toast",
+          "declaration": {
+            "name": "HeliumToast",
+            "module": "src/toast.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/toggle.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "The `he-toggle` element is a button, which switches between on and off state when clicked.\n\nWhen multiple `he-toggle` elements share the same `name`, selecting one unselects the rest.\nWhen part of a `form`, only `he-toggle` elements within the form are effected by this behavior.\nOtherwise, the whole document is searched for `he-toggle` with the same `name`.",
+          "name": "HeliumToggle",
+          "slots": [
+            {
+              "description": "The html content of the toggle element",
+              "name": "inner"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "default": "true"
+            },
+            {
+              "kind": "field",
+              "name": "_internals",
+              "type": {
+                "text": "ElementInternals"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "checked",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "checked",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "attribute": "name",
+              "reflects": true
+            },
+            {
+              "kind": "method",
+              "name": "checkValidity",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Checks if the value of the input is valid and\nreports the validity."
+            },
+            {
+              "kind": "method",
+              "name": "formResetCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "The native callback function for resetting the input a part of a form."
+            },
+            {
+              "kind": "method",
+              "name": "reset",
+              "return": {
+                "type": {
+                  "text": "HeliumToggle"
+                }
+              },
+              "description": "Resets the input to the default state."
+            },
+            {
+              "kind": "method",
+              "name": "_clickCallback",
+              "description": "Callback for clicks"
+            }
+          ],
+          "events": [
+            {
+              "name": "change",
+              "type": {
+                "text": "Event"
+              },
+              "description": "The element has been toggled"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "disabled"
+            },
+            {
+              "name": "checked",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "checked"
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "fieldName": "name"
+            },
+            {
+              "type": {
+                "text": "null|'outline'"
+              },
+              "description": "The styling variation of the element",
+              "name": "variant"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "he-toggle",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HeliumToggle",
+          "declaration": {
+            "name": "HeliumToggle",
+            "module": "src/toggle.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "he-toggle",
+          "declaration": {
+            "name": "HeliumToggle",
+            "module": "src/toggle.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/utils.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "t",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "text",
+              "type": {
+                "text": "string"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "heSpaceBelow",
+          "return": {
+            "type": {
+              "text": "number"
+            }
+          },
+          "parameters": [
+            {
+              "name": "element",
+              "type": {
+                "text": "HTMLElement"
+              }
+            }
+          ],
+          "description": "Returns the amount of pixels between the element and\nthe bottom of the screen."
+        },
+        {
+          "kind": "function",
+          "name": "hePositionRelative",
+          "return": {
+            "type": {
+              "text": "void"
+            }
+          },
+          "parameters": [
+            {
+              "name": "$elem",
+              "type": {
+                "text": "HTMLElement"
+              }
+            },
+            {
+              "name": "$target",
+              "type": {
+                "text": "HTMLElement"
+              }
+            },
+            {
+              "name": "position",
+              "type": {
+                "text": "RelativePosition"
+              }
+            },
+            {
+              "name": "offset",
+              "default": "0",
+              "type": {
+                "text": "number"
+              }
+            }
+          ],
+          "description": "Positions the `$element` relative to the `$target`."
+        },
+        {
+          "kind": "function",
+          "name": "heDisableBodyScroll"
+        },
+        {
+          "kind": "function",
+          "name": "heEnableBodyScroll"
+        },
+        {
+          "kind": "function",
+          "name": "heCallOnOutsideClick",
+          "return": {
+            "type": {
+              "text": ""
+            }
+          },
+          "parameters": [
+            {
+              "name": "elements",
+              "type": {
+                "text": "Array<HTMLElement>"
+              }
+            },
+            {
+              "name": "callback",
+              "type": {
+                "text": "() => void"
+              }
+            }
+          ],
+          "description": "Calls the provided callback if the a click occurs outside of the elements."
+        },
+        {
+          "kind": "function",
+          "name": "heIsVisible",
+          "parameters": [
+            {
+              "name": "elem",
+              "type": {
+                "text": "HTMLElement"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "heHash",
+          "parameters": [
+            {
+              "name": "str",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "seed",
+              "default": "0"
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "heIsInside",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "parameters": [
+            {
+              "name": "$elem",
+              "type": {
+                "text": "HTMLElement"
+              }
+            },
+            {
+              "name": "x",
+              "type": {
+                "text": "number"
+              }
+            },
+            {
+              "name": "y",
+              "type": {
+                "text": "number"
+              }
+            }
+          ],
+          "description": "Checks if the coordinates are within the elements borders"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "t",
+          "declaration": {
+            "name": "t",
+            "module": "src/utils.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "heSpaceBelow",
+          "declaration": {
+            "name": "heSpaceBelow",
+            "module": "src/utils.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "hePositionRelative",
+          "declaration": {
+            "name": "hePositionRelative",
+            "module": "src/utils.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "heDisableBodyScroll",
+          "declaration": {
+            "name": "heDisableBodyScroll",
+            "module": "src/utils.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "heEnableBodyScroll",
+          "declaration": {
+            "name": "heEnableBodyScroll",
+            "module": "src/utils.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "heCallOnOutsideClick",
+          "declaration": {
+            "name": "heCallOnOutsideClick",
+            "module": "src/utils.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "heIsVisible",
+          "declaration": {
+            "name": "heIsVisible",
+            "module": "src/utils.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "heHash",
+          "declaration": {
+            "name": "heHash",
+            "module": "src/utils.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "heIsInside",
+          "declaration": {
+            "name": "heIsInside",
+            "module": "src/utils.ts"
+          }
+        }
+      ]
+    }
+  ]
+}

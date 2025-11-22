@@ -8,7 +8,7 @@ import { HeliumInput } from "./input.js";
 import { heCallOnOutsideClick, heSpaceBelow, RelativePosition } from './utils.ts';
 
 @customElement('he-select')
-export class HeliumSelect extends HTMLElement {
+export class HeliumSelect extends LitElement {
     static get styles() {
         return [
             styles

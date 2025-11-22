@@ -1,12 +1,9 @@
-import { css } from 'lit-element';
-
-export const styles = css`
 :host {
     --he-button-loading-cursor: default;
-    --he-button-hover-cursor: pointer;
+    --he-button-cursor: pointer;
     --he-button-disabled-cursor: not-allowed;
     --he-button-borderWidth: 0.1rem;
-    --he-button-font-size: 14px;
+    --he-button-fontSize: 14px;
     --he-button-height: 35px;
     --he-button-width: fit-content;
 
@@ -17,6 +14,7 @@ export const styles = css`
     --he-button-borderColor: hsl(240 4.9% 83.9%);
     --he-button-hover-borderColor: var(--he-button-borderColor);
 
+    /** These vars are use for the theme styling and are private for now **/
     --he-theme-color: var(--he-accent-color, steelblue);
     --he-theme-bright1-color: hsl(from var(--he-theme-color) h s calc(l + 10));
     --he-theme-contrast: white;
@@ -28,6 +26,7 @@ export const styles = css`
     box-shadow: none !important;
     width: var(--he-button-width);
     min-width: var(--he-button-minWidth);
+    font-size: var(--he-button-fontSize);
 }
 
 :host([theme=danger]) {
@@ -97,7 +96,7 @@ a {
     padding: inherit;
     vertical-align: middle;
     text-align: center;
-    font-size: var(-he-button-fontSize);
+    font-size: inherit;
     background-color: var(--he-button-backgroundColor);
     outline-style: inherit;
     box-shadow: inherit;
@@ -115,6 +114,10 @@ a {
     min-width: inherit;
 }
 
+:host([disabled]) {
+    pointer-events: none;
+}
+
 :host([disabled]) #he-button {
     opacity: 0.5;
     cursor: var(--he-button-disabled-cursor);
@@ -127,7 +130,7 @@ a {
         color 0.2s;
     background-color: var(--he-button-hover-backgroundColor);
     border-color: var(--he-button-hover-borderColor);
-    cursor: var(--he-button-hover-cursor);
+    cursor: var(--he-button-cursor);
     color: var(--he-button-hover-color);
 }
 
@@ -197,4 +200,3 @@ a {
         box-shadow: inset 0 0 0 0 hsl(from var(--he-button-hover-backgroundColor) h s l);
     }
 }
-`

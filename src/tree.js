@@ -1,4 +1,5 @@
-import sheet from './tree.css';
+// @ts-ignore
+import sheet from "./tree.css" with { type: "css" };
 
 /**
  * @typedef {HTMLDivElement} HTMLNode

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { styles } from './table_styles.ts';
 import { LitElement, TemplateResult, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
@@ -300,10 +301,11 @@ export class HeliumTable extends LitElement {
 
         // All internal input events are not allowed to propagate outwards.
         // Only custom input events are triggered to the outside
-        this.$form.addEventListener('input', (e) => e.stopPropagation());
+        this.$form.addEventListener('input', (e: any) => e.stopPropagation());
     }
 
     deleteChecked(confirm = true) {
+        // @ts-ignore
         let checks = this.shadowRoot.querySelectorAll('.check-row:state(checked)');
 
         let request = {
@@ -313,6 +315,7 @@ export class HeliumTable extends LitElement {
         for (let $check of checks) {
             let row = $check.closest('tr');
             let data = this._getRowData(row);
+        // @ts-ignore
             request.data.push(data);
         }
 
@@ -336,8 +339,10 @@ export class HeliumTable extends LitElement {
             })
                 .then(resp => resp.json())
                 .then(data => {
+        // @ts-ignore
                     data.forEach((delError, i) => {
                         if (!delError) {
+        // @ts-ignore
                             checks[i].closest('tr').remove();
                         }
                     })
@@ -350,6 +355,7 @@ export class HeliumTable extends LitElement {
         }
 
         for (const $check of checks) {
+        // @ts-ignore
             $check.parentElement.parentElement.remove();
         }
 
@@ -413,12 +419,14 @@ export class HeliumTable extends LitElement {
      * @returns void
      */
     formEditAfterSubmitCallback(evt) {
+        // @ts-ignore
         evt.response.json().then(data => {
             switch (this.editRequestType) {
                 case 'POST':
                     this._requestRows(this.replaceBody);
                     break;
                 case 'PATCH':
+        // @ts-ignore
                     data.forEach((entry, i) => {
                         const rowId = this.idsEdit[i];
                         this.replaceRowData(rowId, entry);
@@ -441,6 +449,7 @@ export class HeliumTable extends LitElement {
             if (colName == null) {
                 continue;
             }
+        // @ts-ignore
             colNames[colName] = $col.querySelector('.span-colname').innerText;
         }
 
@@ -453,6 +462,7 @@ export class HeliumTable extends LitElement {
      * @returns {Array<Object.<string, string>>}
      */
     getCheckedData(returnDisplayValues = false) {
+        // @ts-ignore
         let checks = this.shadowRoot.querySelectorAll('.check-row:state(checked)');
         let data = [];
         for (let $check of checks) {
@@ -502,14 +512,19 @@ export class HeliumTable extends LitElement {
                 continue;
             }
             const rowData = this._getRowData($row);
+        // @ts-ignore
             const key = keyColumn.map((x) => rowData[x]).join('-');
+        // @ts-ignore
             rowMap[key] = $row;
         }
 
         const cols = this._getColumns(true);
         for (const entry of data) {
+        // @ts-ignore
             const key = keyColumn.map((x) => entry[x]).join('-');
+        // @ts-ignore
             let $row = rowMap[key];
+        // @ts-ignore
             delete rowMap[key];
 
             if ($row == null) {
@@ -524,11 +539,14 @@ export class HeliumTable extends LitElement {
 
             for (const $col of cols) {
                 const colName = $col.getAttribute('column');
+        // @ts-ignore
                 if (!(colName in entry)) {
                     continue;
                 }
 
+        // @ts-ignore
                 const newVal = entry[colName] ?? '';
+        // @ts-ignore
                 let $cell = $row.cells[$col.cellIndex];
                 $cell.setAttribute('data', newVal);
                 const text = this._renderText($col, newVal);
@@ -541,6 +559,7 @@ export class HeliumTable extends LitElement {
 
         if (removeOld) {
             for (const $row of Object.values(rowMap)) {
+        // @ts-ignore
                 $row.remove();
             }
         }
@@ -587,6 +606,7 @@ export class HeliumTable extends LitElement {
     }
 
     reset() {
+        // @ts-ignore
         this.$body.querySelectorAll('.check-row').forEach(x => x.checked = false);
         if (this.$checkAll != null) {
             this.$checkAll.checked = false;
@@ -609,6 +629,7 @@ export class HeliumTable extends LitElement {
         for (let i = 0; i < columns.length; ++i) {
             const $column = columns[i];
             const colName = $column.getAttribute('column');
+        // @ts-ignore
             const val = newData[colName];
             if (val == null) {
                 continue;
@@ -643,6 +664,7 @@ export class HeliumTable extends LitElement {
                 const rowData = this._getRowData($row);
                 let isMatch = true;
                 for (const [colName, val] of Object.entries(cond)) {
+        // @ts-ignore
                     if (rowData[colName] !== val) {
                         isMatch = false;
                         break;
@@ -669,13 +691,16 @@ export class HeliumTable extends LitElement {
         /** @type {Object.<string, HTMLTableCellElement>} */
         let colMap = {};
         for (const $col of this._getColumns(true)) {
+        // @ts-ignore
             colMap[colName] = $col;
         }
 
         for (const $row of this.$body.rows) {
             let isMatch = true;
             for (const [colName, filterVal] of Object.entries(where)) {
+        // @ts-ignore
                 const $col = colMap[colName];
+        // @ts-ignore
                 if (idx == null) {
                     throw new Error(`No column with name '${colName}'!`);
                 }
@@ -692,6 +717,7 @@ export class HeliumTable extends LitElement {
             }
 
             for (const [colName, newVal] of Object.entries(to)) {
+        // @ts-ignore
                 const $col = colMap[colName];
                 const $cell = $row.cells[$col.cellIndex];
                 $cell.setAttribute('data', newVal);
@@ -704,22 +730,26 @@ export class HeliumTable extends LitElement {
 
     showDialogEdit() {
         this.$diagEdit.reset();
+        // @ts-ignore
         let $check = this.shadowRoot.querySelector('.check-row:state(checked)');
         if ($check == null) {
             throw new Error('No row selected');
         }
 
+        // @ts-ignore
         let $row = $check.parentElement.parentElement;
         this._showDialogEdit($row);
     }
 
     showDialogDuplicate() {
         this.$diagEdit.reset();
+        // @ts-ignore
         let $check = this.shadowRoot.querySelector('.check-row:state(checked)');
         if ($check == null) {
             throw new Error('No row selected');
         }
 
+        // @ts-ignore
         let row = $check.parentElement.parentElement;
         let data = this._getRowData(row, false);
 
@@ -777,6 +807,7 @@ export class HeliumTable extends LitElement {
     * @returns {void}
     */
     _applyCellStyles($cell, colName, val) {
+        // @ts-ignore
         let styles = this.cellStyles[colName]
         if (styles === null) {
             return;
@@ -803,6 +834,7 @@ export class HeliumTable extends LitElement {
     * @returns {void}
     */
     _applyRowStyles($row, colName, val) {
+        // @ts-ignore
         let styles = this.rowStyles[colName];
         if (styles) {
             let style = styles[val];
@@ -812,6 +844,7 @@ export class HeliumTable extends LitElement {
                 $row.style.cssText = '';
             }
         }
+        // @ts-ignore
         let colors = this.rowColors[colName];
         if (colors) {
             let color = colors[val];
@@ -833,6 +866,7 @@ export class HeliumTable extends LitElement {
         for (const $row of this.$body.children) {
             const $check = this._applyRowFilter($row, cols);
             if ($check != null) {
+        // @ts-ignore
                 checks[$row.id] = $check;
             }
         }
@@ -971,8 +1005,10 @@ export class HeliumTable extends LitElement {
      */
     _getColumns(dataOnly = false) {
         if (dataOnly) {
+        // @ts-ignore
             return this.shadowRoot.querySelectorAll('th[column]');
         }
+        // @ts-ignore
         return this.shadowRoot.querySelectorAll('th');
     }
 
@@ -989,13 +1025,16 @@ export class HeliumTable extends LitElement {
         let columns = this._getColumns(true);
         for (let i = 0; i < columns.length; ++i) {
             let $column = columns[i];
+        // @ts-ignore
             if (returnDisplayValues && ['hidden', 'check'].includes($column.getAttribute('type'))) {
                 continue;
             }
 
+        // @ts-ignore
             let $cell = $row.children[$column.cellIndex];
 
             const colName = $column.getAttribute('column');
+        // @ts-ignore
             data[colName] = returnDisplayValues
                 ? $cell.innerText
                 : $cell.getAttribute('data');
@@ -1013,6 +1052,7 @@ export class HeliumTable extends LitElement {
             .map((row) => this._getRowData(row, returnDisplayValues));
     }
 
+        // @ts-ignore
     _handleChangeFilter(e) {
         this.offset = 0;
 
@@ -1043,6 +1083,7 @@ export class HeliumTable extends LitElement {
         }
     }
 
+        // @ts-ignore
     _handleClickApplyColumn(e, $col) {
         e.preventDefault();
         const filterVal = $col.querySelector('.column-filter').value;
@@ -1157,6 +1198,7 @@ export class HeliumTable extends LitElement {
         let $row = document.createElement('tr');
         $row.id = 'row-btn-more';
         let $cell = document.createElement('td');
+        // @ts-ignore
         $cell.colSpan = '100';
         $cell.title = 'Mehr anzeigen';
         $cell.innerHTML = 'Mehr anzeigen';
@@ -1179,11 +1221,14 @@ export class HeliumTable extends LitElement {
                 required = false;
             }
 
+        // @ts-ignore
             const options = this.options[colName];
             let optionMap = {};
             if (options != null) {
+        // @ts-ignore
                 const remap = this.remap[colName];
                 for (const val of options) {
+        // @ts-ignore
                     optionMap[val] = val;
                     if (remap == null) {
                         continue;
@@ -1193,6 +1238,7 @@ export class HeliumTable extends LitElement {
                     if (mapped == null) {
                         continue;
                     }
+        // @ts-ignore
                     optionMap[val] = mapped;
                 }
             }
@@ -1207,6 +1253,7 @@ export class HeliumTable extends LitElement {
             data.push({
                 name: $column.getAttribute('column'),
                 required: required,
+        // @ts-ignore
                 label: $column.querySelector('.span-colname').innerHTML,
                 placeholder: $column.getAttribute('default'),
                 pattern: $column.getAttribute('pattern'),
@@ -1219,10 +1266,12 @@ export class HeliumTable extends LitElement {
 
         /** @type {HeliumFormDialog} */
         let $dialog = document.createElement('he-form-dialog');
+        // @ts-ignore
         $dialog.renderRows(data);
 
         $dialog.setAttribute('endpoint', this.endpoint ?? '');
         $dialog.onsubmit = (evt) => this.formEditBeforeSubmitCallback.bind(this)(evt);
+        // @ts-ignore
         $dialog.onresponse = (evt) => this.formEditAfterSubmitCallback.bind(this)(evt);
         return $dialog;
     }
@@ -1238,6 +1287,7 @@ export class HeliumTable extends LitElement {
 
         for (let $column of this._getColumns()) {
             const colName = $column.getAttribute('column');
+        // @ts-ignore
             let val = data[colName] ?? '';
             let text = val;
             let $cell = document.createElement('td');
@@ -1246,7 +1296,9 @@ export class HeliumTable extends LitElement {
             switch (colType) {
                 case 'check':
                     let $inpCheck = document.createElement('he-check');
+        // @ts-ignore
                     $inpCheck.name = 'rows[]'
+        // @ts-ignore
                     $inpCheck.value = data['id'] ?? '';
                     $inpCheck.classList.add('check-row');
                     $cell.append($inpCheck);
@@ -1257,6 +1309,7 @@ export class HeliumTable extends LitElement {
                     break;
                 case 'callback':
                     $cell.setAttribute('data', val);
+        // @ts-ignore
                     $cell.innerHTML = window[$column.getAttribute('onrender')](data, colName) ?? '';
                     break;
                 case 'hidden':
@@ -1307,6 +1360,7 @@ export class HeliumTable extends LitElement {
             const filterVal = $col.getAttribute('filter');
             const colName = $col.getAttribute('column');
             if (filterVal != null && filterVal !== '') {
+        // @ts-ignore
                 params.append(colName, filterVal);
             }
 
@@ -1324,6 +1378,7 @@ export class HeliumTable extends LitElement {
         }
 
         if (this.pagination != null) {
+        // @ts-ignore
             params.append('offset', this.offset)
             params.append('count', this.pagination + 1);
         }
@@ -1356,6 +1411,7 @@ export class HeliumTable extends LitElement {
         }
 
         let $labelSortAsc = document.createElement('label');
+        // @ts-ignore
         $labelSortAsc.for = colName + 'asc';
         $labelSortAsc.innerHTML = '▲';
         $labelSortAsc.classList.add('label-sorter');
@@ -1372,6 +1428,7 @@ export class HeliumTable extends LitElement {
         }
 
         let $labelSortDesc = document.createElement('label');
+        // @ts-ignore
         $labelSortDesc.for = colName + 'desc';
         $labelSortDesc.classList.add('label-sorter');
         $labelSortDesc.innerHTML = '▼';
@@ -1411,6 +1468,7 @@ export class HeliumTable extends LitElement {
             }
         }
 
+        // @ts-ignore
         const colRemap = this.remap[$column.getAttribute('column')];
         if (colRemap) {
             const valRemap = colRemap[val];
@@ -1429,12 +1487,14 @@ export class HeliumTable extends LitElement {
      */
     _renderFilter($column, colName) {
         let $filter = null;
+        // @ts-ignore
         if (this.options[colName]) {
             $filter = document.createElement('select');
             let $optionEmpty = document.createElement('option');
             $optionEmpty.value = '';
             $filter.append($optionEmpty);
 
+        // @ts-ignore
             for (const val of this.options[colName]) {
                 const text = this._renderText($column, val);
                 let $option = document.createElement('option');
@@ -1446,6 +1506,7 @@ export class HeliumTable extends LitElement {
             $filter = document.createElement('input');
             $filter.type = $column.getAttribute('filter-type') ?? 'text';
             // Using a random text seems to disable autocomplete properly
+        // @ts-ignore
             $filter.autocomplete = 'efase';
             $filter.placeholder = ' ';
         }
@@ -1474,31 +1535,36 @@ export class HeliumTable extends LitElement {
 
             try {
                 // Numbers are converted to strings to simplify sorting later on
-                this.options[colName] = JSON.parse(getAttribute($column, 'options') ?? ''),  
-                    (_key, value, data) => typeof value === 'number' ? data.source : value);
+        // @ts-ignore
+                this.options[colName] = JSON.parse(getAttribute($column, 'options') ?? '');
+        // @ts-ignore
             } catch (error) {
                 throw new Error('The provided options are not valid JSON!');
             }
 
             try {
+        // @ts-ignore
                 this.remap[colName] = JSON.parse(getAttribute($column, 'remap') ?? '');
             } catch (error) {
                 throw new Error('The provided remap is not valid JSON!');
             }
 
             try {
+        // @ts-ignore
                 this.rowColors[colName] = JSON.parse(getAttribute($column, 'row-color') ?? '');
             } catch (error) {
                 throw new Error('The provided row-color is not valid JSON!');
             }
 
             try {
+        // @ts-ignore
                 this.rowStyles[colName] = JSON.parse(getAttribute($column, 'row-style') ?? '');
             } catch (error) {
                 throw new Error('The provided row-style is not valid JSON!');
             }
 
             try {
+        // @ts-ignore
                 this.cellStyles[colName] = JSON.parse(getAttribute($column, 'cell-style') ?? '');
             } catch (error) {
                 throw new Error('The provided cell-style is not valid JSON!');

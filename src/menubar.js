@@ -1,4 +1,5 @@
-import sheet from './menubar.css';
+// @ts-ignore
+import sheet from "./menubar.css" with { type: "css" };
 
 export class HeliumMenubar extends HTMLElement {
     static observedAttributes = [

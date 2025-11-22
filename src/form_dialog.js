@@ -2,7 +2,8 @@ import { HeliumButton } from './button.js';
 import { HeliumInput } from './input.js';
 import { HeliumDialog } from './dialog.js';
 import { HeliumSelect } from './select.js';
-import sheet from './form_dialog.css';
+// @ts-ignore
+import sheet from "./form_dialog.css" with { type: "css" };
 
 export class HeliumFormDialogSubmitEvent extends Event {
     /** @type {RequestInit} */
