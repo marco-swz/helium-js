@@ -397,7 +397,7 @@ export class HeliumInput extends HTMLElement {
      * @returns {void}
      */
     connectedCallback() {
-        this.$input.addEventListener('change', () => this._handleChangeInput.bind(this)());
+        this.$input.addEventListener('change', (e) => this._handleChangeInput.bind(this)(e));
         this.addEventListener('focus', () => this._handleFocusInput.bind(this)());
         this.addEventListener('focusout', (e) => setTimeout(() => this._handleBlurInput.bind(this)(e), 200));
         this.$slot.onslotchange = () => this._handleChangeSlot.bind(this)();
@@ -456,8 +456,10 @@ export class HeliumInput extends HTMLElement {
 
     /**
      * Callback for input changes.
+     * @param {Event} e 
      */
-    _handleChangeInput() {
+    _handleChangeInput(e) {
+        e.stopPropagation();
         if (this.disabled) {
             return;
         }
