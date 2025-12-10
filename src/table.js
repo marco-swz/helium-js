@@ -601,6 +601,7 @@ export class HeliumTable extends HTMLElement {
     }
 
     reset() {
+        this.offset = 0;
         this.$body.querySelectorAll('.check-row').forEach(x => x.checked = false);
         if (this.$checkAll != null) {
             this.$checkAll.checked = false;
@@ -945,6 +946,7 @@ export class HeliumTable extends HTMLElement {
      * @returns {Self}
      */
     _filterColumn($column, filterValue, exact=true) {
+        this.offset = 0;
         const colName = $column.getAttribute('column');
         let $filter = this.$form.querySelector(`.inp-filter[name="${colName}"]`);
         if ($filter != null) {
@@ -1028,8 +1030,6 @@ export class HeliumTable extends HTMLElement {
     }
 
     _handleChangeFilter(e) {
-        this.offset = 0;
-
         const filterValue = e.currentTarget.value;
         const idx = e.currentTarget.closest('td').cellIndex;
         const $col = this._getColumns(false)[idx];
@@ -1768,6 +1768,8 @@ export class HeliumTable extends HTMLElement {
      * @param {null|'desc'|'asc'} dir 
      */
     _sortColumn($column, dir) {
+        this.offset = 0;
+
         if (dir !== 'desc' && dir !== 'asc' && dir != null) {
             throw new Error(`Invalid sort direction: ${dir}`);
         }
