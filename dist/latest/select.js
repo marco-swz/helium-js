@@ -523,7 +523,7 @@ class HeliumSelect extends HTMLElement {
      * @returns {boolean} `true` if the options should be visible
      */
     _onFilterelementDefault(filterVal, $option) {
-        filterVal.toLowerCase();
+        filterVal = filterVal.toLowerCase();
         let val = $option.value ?? $option.getAttribute('value');
         return filterVal.length === 0 || (val !== '' && $option.innerText.toLowerCase().includes(filterVal))
     }
