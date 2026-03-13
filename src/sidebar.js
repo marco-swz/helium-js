@@ -1,4 +1,5 @@
-import sheet from './sidebar.css';
+// @ts-ignore
+import sheet from "./sidebar.css" with { type: "css" };
 import { HeliumTree } from './tree.js';
 
 export class HeliumSidebar extends HTMLElement {

@@ -1,0 +1,104 @@
+import { css } from 'lit-element';
+
+export const styles = css`
+ :host {
+     --he-tabs-backgroundColor: white;
+     --he-tabs-color: black;
+     --he-tabs-hover-backgroundColor: lightgrey;
+     --he-tabs-unselected-backgroundColor: whitesmoke;
+     --he-tabs-unselected-color: gray;
+     --he-tabs-height: fit-content;
+
+     display: block;
+     height: var(--he-tabs-height);
+ }
+
+ :host([variant=pebble]) {
+    & #he-tabs-nav {
+        padding: 10px 0;
+        gap: 5px;
+    }
+
+    & #he-tabs-nav label {
+        color: hsl(240 3.8% 46.1%);
+    }
+
+    & #he-tabs-nav label:has(:checked) {
+        background-color: rgb(228 228 231);
+        border-radius: 4px;
+        color: black;
+    }
+ }
+
+ :host([variant=pebble-inverted]) {
+    & #he-tabs-nav {
+        padding: 4px;
+        gap: 5px;
+        background-color: #e6e6e6;
+        width: fit-content;
+        border-radius: 8px;
+    }
+
+    & #he-tabs-nav label {
+        color: hsl(240 3.8% 46.1%);
+        border-radius: 4px;
+        font-weight: 600;
+
+        &:hover {
+            transition: color 0.2s;
+            color: black;
+        }
+    }
+
+    & #he-tabs-nav label:has(:checked) {
+        transition:
+            background-color 0.2s,
+            color 0.2s;
+        background-color: white;
+        color: black;
+    }
+ }
+
+#he-tabs-content {
+     height: var(--he-tabs-height);
+ }
+
+#he-tabs-nav {
+    display: flex;
+}
+
+:host(:not([variant])) {
+    #he-tabs-nav label {
+        color: var(--he-tabs-unselected-color);
+        border-bottom: 3px solid transparent;
+    }
+
+    #he-tabs-nav label:has(:checked) {
+        transition:
+            border-bottom-color 0.2s,
+            color 0.2s;
+        color: var(--he-tabs-color);
+        border-bottom-color: steelblue;
+    }
+
+    #he-tabs-nav label:hover {
+        transition:
+            border-bottom-color 0.2s,
+            color 0.2s;
+        border-bottom: 3px solid var(--he-tabs-hover-backgroundColor);
+    }
+
+    #he-tabs-content {
+        border-top: 1px solid grey;
+    }
+}
+
+#he-tabs-nav label {
+    font-weight: 600;
+    user-select: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+`;

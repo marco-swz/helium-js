@@ -1,0 +1,99 @@
+import { _ as __decorate, i, r, A, b } from './lit-element-C9ed7Kq3.js';
+import { t } from './custom-element-DX8pDbbK.js';
+import { n } from './property-BCLoIpyb.js';
+
+var styles = ":host {\n    --he-button-loading-cursor: default;\n    --he-button-cursor: pointer;\n    --he-button-disabled-cursor: not-allowed;\n    --he-button-borderWidth: 0.1rem;\n    --he-button-fontSize: 14px;\n    --he-button-height: 35px;\n    --he-button-width: fit-content;\n\n    --he-button-color: black;\n    --he-button-backgroundColor: white;\n    --he-button-hover-backgroundColor: hsl(240 4.8% 95.9%);\n    --he-button-hover-color: black;\n    --he-button-borderColor: hsl(240 4.9% 83.9%);\n    --he-button-hover-borderColor: var(--he-button-borderColor);\n\n    /** These vars are use for the theme styling and are private for now **/\n    --he-theme-color: var(--he-accent-color, steelblue);\n    --he-theme-bright1-color: hsl(from var(--he-theme-color) h s calc(l + 10));\n    --he-theme-contrast: white;\n\n    display: inline-block;\n    text-wrap: nowrap;\n    border-radius: 3px;\n    outline-style: none;\n    box-shadow: none !important;\n    width: var(--he-button-width);\n    min-width: var(--he-button-minWidth);\n    font-size: var(--he-button-fontSize);\n}\n\n:host([theme=danger]) {\n    --he-theme-color: hsl(0 72.2% 50.6%);\n    --he-theme-bright1-color: hsl(from var(--he-theme-color) h s calc(l + 10));\n    --he-theme-contrast: white;\n}\n\n:host([theme=warning]) {\n    --he-theme-color: hsl(32.1 94.6% 43.7%);\n    --he-theme-bright1-color: hsl(from var(--he-theme-color) h s calc(l + 10));\n    --he-theme-contrast: white;\n}\n\n:host([theme=success]) {\n    --he-theme-color: hsl(142.1 76.2% 36.3%);\n    --he-theme-bright1-color: hsl(from var(--he-theme-color) h s calc(l + 10));\n    --he-theme-contrast: white;\n}\n\n:host([theme][variant]), \n:host([theme]) {\n    --he-button-color: var(--he-theme-color);\n    --he-button-hover-color: var(--he-theme-contrast);\n    --he-button-backgroundColor: var(--he-theme-contrast);\n    --he-button-hover-backgroundColor: var(--he-theme-color);\n    --he-button-borderColor: var(--he-theme-color);\n    --he-button-hover-borderColor: var(--he-theme-color);\n}\n\n:host([variant=primary]), :host([variant=primary][theme]) {\n    --he-button-color: var(--he-theme-contrast);\n    --he-button-hover-color: var(--he-theme-contrast);\n    --he-button-backgroundColor: var(--he-theme-color);\n    --he-button-hover-backgroundColor: var(--he-theme-bright1-color);\n    --he-button-borderColor: var(--he-theme-color);\n    --he-button-hover-borderColor: var(--he-theme-bright1-color);\n}\n\n:host([variant=ghost]) {\n    --he-button-borderColor: white;\n    --he-button-hover-borderColor: var(--he-button-hover-backgroundColor);\n}\n:host([variant=ghost][theme]) {\n    --he-button-color: var(--he-theme-color);\n    --he-button-hover-color: var(--he-theme-contrast);\n    --he-button-backgroundColor: var(--he-theme-contrast);\n    --he-button-hover-backgroundColor: var(--he-theme-color);\n    --he-button-borderColor: var(--he-theme-contrast);\n    --he-button-hover-borderColor: var(--he-theme-color);\n}\n\na {\n    width: inherit;\n    cursor: inherit;\n    padding: inherit;\n    border-radius: inherit;\n    outline-style: inherit;\n    box-shadow: inherit;\n    text-shadow: inherit;\n    min-width: inherit;\n}\n\n#he-button {\n    position: relative;\n    border-radius: inherit;\n    padding: inherit;\n    vertical-align: middle;\n    text-align: center;\n    font-size: inherit;\n    background-color: var(--he-button-backgroundColor);\n    outline-style: inherit;\n    box-shadow: inherit;\n    text-shadow: inherit;\n    cursor: inherit;\n    color: var(--he-button-color);\n    height: var(--he-button-height);\n    border-width: var(--he-button-borderWidth);\n    border-style: solid;\n    border-color: var(--he-button-borderColor);\n    padding: 0px 10px;\n    font-weight: 600;\n    width: inherit;\n    overflow: hidden;\n    min-width: inherit;\n}\n\n:host([disabled]) {\n    pointer-events: none;\n}\n\n:host([disabled]) #he-button {\n    opacity: 0.5;\n    cursor: var(--he-button-disabled-cursor);\n}\n\n:host(:not([loading]):not([disabled]):hover) #he-button {\n    transition:\n        background-color 0.2s,\n        border-color 0.2s,\n        color 0.2s;\n    background-color: var(--he-button-hover-backgroundColor);\n    border-color: var(--he-button-hover-borderColor);\n    cursor: var(--he-button-cursor);\n    color: var(--he-button-hover-color);\n}\n\n:host(:not([loading]):not([disabled]):active) #he-button {\n    animation: inset-anim 0.15s 1 ease-in-out;\n}\n\n:host([loading]) {\n    pointer-events: none;\n}\n\n:host([loading]) #he-button {\n    opacity: 0.5;\n    cursor: var(--he-button-loading-cursor);\n}\n\n:host([loading]) #he-button::after {\n    content: \"\";\n    position: absolute;\n    width: 16px;\n    height: 16px;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    margin: auto;\n    border: 4px solid transparent;\n    border-top-color: var(--he-button-spinner-color, black);\n    border-radius: 50%;\n    animation: button-loading-spinner 1s ease infinite;\n}\n\n:host([ok]) #he-button::after {\n    content: \"\";\n    position: absolute;\n    width: 16px;\n    height: 16px;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    margin: auto;\n    border: 4px solid transparent;\n    border-bottom-color: var(--he-button-spinner-color, black);\n    border-right-color: var(--he-button-spinner-color, black);\n    transform: rotate(45deg);\n}\n\n@keyframes button-loading-spinner {\n    from {\n        transform: rotate(0turn);\n    }\n\n    to {\n        transform: rotate(1turn);\n    }\n}\n\n@keyframes inset-anim {\n    0% {\n        box-shadow: inset 0 0 0 0 hsl(from var(--he-button-hover-backgroundColor) h s l);\n    }\n    50% {\n        box-shadow: inset 0 0 10px 0 hsl(from var(--he-button-hover-backgroundColor) h s calc(l - 10));\n    }\n    100% {\n        box-shadow: inset 0 0 0 0 hsl(from var(--he-button-hover-backgroundColor) h s l);\n    }\n}\n";
+
+/**
+ * A simple button with pre-definied variants, themes and additional states.
+ *
+ * @cssprop [--he-button-cursor=pointer] - The default cursor type of the button
+ * @cssprop [--he-button-loading-cursor=default] - The cursor type when in `loading` state
+ * @cssprop [--he-button-disabled-cursor=not-allowed] - The cursor type when in `disabled` state
+ * @cssprop [--he-button-height=35px] - The height of the button
+ * @cssprop [--he-button-fontSize=14px] - The font size of the text
+ * @cssprop [--he-button-width=fit-content] - The button width
+ * @cssprop [--he-button-color=black] - The text color of the button
+ * @cssprop [--he-button-backgroundColor=white] - The background color of the button
+ * @cssprop [--he-button-borderWidth=0.1rem] - The border width of the button
+ * @cssprop [--he-button-borderColor=hsl(240 4.9% 83.9%)] The border color of the button
+ * @cssprop [--he-button-hover-backgroundColor=hsl(240 4.8% 95.9%)] - The background color when hovering
+ * @cssprop [--he-button-hover-color=black] - The text color when hovering
+ * @cssprop [--he-button-hover-borderColor=var(--he-button-borderColor)] - The border color when hovering
+ *
+ * @tag he-button
+ */
+let HeliumButton = class HeliumButton extends i {
+    constructor() {
+        super(...arguments);
+        /**
+         * Disables the button if set.
+         * Clicks will no longer fire events.
+         */
+        this.disabled = false;
+        /**
+         * Sets the `loading` state the button.
+         * It shows a loading animation and disables inputs.
+         */
+        this.loading = false;
+        /**
+         * This property can be used to assign a link to the button.
+         * If it is clicked, the link is opened.
+         */
+        this.href = '';
+        /**
+         * Sets the (color) theme of the button.
+         */
+        this.theme = null;
+        /**
+         * Sets the style variant of the button.
+         * @default 'outline'
+         */
+        this.variant = null;
+    }
+    static get styles() {
+        return [
+            r(styles),
+        ];
+    }
+    /**
+     * Lit render function.
+     * @internal
+     */
+    render() {
+        return b `
+            <a href=${this.href || A}>
+                <button id="he-button" @click=${() => this._handleClickButton()}>
+                    <slot></slot>
+                </button>
+            </a>
+        `;
+    }
+    /**
+     * Callback for button clicks.
+     * It is currently just a placeholder for future features.
+     * @internal
+     */
+    _handleClickButton() {
+    }
+};
+__decorate([
+    n({ type: Boolean, reflect: true })
+], HeliumButton.prototype, "disabled", void 0);
+__decorate([
+    n({ type: Boolean, reflect: true })
+], HeliumButton.prototype, "loading", void 0);
+__decorate([
+    n({ type: String, reflect: true, useDefault: true })
+], HeliumButton.prototype, "href", void 0);
+__decorate([
+    n({ reflect: true })
+], HeliumButton.prototype, "theme", void 0);
+__decorate([
+    n({ reflect: true })
+], HeliumButton.prototype, "variant", void 0);
+HeliumButton = __decorate([
+    t('he-button')
+], HeliumButton);
+
+export { HeliumButton };

@@ -1,0 +1,6 @@
+import{f as t,u as e}from"./lit-element-BFntg_Aa.js";
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */const r={attribute:!0,type:String,converter:e,reflect:!1,hasChanged:t},o=(t=r,e,o)=>{const{kind:s,metadata:n}=o;let a=globalThis.litPropertyMetadata.get(n);if(void 0===a&&globalThis.litPropertyMetadata.set(n,a=new Map),"setter"===s&&((t=Object.create(t)).wrapped=!0),a.set(o.name,t),"accessor"===s){const{name:r}=o;return{set(o){const s=e.get.call(this);e.set.call(this,o),this.requestUpdate(r,s,t,!0,o)},init(e){return void 0!==e&&this.C(r,void 0,t,e),e}}}if("setter"===s){const{name:r}=o;return function(o){const s=this[r];e.call(this,o),this.requestUpdate(r,s,t,!0,o)}}throw Error("Unsupported decorator location: "+s)};function s(t){return(e,r)=>"object"==typeof r?o(t,e,r):((t,e,r)=>{const o=e.hasOwnProperty(r);return e.constructor.createProperty(r,t),o?Object.getOwnPropertyDescriptor(e,r):void 0})(t,e,r)}export{s as n};

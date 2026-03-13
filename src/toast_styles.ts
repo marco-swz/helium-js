@@ -1,0 +1,126 @@
+import { css } from 'lit-element';
+
+export const styles = css`
+:host {
+    position: fixed;
+    top: unset;
+    right: unset;
+    left: 50%;
+    bottom: 10px;
+    transform: translateX(-50%);
+    width: 300px;
+    font-size: 16px;
+    font-weight: 500;
+    z-index: 500;
+    background-color: white;
+}
+
+:host([position=bottom-right]) {
+    top: unset;
+    left: unset;
+    bottom: 10px;
+    right: 10px;
+    transform: unset;
+}
+
+:host([position=bottom-left]) {
+    top: unset;
+    right: unset;
+    bottom: 10px;
+    left: 10px;
+    transform: unset;
+}
+
+:host([position=top-left]) {
+    bottom: unset;
+    right: unset;
+    top: 10px;
+    left: 10px;
+    transform: unset;
+}
+
+:host([position=top-right]) {
+    bottom: unset;
+    left: unset;
+    top: 10px;
+    right: 10px;
+    transform: unset;
+}
+
+:host([position=top]) {
+    bottom: unset;
+    right: unset;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#contToasts {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#toast {
+    border: 1px solid grey;
+    border-radius: var(--he-toast-radius, 3px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    border-left: 5px solid steelblue;
+}
+
+#toast[type=warn] {
+    border-left-color: var(--he-toast-clr-warn, orange);
+}
+
+#toast[type=error] {
+    border-left-color: var(--he-toast-clr-error, indianred);
+}
+
+#toast[type=success] {
+    border-left-color: var(--he-toast-clr-success, seagreen);
+}
+
+#bar {
+    width: 100%;
+    height: 3px;
+    background-color: lightgrey;
+    margin-right: auto;
+}
+
+#contMain {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#contText {
+    padding: 1rem 2rem;
+    font-size: inherit;
+}
+
+@property --circle-fill {
+    syntax: '<percentage>';
+    inherits: false;
+    initial-value: 0%;
+}
+
+#btnClose {
+    --circle-fill: 0%;
+    border-radius: 50%;
+    font-size: 20px;
+    font-weight: 500;
+    margin-right: 10px;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    /* background: conic-gradient(lightgrey var(--circle-fill), white 0); */
+}
+
+#btnClose:hover {
+    /* --circle-fill: 100%; */
+    background-color: whitesmoke;
+}
+`

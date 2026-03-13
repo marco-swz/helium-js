@@ -1,0 +1,235 @@
+import { css } from 'lit-element';
+
+export const styles = css`
+:host {
+    --he-select-backgroundColor: whitesmoke;
+    --he-select-borderColor: lightgrey;
+    --he-select-borderWidth: 1px;
+    --he-select-borderRadius: 3px;
+    --he-select-hover-borderColor: grey;
+    --he-select-color: black;
+    --he-select-padding: 0.3rem 0.4rem;
+    --he-select-popover-borderRadius: 4px;
+    --he-select-popover-maxHeight: 300px;
+    --he-select-popover-maxWidth: 300px;
+    /*--he-select-popover-width: fit-content;*/
+    --he-select-popover-backgroundColor: white;
+    --he-select-option-hover-backgroundColor: whitesmoke;
+    --he-select-option-selected-backgroundColor: whitesmoke;
+    --he-select-after-margin: auto 4px auto auto;
+    --he-select-after-content: "▼";
+    --he-select-after-fontSize: 10px;
+    --he-select-after-display: block;
+    --he-select-after-padding: 0px 2px 0px 5px;
+    --he-select-disabled-color: hsl(from var(--he-select-color) h s calc(l + 50));
+    --he-select-readonly-color: var(--he-select-color);
+    --he-select-before-color: black;
+    --he-select-before-content: '';
+    --he-select-before-fontFamily: 'Font Awesome 5 Pro';
+    --he-select-before-display: 'none';
+    --he-select-before-fontSize: 10px;
+    --he-select-before-padding: 0;
+
+    height: 1.6rem;
+    font-size: 14px;
+    min-width: 150px;
+    width: 150px;
+    display: inline-block;
+}
+
+:host([readonly]), 
+:host([readonly])::slotted([slot=button]) {
+    pointer-events: none;
+    color: var(--he-select-readonly-color);
+}
+
+:host([disabled]), 
+:host([disabled])::slotted([slot=button]) {
+    pointer-events: none;
+    color: var(--he-select-disabled-color);
+}
+
+:host([variant="underline"]) {
+    & #inp {
+        border-top: 0;
+        border-left: 0;
+        border-right: 0;
+        border-radius: 0;
+    }
+}
+
+:host([empty]) {
+    cursor: default;
+    pointer-events: none;
+}
+
+#cont-button {
+    height: inherit;
+    width: inherit;
+    display: flex;
+    align-items: center;
+    background-color: var(--he-select-backgroundColor);
+    border-width: var(--he-select-borderWidth);
+    border-radius: var(--he-select-borderRadius);
+    border-color: var(--he-select-borderColor);
+    border-style: solid;
+    padding: 0;
+
+    &::before {
+        content: var(--he-select-before-content);
+        color: var(--he-select-before-color);
+        font-family: var(--he-select-before-fontFamily);
+        font-size: var(--he-select-before-fontSize);
+        display: var(--he-select-before-display);
+        padding: var(--he-select-before-padding);
+    }
+
+    &::after {
+        content: var(--he-select-after-content);
+        font-size: var(--he-select-after-fontSize);
+        display: var(--he-select-after-display);
+        margin: var(--he-select-after-margin);
+        padding: var(--he-select-after-padding);
+    }
+}
+
+#inp {
+    position: relative;
+    font-size: inherit;
+    border-radius: var(--he-select-borderRadius);
+    width: 100%;
+    height: inherit;
+    min-width: inherit;
+    outline: none;
+    text-align: left;
+    padding: var(--he-select-padding);
+    background-color: var(--he-select-backgroundColor);
+    text-wrap: nowrap;
+    border: 0;
+    color: inherit;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    align-items: center;
+}
+
+#inp:hover {
+    transition:
+        border-color 0.2s;
+    cursor: pointer;
+    border-color: var(--he-select-hover-borderColor);
+}
+
+#popover-content {
+    width: min-content;
+    border-radius: var(--he-select-popover-borderRadius);
+}
+
+#cont-options {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--he-select-popover-backgroundColor);
+    max-height: var(--he-select-popover-maxHeight);
+    width: var(--he-select-popover-width);
+    overflow: auto;
+    overscroll-behavior: contain;
+    user-select: none;
+}
+
+slot[name=option] {
+    display: inline-flex;
+    flex-direction: column;
+}
+
+slot[name=button] {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+#cont-options option,
+::slotted(*) {
+    padding: 5px 10px;
+    border-radius: 3px;
+    text-align: left;
+    width: 100%;
+    width: -moz-available;          /* WebKit-based browsers will ignore this. */
+    width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
+    width: fill-available;
+    display: inline-block;
+    align-items: center;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+#cont-options option[selected]::before,
+::slotted([slot=option][selected])::before {
+    font-family: "Font Awesome 5 Pro";
+    content: "\f00c";
+    font-weight: 600;
+    margin-right: 6px;
+    color: steelblue;
+}
+
+#cont-options:not(:hover) option[highlighted],
+#cont-options:not(:hover) ::slotted([slot=option][highlighted]) {
+    background-color: var(--he-select-option-selected-backgroundColor);
+}
+
+#cont-options option:hover:not(:disabled),
+::slotted([slot=option]:hover:not(:disabled))
+{
+    background-color: var(--he-select-option-hover-backgroundColor);
+    cursor: pointer;
+}
+
+#filter {
+    width: 100%;
+    width: -moz-available;          /* WebKit-based browsers will ignore this. */
+    width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
+    width: fill-available;
+    margin: 3px;
+}
+
+:host([filter="inline"]) {
+    & #filter {
+        --he-input-padding: 0;
+        padding: var(--he-select-padding);
+        border: 0;
+        font-size: inherit;
+        width: 100%;
+        margin: 0;
+        min-width: inherit;
+        border-radius: var(--he-select-borderRadius);
+        background-color: var(--he-select-backgroundColor);
+        outline: none;
+        text-align: left;
+        text-wrap: nowrap;
+        color: inherit;
+    }
+}
+
+:host([multiple]) {
+    & #cont-button {
+        & #inp {
+            display: flex;
+            gap: 3px;
+
+            & span:not(.placeholder) {
+                display: inline-table;
+                align-items: center;
+                border: 1px solid lightgrey;
+                border-radius: 5px;
+                padding: 2px 5px;
+                background-color: white;
+                overflow: hidden;
+                width: fit-content;
+                text-overflow: ellipsis;
+            }
+
+            & span.placeholder {
+                color: grey;
+            }
+        }
+    }
+}
+`;

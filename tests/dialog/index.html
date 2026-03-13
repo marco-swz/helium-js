@@ -2,13 +2,26 @@
 <html lang=en>
 <head>
     <meta charset=utf-8>
-    <script src="/dist/latest/dialog.js" type="module"></script>
+    <script src="/dist/1.0.0/dialog.js" type="module"></script>
 </head>
 
 <body>
-    <he-dialog id="test-open-close-events">
-        <div slot="body"></div>
-        <div slot="footer"><button>Ok</button></div>
+    <he-dialog id="test-slots-default">
+        <div>Default</div>
+        <div slot="footer">Footer</div>
+        <div slot="title">Title</div>
+    </he-dialog>
+
+    <he-dialog id="test-slots-body">
+        <div slot="body">Body</div>
+    </he-dialog>
+
+    <he-dialog id="test-open-close">
+        <div slot="body">Open</div>
+    </he-dialog>
+
+    <he-dialog id="test-outside-close">
+        <div>OutsideClose</div>
     </he-dialog>
 </body>
 
